@@ -1,4 +1,4 @@
-# KCSナビ バックエンド設計
+# KCS Navi データベース設計
 
 KCSナビのデータベースを設計・実装する際の指針とする。[requirements.md](requirements.md) の機能要件のうち、優先度が Must（MUST）のものを対象とし、Should（SHOULD）・Could（COULD）の機能は実装対象に含めない。
 
