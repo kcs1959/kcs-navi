@@ -10,21 +10,24 @@ TODO: 以下をまとめる。
 
 # 例（リアクションの登録API）
 
-QRコードチェックイン API
+# QRコードチェックイン API
 
-1.機能
-来場者が会場入口のQRコードをスマートフォンで読み取ることで、イベントへのチェックイン処理を行う機能。
-QRコード（トークン）の有効性検証、二重チェックインの防止、チェックイン日時の記録を行う。
+## 1.機能
 
-2.HTTPリクエストメソッド
-POST
+- 来場者が会場入口のQRコードをスマートフォンで読み取ることで、イベントへのチェックイン処理を行う機能。
+- QRコード（トークン）の有効性検証、二重チェックインの防止、チェックイン日時の記録を行う。
 
-3.URL
-/api/v1/events/{eventId}/check-in
+## 2.HTTPリクエストメソッド
 
-4.レスポンスのJSON形式
+- POST
 
-Case1.成功時 (200 OK)
+## 3.URL
+
+- /api/v1/events/{eventId}/check-in
+
+## 4.レスポンスのJSON形式
+
+### Case1.成功時 (200 OK)
 
 {
 "status": "success",
@@ -37,15 +40,17 @@ Case1.成功時 (200 OK)
 }
 }
 
-Case2.エラー時 (400 Bad Request)
+### Case2.エラー時 (400 Bad Request)
+
 {
 "status": "fail",
 "message": "すでにチェックインが完了しています。"
 }
 
-5.疑似コード
+## 5.疑似コード
 
-Controller:
+### Controller:
+
 class CheckInController {
 constructor(checkInService) {
 this.checkInService = checkInService;
@@ -85,7 +90,8 @@ message: "内部サーバーエラーが発生しました。"
 }
 }
 
-Service:
+### Service:
+
 class CheckInService {
 constructor(checkInRepository, eventRepository) {
 this.checkInRepository = checkInRepository;
@@ -115,7 +121,8 @@ return await this.checkInRepository.save(checkInRecord);
 }
 }
 
-Repository:
+### Repository:
+
 class CheckInRepository {
 constructor(dbClient) {
 this.dbClient = dbClient;
