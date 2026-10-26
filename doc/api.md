@@ -2,36 +2,41 @@
 
 TODO: 以下をまとめる。
 
-- APIの持つ機能
+- そのAPIの持つ機能
 - HTTPリクエストメソッド
 - URL
 - レスポンスのJSON形式
 - Controller・Service・Repositoryの疑似コード（発展）
 
 # 例（リアクションの登録API）
-
 1. APIの持つ機能
-
-- 展示作品に対して、来場者が「いいね」を登録できる。
-- 指定された展示作品に「いいね」を追加する
-- 展示作品が存在するか確認する
-- 同一来場者による重複登録を防止する（発展）
-- 登録後のリアクション総数を取得して返す
-- ログインなしで利用できる
-
+- 指定された班の情報を取得する
+- 名前、画像（もしあれば）、その班の説明を返す
 2. HTTPリクエストメソッド
-
-- POST
-
+- GET
 3. URL
-
-- `POST /api/v1/exhibits/{exhibit_id}/reactions`
-
+- /api/teams/{groupId}
 4. レスポンス形式
 
-```
-   {
-   "exhibit_id": 123,
-   "reaction_count": 21
-   }
-```
+[
+  {
+    "id": 1,
+    "name": "Web班",
+    "description": "ウェブサイトを開発しています。",
+    "members": [
+      {
+        "id": 101,
+        "role": "班長",
+        "name": "骨なしチキン"
+      }
+    ],
+    "imageUrl": "/images/teams/web.png"
+  },
+  {
+    "id": 2,
+    "name": "音楽班",
+    "description": "音楽を作成しています。",
+    "members": [],
+    "imageUrl": null
+  }
+]
