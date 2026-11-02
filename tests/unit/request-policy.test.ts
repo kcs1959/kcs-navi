@@ -6,9 +6,11 @@ import {
 } from '../../server/services/request-policy'
 
 describe('write request origin policy', () => {
-  const siteUrl = 'http://localhost:3000' // TODO: ハードコーディングしない
+  // 環境変数に依存せず、関数に渡す比較用のURLを固定する。
+  const siteUrl = 'http://localhost:3001'
   it('allows native forms and fetch from the configured origin', () => {
     expect(isSameOriginPost(siteUrl, 'same-origin', siteUrl)).toBe(true)
+    expect(isSameOriginPost(siteUrl, undefined, siteUrl)).toBe(true)
     expect(isSameOriginPost(undefined, 'same-origin', siteUrl)).toBe(true)
   })
   it('rejects cross-site, cross-port, absent and malformed origins', () => {
