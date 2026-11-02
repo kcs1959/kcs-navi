@@ -7,7 +7,7 @@ git clone https://github.com/kcs1959/kcs-navi.git
 cd kcs-navi
 
 nvm install # Node.jsのインストール
-nvm use # Node.jsのバージョンを設定ファイル通りに切り替える
+nvm use # Node.jsのバージョンを`.nvmrcで書かれているものに切り替える
 npm install --global npm@11.13.0 # npmパッケージのインストール
 
 # 入ったか確認
@@ -66,7 +66,7 @@ npm install --global d1s@0.3.16
 d1studio
 ```
 
-# 通常開発時のコマンド
+# 通常開発時
 
 ## 1. 依存ライブラリを追加・変更したとき
 
@@ -84,7 +84,7 @@ npm install
 npm run dev
 ```
 
-## 3. 班・作品のデータを変更したとき
+## 3. 実データを変更したとき
 
 `seeds/` 内のSQLを編集し、編集したファイルを指定して手動で投入する。
 
