@@ -1,0 +1,21 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="302" height="124" viewBox="0 0 302 124" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame" clip-path="url(#clip0_0_45)">
+<path id="Vector" d="M254 82.6667C289.346 82.6667 318 58.9795 318 29.76C318 0.540453 289.346 -23.1467 254 -23.1467C218.654 -23.1467 190 0.540453 190 29.76C190 58.9795 218.654 82.6667 254 82.6667Z" fill="#EFF7EB"/>
+<path id="Vector_2" d="M10 107.467L62 49.6L126 107.467H10Z" fill="#BDD6BA"/>
+<path id="Vector_3" d="M210 119.867L259 66.1333L309 119.867H210Z" fill="#BDD6BA"/>
+<g id="Group">
+<path id="Vector_4" d="M113 35.5467H190C201.333 36.0978 208.667 42.16 212 53.7333L223 85.9733C227 101.404 221 106.089 205 100.027L179 83.4933H124L97 100.027C82.3333 106.089 76.6667 101.404 80 85.9733L91 53.7333C94.3333 41.6089 101.667 35.5467 113 35.5467Z" fill="#FFFCF5" stroke-width="3" stroke="#4B2D22"/>
+</g>
+<g id="Vector_5">
+<path d="M113 50.4267V74.4ZM99 62.8267H127Z" fill="black"/>
+<path d="M113 50.4267V74.4M99 62.8267H127" stroke-width="5" stroke-linecap="round" stroke="#4B2D22"/>
+</g>
+<path id="Vector_6" d="M178 58.6933C181.314 58.6933 184 56.4727 184 53.7333C184 50.994 181.314 48.7733 178 48.7733C174.686 48.7733 172 50.994 172 53.7333C172 56.4727 174.686 58.6933 178 58.6933Z" fill="#EE8B4A"/>
+<path id="Vector_7" d="M194 72.7467C197.314 72.7467 200 70.526 200 67.7867C200 65.0473 197.314 62.8267 194 62.8267C190.686 62.8267 188 65.0473 188 67.7867C188 70.526 190.686 72.7467 194 72.7467Z" fill="#EE8B4A"/>
+</g>
+<defs>
+<clipPath id="clip0_0_45">
+<rect width="302" height="124" fill="white"/>
+</clipPath>
+</defs>
+</svg>

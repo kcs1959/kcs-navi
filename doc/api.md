@@ -1,271 +1,112 @@
-# KCS Navi API設計
+# KCS Navi API
 
-TODO: 以下をまとめる。
+`requirements.md` の開発スコープ（第3節）を優先したプロトタイプ仕様。旧案の `/api/v1`、QRトークン、利用者ID、重複排除、制作者名、`desks` テーブルは使用しない。
 
-- APIの持つ機能
-- HTTPリクエストメソッド
-- URL
-- レスポンスのJSON形式
-- Controller・Service・Repositoryの疑似コード（発展）
+## データモード
 
-# リアクションの登録API
+- `NUXT_DATA_MODE=demo`: プロセス内の架空データ。再起動でチェックイン・いいねはリセットされる。JSONには `mode: "demo"` を返す。
+- `NUXT_DATA_MODE=d1`: Cloudflareの `DB` バインディングを使う。D1未接続・読み書き失敗時は503とし、デモへ自動切替しない。
+- 本番ではモードの既定値を空にする。実データの運用はD1を選択し、明示した `demo` 設定ではCloudflare上でも架空データのプレビューを表示できる。
 
-1. APIの持つ機能
+全APIは認証不要。読み取り結果と書き込み結果には `Cache-Control: no-store` を付ける。
 
-- 展示作品に対して、来場者が「いいね」を登録できる。
-- 指定された展示作品に「いいね」を追加する
-- 展示作品が存在するか確認する
-- 同一来場者による重複登録を防止する（発展）
-- 登録後のリアクション総数を取得して返す
-- ログインなしで利用できる
+## GET /api/exhibitions
 
-2. HTTPリクエストメソッド
-
-- POST
-
-3. URL
-
-- `POST /api/v1/exhibits/{exhibit_id}/reactions`
-
-4. レスポンス形式
-
-```
-   {
-   "exhibit_id": 123,
-   "reaction_count": 21
-   }
-```
-
-# 展示作品取得API
-
-1. APIのもつ機能
-
-- 来場者が地図上で選択した机の展示作品を取得できる(F-03)
-- 作品名、説明、制作者名、所属班名、制作者コメントを返す(F-04)
-- 作品ごとのリアクション数を返す(F-25)
-- ログインなしで利用できる
-
-2. HTTPリクエストメソッド
-   データを読むだけなのでGETのみ。
-
-- GET　
-
-# 来場者数集計API
-
-1. APIの持つ機能 -当日のチェックイン数（延べ人数）を集計する -日別のチェックイン数を集計する（F-15）。-時間別のチェックイン数を集計する（F-16）。-日本時間（Asia/Tokyo）を基準に集計する。-集計結果をJSON形式で返す。-チェックイン記録が存在しない場合、当日のチェックイン数は0件として返す。-ログインなしで利用できる。
-
-2. HTTPリクエストメソッド
-
-- GET
-
-3. URL
-
-- `GET /api/v1/checkins/stats`
-
-4. レスポンス形式
-
-```
-   {
-  "today": {
-    "date": "2026-10-26",
-    "count": 120
-  },
-  "daily": [
+```json
+{
+  "mode": "demo",
+  "exhibitions": [
     {
-      "date": "2026-10-25",
-      "count": 80
-    },
-    {
-      "date": "2026-10-26",
-      "count": 120
-    }
-  ],
-  "hourly": [
-    {
-      "hour": "2026-10-26T10:00:00+09:00",
-      "count": 35
-    },
-    {
-      "hour": "2026-10-26T11:00:00+09:00",
-      "count": 42
+      "id": 1,
+      "teamId": 1,
+      "deskKey": "desk-a",
+      "title": "空を歩くVR",
+      "description": "作品の説明",
+      "creatorComment": "制作者コメント",
+      "likes": 24
     }
   ]
 }
 ```
 
-# QRコードチェックイン API
+机は固定設定の `desk-a`、`desk-b`、`desk-c`。同じ `deskKey` を持つ作品を複数返せる。制作者を表示する場合は登録者がコメント本文に含める。
 
-## 1.機能
+## GET /api/teams
 
-- 来場者が会場入口のQRコードをスマートフォンで読み取ることで、イベントへのチェックイン処理を行う機能。
-- QRコード（トークン）の有効性検証、二重チェックインの防止、チェックイン日時の記録を行う。
-
-## 2.HTTPリクエストメソッド
-
-- POST
-
-## 3.URL
-
-- /api/v1/events/{eventId}/check-in
-
-## 4.レスポンスのJSON形式
-
-### Case1.成功時 (200 OK)
-
+```json
 {
-"status": "success",
-"data": {
-"checkInId": "chk_88291039",
-"eventId": "evt_12345678",
-"userId": "usr_98765432",
-"status": "CHECKED_IN",
-"checkedInAt": "2026-10-26T19:50:00Z"
+  "mode": "demo",
+  "teams": [
+    {
+      "id": 1,
+      "key": "vr",
+      "name": "VR・体験班",
+      "description": "班の紹介文"
+    }
+  ]
 }
-}
+```
 
-### Case2.エラー時 (400 Bad Request)
+## POST /api/exhibitions/:id/likes
 
+リクエスト本文なし。作品IDは正の安全な整数。1リクエストでいいねを1件追加し、更新後の合計を返す。匿名識別や利用者ごとの一意制約は設けない。
+
+```json
+{ "mode": "demo", "exhibitionId": 1, "likes": 25 }
+```
+
+成功200、ID不正400、作品なし404。
+
+## GET /checkin → POST /api/checkins → GET /welcome
+
+入口QRのURLは `NUXT_PUBLIC_SITE_URL` + `/checkin`。受付ページの読み込み時にJavaScriptが空のフォームを1回自動POSTする。利用者が操作する登録・確認ボタンは設けない。
+
+`POST /api/checkins` は本文を受け取らず、保存成功後に **303、Location: /welcome?checkedInAt=<サーバー時刻>&mode=demo|d1** を返す。時刻は受付時刻の表示用途に限り、識別子や入場証明として扱わない。受け付けたPOSTは毎回1件増やす。利用者ID・識別Cookie・QRトークン・再入場判定・二重登録抑制は設けない。日時はクライアント値を受け付けず、D1の時刻を保存する。WelcomeのGETや再読込では追加登録しない。
+
+JavaScript無効時や通信失敗時は受付ページで状態を伝える。HTMLフォームのエラーは `/checkin?error=busy|forbidden|unavailable` へ303で戻し、自動POSTを停止して再試行リンクを表示する。JSONクライアントには元のエラーステータスを返す。識別情報を持たせないため、Welcomeの直アクセスだけではチェックインの成否を証明しない。
+
+## GET /api/checkins/stats
+
+```json
 {
-"status": "fail",
-"message": "すでにチェックインが完了しています。"
+  "mode": "demo",
+  "today": { "date": "2026-11-01", "count": 18 },
+  "daily": [{ "date": "2026-11-01", "count": 18 }],
+  "hourly": [{ "hour": "2026-11-01T10:00:00+09:00", "count": 18 }],
+  "congestion": {
+    "estimatedVisitors": 10,
+    "estimatedRate": 25,
+    "capacity": 40,
+    "windowMinutes": 20,
+    "level": "relaxed",
+    "label": "ゆったり",
+    "calculatedAt": "2026-11-01T01:10:00.000Z",
+    "lastCheckinAt": "2026-11-01T01:08:00.000Z"
+  }
 }
+```
 
-## 5.疑似コード
+- JSTの日別・日付を含む1時間単位で全記録を集計する。当日はJSTの00:00以上・翌00:00未満。0件なら当日件数は0、日別・時間別は空配列。
+- 直近20分は基準時刻の20分前**以上**・基準時刻**以下**。未来の記録はどの集計からも除く。
+- 開催時刻が確定していないため、開催時間外も受け付けた記録は集計する。
+- 推定混雑率 = 推定滞在人数 ÷ 40 × 100。100%を超えても切り詰めない。
+- 50%未満 `relaxed`（ゆったり）、50%以上80%未満 `moderate`（やや混雑）、80%以上 `busy`（混雑）。
+- 計算ごとにD1の基準時刻を取得する。記録がなければ `lastCheckinAt` は `null`。フロントエンドは30秒ごとに再取得する。
+- 実測ではなく「推定滞在人数」「推定混雑率」と明記する。
 
-### Controller:
+## 書き込みの保護・エラー
 
-class CheckInController {
-constructor(checkInService) {
-this.checkInService = checkInService;
-}
+POSTは設定済み `NUXT_PUBLIC_SITE_URL` と `Origin` の一致を要求する。Originがない場合は `Sec-Fetch-Site: same-origin` のみ許可する。別Origin・別サブドメインからの要求は403。本文付き要求は400。
 
-async handleCheckIn(req, res) {
-try {
-const eventId = req.params.eventId;
+IPやCookieを保存しない、プロセス単位のトークンバケットを使用する。上限はチェックイン120件/分、いいね360件/分。超過時は429と `Retry-After: 1`。各Workerプロセスの枠は独立しているため、公開時のCloudflare側レート制限と併用する想定。これは連続送信への緩和策であり、利用者の重複判定ではない。
 
-const userId = req.user.id;
-const { qrToken } = req.body;
+DB障害は503。DBの例外詳細はサーバーログに記録し、レスポンスには一般向けメッセージを返す。フロントエンドは読み込み・失敗・再試行を表示する。
 
-if (!qrToken) {
-return res.status(400).json({
-status: "fail",
-message: "QRトークンが必要です。"
-});
-}
+## 層の責務
 
-const result = await this.checkInService.processCheckIn(eventId, userId, qrToken);
-return res.status(200).json({
-status: "success",
-data: result
-});
-} catch (error) {
-if (error.isBusinessError) {
-return res.status(400).json({
-status: "fail",
-message: error.message
-});
-}
-return res.status(500).json({
-status: "error",
-message: "内部サーバーエラーが発生しました。"
-});
-}
-}
-}
+- `server/api`: HTTP、入力検証、Origin、リダイレクト。
+- `server/services`: JST集計・推定値・混雑しきい値、入力・連続送信ポリシー。
+- `server/repositories`: デモメモリとD1の読み書き。D1のパラメータはバインドする。
+- `shared/types.ts`: フロントエンドとAPI間の型。
 
-### Service:
-
-class CheckInService {
-constructor(checkInRepository, eventRepository) {
-this.checkInRepository = checkInRepository;
-this.eventRepository = eventRepository;
-}
-
-async processCheckIn(eventId, userId, qrToken) {
-const event = await this.eventRepository.findByQrToken(qrToken);
-if (!event || event.id !== eventId) {
-throw new BusinessError("無効なQRコードです。");
-}
-
-const existingCheckIn = await this.checkInRepository.findByUserAndEvent(userId, eventId);
-if (existingCheckIn) {
-throw new BusinessError("すでにチェックインが完了しています。");
-}
-
-const checkInRecord = {
-checkInId: "chk\_" + generateUniqueId(),
-eventId: eventId,
-userId: userId,
-status: "CHECKED_IN",
-checkedInAt: new Date().toISOString()
-};
-
-return await this.checkInRepository.save(checkInRecord);
-}
-}
-
-### Repository:
-
-class CheckInRepository {
-constructor(dbClient) {
-this.dbClient = dbClient;
-}
-
-async findByUserAndEvent(userId, eventId) {
-const query = "SELECT \* FROM check_ins WHERE user_id = ? AND event_id = ?";
-const result = await this.dbClient.queryOne(query, [userId, eventId]);
-return result || null;
-}
-
-async save(record) {
-const query = "INSERT INTO check_ins (id, event_id, user_id, status, checked_in_at) VALUES (?, ?, ?, ?, ?)";
-await this.dbClient.execute(query, [
-record.checkInId,
-record.eventId,
-record.userId,
-record.status,
-record.checkedInAt
-]);
-return record;
-}
-}
-
-# 班情報取得API
-
-1. APIの持つ機能
-
-- 指定された班の情報を取得する
-- 名前、画像（もしあれば）、その班の説明を返す
-
-2. HTTPリクエストメソッド
-
-- GET
-
-3. URL
-
-- /api/teams/{groupId}
-
-4. レスポンス形式
-
-[
-{
-"id": 1,
-"name": "Web班",
-"description": "ウェブサイトを開発しています。",
-"members": [
-{
-"id": 101,
-"role": "班長",
-"name": "骨なしチキン"
-}
-],
-"imageUrl": "/images/teams/web.png"
-},
-{
-"id": 2,
-"name": "音楽班",
-"description": "音楽を作成しています。",
-"members": [],
-"imageUrl": null
-}
-]
+DBスキーマは `migrations/0001_create_exhibitions.sql` が実装上の定義。4テーブルは `teams`、`exhibitions`、`checkins`、`likes`。`seeds/test.sql` はローカル検証用の架空の班・作品のみを含み、実際のDB投入は開発者が行う。
