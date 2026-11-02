@@ -37,14 +37,8 @@ const filteredWorks = computed(() => {
   const keyword = search.value.trim().toLocaleLowerCase('ja')
   return (works.value?.exhibitions ?? []).filter((work) => {
     const team = teams.value.find((item) => item.id === work.teamId)
-    // 班の紹介ページからは ID と key のどちらでも絞り込めるようにする。
-    const matchesTeam =
-      !selectedTeam.value ||
-      String(work.teamId) === selectedTeam.value ||
-      team?.key === selectedTeam.value
     return (
-      matchesTeam &&
-      (!keyword || `${work.title} ${team?.name ?? ''}`.toLocaleLowerCase('ja').includes(keyword))
+      !keyword || `${work.title} ${team?.name ?? ''}`.toLocaleLowerCase('ja').includes(keyword)
     )
   })
 })
@@ -66,27 +60,6 @@ function clearFilters() {
       title="展示作品"
       description="KCSのメンバーが制作しました！"
     />
-
-    <div class="discovery-hint">
-      <img src="/figma/works-icon-search.svg" alt="" width="20" height="20" />
-      <p>班を選んで、作品を絞り込もう</p>
-    </div>
-
-    <div class="discovery-controls">
-      <label class="filter-label">
-        <span>班で絞り込む</span>
-        <select v-model="selectedTeam">
-          <option value="">すべての班</option>
-          <option v-for="team in teams" :key="team.id" :value="String(team.id)">
-            {{ team.name }}
-          </option>
-        </select>
-      </label>
-      <label class="filter-label">
-        <span>作品名・班名で検索</span>
-        <input v-model="search" type="search" placeholder="気になる作品を探す" />
-      </label>
-    </div>
 
     <div v-if="worksError || teamsError" class="error-card" role="alert">
       <p>展示情報を読み込めませんでした。</p>
@@ -116,44 +89,6 @@ function clearFilters() {
 <style scoped>
 .works-page {
   gap: 16px;
-}
-.discovery-hint {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px;
-  border-radius: 20px;
-  background: var(--kcs-white, #fff);
-}
-.discovery-hint img {
-  flex: none;
-}
-.discovery-hint p {
-  margin: 0;
-  color: var(--kcs-muted, #7d5b49);
-  font-size: 12px;
-}
-.discovery-controls {
-  display: grid;
-  gap: 10px;
-}
-.filter-label {
-  display: grid;
-  gap: 5px;
-  font-size: 10px;
-  color: var(--kcs-muted, #7d5b49);
-}
-.filter-label select,
-.filter-label input {
-  width: 100%;
-  min-height: 44px;
-  border: 1px solid var(--kcs-line, #ead6c5);
-  border-radius: 12px;
-  padding: 10px 12px;
-  background: white;
-  color: var(--kcs-ink, #4b2d22);
-  font: inherit;
-  font-size: 12px;
 }
 .result-count {
   margin: -4px 0;
