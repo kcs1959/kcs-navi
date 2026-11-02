@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Exhibition, Team } from '../../shared/types'
-import { getTeamPresentation } from '../utils/teamPresentation'
 const props = defineProps<{
   exhibition: Exhibition
   team?: Team
@@ -14,8 +13,6 @@ const submitting = ref(false)
 const likeError = ref('')
 const liked = ref(false)
 const { updateLikes } = useExhibitionDialog()
-const presentation = computed(() => getTeamPresentation(props.team?.key))
-const artwork = computed(() => presentation.value.detail)
 watch(
   () => props.exhibition.id,
   () => {
@@ -87,14 +84,8 @@ function dismissBackdrop(event: MouseEvent) {
           {{ index + 1 }}. {{ item.title }}
         </button>
       </div>
-      <div v-if="artwork" class="detail-artwork" :style="{ background: presentation.tint }">
-        <img :src="artwork.src" alt="" :width="artwork.width" :height="artwork.height" />
-      </div>
       <div class="detail-tags">
-        <NuxtLink
-          class="chip"
-          :style="{ background: presentation.tint }"
-          :to="`/teams/${team?.id ?? exhibition.teamId}`"
+        <NuxtLink class="chip" :to="`/teams/${team?.id ?? exhibition.teamId}`"
           >{{ team?.name ?? '班紹介' }} ↗</NuxtLink
         >
       </div>
@@ -107,7 +98,7 @@ function dismissBackdrop(event: MouseEvent) {
         <p>班の情報を取得できませんでした。</p>
         <button class="secondary-button" @click="emit('retryTeams')">班の情報を再読み込み</button>
       </div>
-      <section class="creator-comment" :style="{ background: presentation.tint }">
+      <section class="creator-comment">
         <h3>制作者より</h3>
         <p>{{ exhibition.creatorComment }}</p>
       </section>
@@ -141,8 +132,7 @@ function dismissBackdrop(event: MouseEvent) {
   backdrop-filter: blur(3px);
 }
 .detail-body {
-  /* ダイアログの1px枠を差し引き、302pxのFigma素材を縮小せず配置する。 */
-  padding: 19px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -162,16 +152,6 @@ function dismissBackdrop(event: MouseEvent) {
   background: var(--paper);
   flex-shrink: 0;
 }
-.detail-artwork {
-  overflow: hidden;
-  border-radius: 20px;
-}
-.detail-artwork img {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  margin: auto;
-}
 .detail-tags {
   display: flex;
   gap: 8px;
@@ -186,6 +166,7 @@ function dismissBackdrop(event: MouseEvent) {
   color: var(--muted);
 }
 .creator-comment {
+  background: var(--paper);
   padding: 12px;
   border-radius: 20px;
   border: 1px solid var(--line);

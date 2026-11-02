@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
-import { getTeamPresentation } from '../utils/teamPresentation'
 
 useHead({ title: '会場マップ' })
 const { data, error, status, refresh } = await useFetch<ExhibitionsResponse>('/api/exhibitions', {
@@ -14,7 +13,9 @@ const {
   status: statsStatus,
   refresh: refreshStats,
 } = useCrowdStats()
-// deskKeyはDBの作品に対応する固定キー。座標編集やdesksテーブルを用いず配置を管理する。
+
+// TODO: 地図表示ロジック要検討（3D?）
+// deskKeyはDBの作品に対応する固定キー（仮）
 const deskPositions = ['desk-a', 'desk-b', 'desk-c']
 const worksAvailable = computed(
   () => Boolean(data.value) && !error.value && status.value !== 'pending',
@@ -29,9 +30,6 @@ const desks = computed(() =>
     const teams =
       teamData.value?.teams.filter((team) => works.some((work) => work.teamId === team.id)) ?? []
     const teamNames = [...new Set(teams.map((team) => team.name))]
-    // 位置と装飾色だけを固定し、机の名前や作品はすべて現在のD1登録内容から求める。
-    // 複数の班が利用する机や未対応の班に、特定分野のアイコンを当てはめない。
-    const icon = teams.length === 1 ? getTeamPresentation(teams[0]!.key).mapIcon : undefined
     // 取得前・取得失敗の件数を0と扱わず、実際に空の机と区別する。
     const count = worksAvailable.value ? works.length : null
     return {
@@ -46,7 +44,6 @@ const desks = computed(() =>
       countLabel:
         count === null ? (status.value === 'pending' ? '読み込み中' : '未取得') : `${count}作品`,
       titles: works.map((work) => work.title).join('、'),
-      icon,
       class: `desk-position-${index + 1}`,
     }
   }),
@@ -85,18 +82,8 @@ function selectDesk(key: string) {
           :aria-label="`${desk.label}、展示机${desk.letter}、${desk.countLabel}${desk.titles ? `：${desk.titles}の詳細を見る` : ''}`"
           @click="selectDesk(desk.key)"
         >
-          <img
-            v-if="desk.icon"
-            :src="desk.icon.src"
-            alt=""
-            :width="desk.icon.width"
-            :height="desk.icon.height"
-          />
-          <span v-else class="desk-letter" aria-hidden="true">{{ desk.letter }}</span>
           <span class="desk-label">{{ desk.label }}</span>
-          <span v-if="desk.key !== 'desk-c'" class="chip desk-count"
-            >{{ desk.number }} · {{ desk.countLabel }}</span
-          >
+          <span class="chip desk-count">{{ desk.number }} · {{ desk.countLabel }}</span>
         </button>
       </div>
     </section>
@@ -158,7 +145,7 @@ function selectDesk(key: string) {
   background: white;
   border: 1px solid var(--line);
   border-radius: 12px;
-  /* DBの長い班名が2行になっても、アイコンと件数を固定サイズの机内に収める。 */
+  /* DBの長い班名が2行になっても、件数とともに固定サイズの机内に収める。 */
   padding: 8px 4px;
   display: flex;
   flex-direction: column;
@@ -219,22 +206,8 @@ function selectDesk(key: string) {
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
-.desk img {
-  flex: none;
-}
 .desk-position-3 .desk-label {
   -webkit-line-clamp: 1;
-}
-.desk-letter {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  font-weight: 700;
-}
-.desk-position-3 .desk-letter {
-  width: 22px;
-  height: 22px;
 }
 .map-caption {
   color: var(--muted);
@@ -246,20 +219,5 @@ function selectDesk(key: string) {
   font-size: 10px;
   color: var(--muted);
   text-align: center;
-}
-.play-fab {
-  position: absolute;
-  right: 20px;
-  top: 590px;
-  width: 68px;
-  height: 68px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--strong);
-  font-size: 10px;
-  box-shadow: 0 6px 20px #4b2d2214;
 }
 </style>

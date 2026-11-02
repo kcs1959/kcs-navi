@@ -30,6 +30,7 @@ watch(() => route.path, closeExhibition)
         <KcsLogo />
         <span class="brand-copy"><strong>KCS Navi</strong><small>三田祭 2026</small></span>
       </NuxtLink>
+      <!--TODO: ハンバーガーメニューを改良。別ページ`/menu`ではなく、アニメーションでポップアップを表示させる-->
       <NuxtLink
         class="icon-button"
         :to="route.path === '/menu' ? '/' : '/menu'"

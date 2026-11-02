@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
-import { getTeamPresentation } from '../../utils/teamPresentation'
 
 const route = useRoute()
 const { data, error, refresh } = await useFetch<TeamsResponse>('/api/teams', { key: 'teams' })
@@ -21,7 +20,6 @@ const teamWorks = computed(
   () => works.value?.exhibitions.filter((work) => work.teamId === team.value?.id) ?? [],
 )
 const { openExhibition } = useExhibitionDialog()
-const presentation = computed(() => getTeamPresentation(team.value?.key))
 
 useHead(() => ({ title: team.value?.name ?? '班紹介' }))
 </script>
@@ -40,18 +38,6 @@ useHead(() => ({ title: team.value?.name ?? '班紹介' }))
     </div>
     <template v-else-if="team">
       <section class="card team-about">
-        <div
-          v-if="presentation.hero"
-          class="team-artwork"
-          :style="{ background: presentation.tint }"
-        >
-          <img
-            :src="presentation.hero.src"
-            alt=""
-            :width="presentation.hero.width"
-            :height="presentation.hero.height"
-          />
-        </div>
         <p>{{ team.description }}</p>
       </section>
       <h2 class="section-heading">
@@ -66,7 +52,6 @@ useHead(() => ({ title: team.value?.name ?? '班紹介' }))
         :key="exhibition.id"
         :exhibition="exhibition"
         :team="team"
-        :team-view="true"
         :show-description="false"
         @select="openExhibition(exhibition)"
       />
@@ -100,25 +85,8 @@ useHead(() => ({ title: team.value?.name ?? '班紹介' }))
   background: #fff;
 }
 .team-about {
-  display: grid;
-  gap: 12px;
-  /* 枠線を含む20pxの余白。302pxの素材を狭い画面以外で切り取らない。 */
-  padding: 19px;
+  padding: 20px;
 }
-.team-artwork {
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  height: 140px;
-}
-.team-artwork img {
-  display: block;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: none;
-}
-.team-about h2,
 .section-heading {
   margin: 0;
   font-size: 18px;

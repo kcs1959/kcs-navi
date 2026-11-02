@@ -1,22 +1,14 @@
 <script setup lang="ts">
 import type { Exhibition, Team } from '../../shared/types'
-import { getTeamPresentation } from '../utils/teamPresentation'
-const props = withDefaults(
+withDefaults(
   defineProps<{
     exhibition: Exhibition
     team?: Team
-    teamView?: boolean
     showDescription?: boolean
   }>(),
-  { team: undefined, teamView: false, showDescription: true },
+  { team: undefined, showDescription: true },
 )
 defineEmits<{ select: [] }>()
-const presentation = computed(() => getTeamPresentation(props.team?.key))
-const artwork = computed(() =>
-  props.teamView
-    ? (presentation.value.teamCard ?? presentation.value.card)
-    : presentation.value.card,
-)
 </script>
 <template>
   <button
@@ -24,18 +16,8 @@ const artwork = computed(() =>
     :aria-label="`${exhibition.title}の詳細を見る`"
     @click="$emit('select')"
   >
-    <span v-if="artwork" class="artwork" :style="{ background: presentation.tint }"
-      ><img
-        :src="artwork.src"
-        alt=""
-        :width="artwork.width"
-        :height="artwork.height"
-        loading="lazy"
-    /></span>
     <span class="work-meta"
-      ><span class="chip" :style="{ background: presentation.tint }">{{
-        team?.name ?? '展示作品'
-      }}</span
+      ><span class="chip">{{ team?.name ?? '展示作品' }}</span
       ><span>展示 {{ exhibition.deskKey.replace('desk-', '').toUpperCase() }}</span></span
     >
     <strong class="work-title">{{ exhibition.title }}</strong>
@@ -45,8 +27,7 @@ const artwork = computed(() =>
 <style scoped>
 .exhibition-card {
   width: 100%;
-  /* 枠線1pxを含む20pxの余白にし、390px画面で素材の実寸302pxを保つ。 */
-  padding: 19px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -56,17 +37,6 @@ const artwork = computed(() =>
 }
 .exhibition-card:hover {
   border-color: var(--orange);
-}
-.artwork {
-  display: block;
-  overflow: hidden;
-  border-radius: 20px;
-}
-.artwork img {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  margin: auto;
 }
 .work-meta {
   display: flex;

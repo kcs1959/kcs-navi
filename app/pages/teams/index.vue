@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
-import { getTeamPresentation } from '../../utils/teamPresentation'
 
 useHead({ title: '班紹介' })
 const { data, error, refresh } = await useFetch<TeamsResponse>('/api/teams', { key: 'teams' })
@@ -27,9 +26,7 @@ const countWorks = (teamId: number) =>
       class="card team-card"
     >
       <div class="team-card-top">
-        <span class="chip" :style="{ background: getTeamPresentation(team.key).tint }">{{
-          team.name
-        }}</span>
+        <span class="chip">{{ team.name }}</span>
         <span class="work-count"
           >{{
             countWorks(team.id) === null ? '作品数未取得' : `${countWorks(team.id)} 作品`
