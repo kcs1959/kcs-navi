@@ -1,0 +1,9 @@
+{
+  "extends": "../.nuxt/tsconfig.node.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "tsBuildInfoFile": "../.nuxt/test/tests.tsbuildinfo"
+  },
+  "include": ["../.nuxt/nuxt.node.d.ts", "../vitest.config.ts", "./unit/**/*.ts", "./d1/**/*.ts"],
+  "exclude": []
+}

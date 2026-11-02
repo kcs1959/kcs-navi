@@ -1,201 +1,99 @@
 # KCS Navi データベース設計
 
-KCSナビのデータベースを設計・実装する際の指針とする。[requirements.md](requirements.md) の機能要件のうち、優先度が Must（MUST）のものを対象とし、Should（SHOULD）・Could（COULD）の機能は実装対象に含めない。
+[requirements.md](requirements.md) の**第3節「開発スコープ」を優先**する。Cloudflare D1（SQLite）を使用し、4テーブルで構成する。旧案のPostgreSQL、`desks`、制作者名の独立項目、利用者ID・識別Cookieは採用しない。
 
-以下の方針に従い、5テーブルで構成する。
+スキーマの実装上の定義は [0001_create_exhibitions.sql](../migrations/0001_create_exhibitions.sql)。本書およびSQLファイルの作成のみを行い、マイグレーション・シードの実行は開発者が行う。
 
-- 展示作品は1つの班に所属し、1つの机に関連付ける。
-- 制作者は作品詳細に表示する文字列として保持し、班メンバーの管理機能は設けない。
-- 来場者はログイン不要でQRチェックインする。利用者を識別するトークンは保存しない。
-- チェックイン数は延べ件数として集計し、同一利用者による短時間の重複チェックイン抑制は実装しない。
-- 推定滞在人数は直近20分間のチェックイン件数、推定混雑率は「推定滞在人数 ÷ 40人 × 100%」とする。
-- リアクションは「いいね」の1種類とする。
+## テーブル・関連
 
-F-27（ページ間の移動）・F-31（通信エラーの表示）はアプリケーション層で実装し、専用テーブルは作成しない。非機能要件は、対象機能の設計・実装で参照する目標として扱う。
+| テーブル      | 主なカラム                                                                                                             | 役割・関連                                |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `teams`       | `id INTEGER PRIMARY KEY`, `key TEXT`, `name TEXT`, `description TEXT`                                                  | 班紹介。`key` は一意の表示用キー          |
+| `exhibitions` | `id INTEGER PRIMARY KEY`, `team_id INTEGER`, `desk_key TEXT`, `title TEXT`, `description TEXT`, `creator_comment TEXT` | 作品詳細。各作品は1班に所属               |
+| `checkins`    | `id INTEGER PRIMARY KEY`, `checked_in_at TEXT`                                                                         | ブース全体のチェックイン。1 POSTにつき1行 |
+| `likes`       | `id INTEGER PRIMARY KEY`, `exhibition_id INTEGER`, `created_at TEXT`                                                   | 作品へのいいね。1 POSTにつき1行           |
 
-## 1. テーブル一覧
+`teams.id → exhibitions.team_id` は1対多、`exhibitions.id → likes.exhibition_id` は1対多。チェックインは作品・班に紐づけない。`INTEGER PRIMARY KEY` はSQLiteの自動採番を使用する。
 
-| テーブル名  | 役割                                       | 対応する機能要件                                     |
-| ----------- | ------------------------------------------ | ---------------------------------------------------- |
-| `teams`     | 作品の所属班と班の名前・紹介文を管理する   | F-04、F-08                                           |
-| `desks`     | マップ上の机と作品を対応付ける             | F-01、F-02、F-03                                     |
-| `exhibits`  | 展示作品の詳細情報を管理する               | F-03、F-04                                           |
-| `checkins`  | QRチェックインを記録し、人数集計の元とする | F-12、F-13、F-14、F-15、F-16、F-17、F-18、F-19、F-20 |
-| `reactions` | 展示作品への「いいね」を記録する           | F-24、F-25                                           |
+机の座標・識別子はアプリケーションの固定設定で管理し、`desk_key` は `desk-a`、`desk-b`、`desk-c` のいずれか。表示名はD1に登録した班名・作品名から組み立てる。1つの机に複数作品を表示できるよう、`desk_key` に一意制約は設けない。制作者名を載せるときは、登録者が `creator_comment` の本文に含める。
 
-班メンバー、タグ、設定変更、複数種類のリアクションを管理するテーブルは作成しない。
+## 制約・インデックス
 
-## 2. 各テーブルのカラム一覧
+主キー以外の全カラムを `NOT NULL` とする。
 
-PostgreSQLを使用する。すべてのカラムを `NOT NULL` とし、単独の主キーとなる `id` はDB側で自動採番する。外部キーは参照先の主キーに対する制約として定義する。
+| 対象                          | 制約                                                                       |
+| ----------------------------- | -------------------------------------------------------------------------- |
+| `teams.key`                   | `UNIQUE`、1〜40文字                                                        |
+| `teams.name`                  | 1〜100文字                                                                 |
+| `teams.description`           | 1〜5,000文字                                                               |
+| `exhibitions.team_id`         | 外部キー、班削除は `ON DELETE RESTRICT`                                    |
+| `exhibitions.desk_key`        | 固定3キーの `CHECK`                                                        |
+| `exhibitions.title`           | 1〜200文字                                                                 |
+| `exhibitions.description`     | 1〜10,000文字                                                              |
+| `exhibitions.creator_comment` | 0〜5,000文字                                                               |
+| `likes.exhibition_id`         | 外部キー、作品削除は `ON DELETE CASCADE`                                   |
+| 日時カラム                    | UTC ISO 8601・ミリ秒3桁の正規形（例 `2026-11-01T01:00:00.000Z`）を `CHECK` |
 
-### 2.1 `teams`（班）
+インデックスは `exhibitions(team_id)`、`exhibitions(desk_key)`、`checkins(checked_in_at)`、`likes(exhibition_id)`。利用者単位の一意制約や識別情報を保存するインデックスは設けない。
 
-F-08の班紹介と、F-04の所属班表示に必要な情報を保存する。
+日時の既定値はD1の `strftime('%Y-%m-%dT%H:%M:%fZ', 'now')`。UTC正規形に統一することで、時刻の文字列範囲比較をインデックスで扱える。APIはクライアントから日時や利用者情報を受け付けない。
 
-| カラム        | 型           | 説明       |
-| ------------- | ------------ | ---------- |
-| `id`          | BIGINT       | PK         |
-| `name`        | VARCHAR(100) | 班名       |
-| `description` | TEXT         | 班の紹介文 |
+## チェックイン・集計
 
-班メンバー一覧（F-10）および班の写真・活動内容（F-11）のデータは保持しない。
+受け付けたPOSTごとに `INSERT INTO checkins DEFAULT VALUES` を実行し、保存時刻を `RETURNING checked_in_at` で取得する。同一利用者の判定、重複排除、再入場判定は行わない。受付完了の303リダイレクトで時刻を表示用に渡すが、識別子や入場証明には使用しない。
 
-### 2.2 `desks`（展示机）
+集計は取得時に再計算し、累計・推定人数・混雑率の専用テーブルは作らない。D1の時計から基準時刻を1回取得し、すべての集計へ同じ値をバインドする。集計クエリはD1のバッチ内で実行する。
 
-ブース内の机を識別し、マップ上の表示と対応付ける。
-
-| カラム    | 型           | 説明                          |
-| --------- | ------------ | ----------------------------- |
-| `id`      | BIGINT       | PK                            |
-| `label`   | VARCHAR(50)  | 机の表示名（例：机A）         |
-| `map_key` | VARCHAR(100) | SVG上の机を識別する一意のキー |
-
-フロントエンドのSVG要素の `id` と `map_key` を一致させる。
-
-```xml
-<rect id="desk-a" />
-<rect id="desk-b" />
-```
-
-上記の `desk-a` に対応する机レコードでは、`map_key` に `desk-a` を設定する。座標・形状などの描画情報はSVG側で管理し、DBには保存しない。
-
-### 2.3 `exhibits`（展示作品）
-
-F-04で指定された作品詳細と、所属班・展示机への参照を保存する。
-
-| カラム            | 型           | 説明             |
-| ----------------- | ------------ | ---------------- |
-| `id`              | BIGINT       | PK               |
-| `team_id`         | BIGINT       | FK → `teams.id`  |
-| `desk_id`         | BIGINT       | FK → `desks.id`  |
-| `title`           | VARCHAR(200) | 作品名           |
-| `description`     | TEXT         | 作品の説明       |
-| `creator_names`   | TEXT         | 表示用の制作者名 |
-| `creator_comment` | TEXT         | 制作者コメント   |
-
-複数人で制作した作品は、全員の名前を `creator_names` に1つの文字列として保存する。制作者と班メンバーを関連付ける中間テーブルは作成しない。
-
-机を選択して作品詳細を参照する導線（F-03・F-04）を実装する。1つの机にある複数作品の閲覧（F-05）、全作品の一覧表示（F-06）、検索・絞り込み（F-07）、班ごとの作品一覧（F-09）は実装しない。机と作品の関連付け自体には、机ごとの作品数を制限する一意制約を設けない。
-
-### 2.4 `checkins`（QRチェックイン）
-
-ブース全体へのチェックインを、1回につき1レコードで保存する。
-
-| カラム          | 型          | 説明                                                  |
-| --------------- | ----------- | ----------------------------------------------------- |
-| `id`            | BIGINT      | PK                                                    |
-| `checked_in_at` | TIMESTAMPTZ | チェックイン時刻。既定値は `CURRENT_TIMESTAMP` とする |
-
-`checked_in_at` はDB側の時刻を使用し、クライアントから送信された日時で上書きしない。チェックインの保存に成功したレコードを集計対象とする。累計人数、推定滞在人数、推定混雑率は保存せず、チェックイン記録から算出する。
-
-#### 推定アルゴリズム
-
-集計の基準時刻をDBの `CURRENT_TIMESTAMP` とし、基準時刻の20分前以上・基準時刻以下のチェックイン件数を求める。
+以下の `:now` はUTCの基準時刻、`:window_start` はその20分前を表す。
 
 ```sql
-SELECT COUNT(*) AS estimated_visitors,
-       CURRENT_TIMESTAMP AS calculated_at
+SELECT strftime('%Y-%m-%dT%H:%M:%fZ', 'now') AS now;
+
+-- 両端を含む直近20分。未来のデータは除く。
+SELECT COUNT(CASE WHEN checked_in_at >= :window_start THEN 1 END) AS estimated_visitors,
+       MAX(checked_in_at) AS last_checkin_at
 FROM checkins
-WHERE checked_in_at >= CURRENT_TIMESTAMP - INTERVAL '20 minutes'
-  AND checked_in_at <= CURRENT_TIMESTAMP;
-```
+WHERE checked_in_at <= :now;
 
-推定値は次の式で算出する。
-
-\[
-\text{推定滞在人数} = \text{直近20分間のチェックイン件数}
-\]
-
-\[
-\text{推定混雑率} = \frac{\text{推定滞在人数}}{40}\times100\%
-\]
-
-推定混雑率の計算では小数を扱える型を使用する。直近20分間のチェックインが28件なら70%、0件なら0%とし、100%を超えた場合も値を切り詰めない。
-
-当日・日別・時間別のチェックイン数（F-14・F-15・F-16）は、日本時間（`Asia/Tokyo`）を基準に集計する。「当日」は日本時間の当日00:00以上・翌日00:00未満とし、直近24時間とは区別する。
-
-日別集計は次のクエリを使用する。当日の件数は当日の日付に対応する値とし、該当レコードがなければ0件を返す。
-
-```sql
-SELECT (checked_in_at AT TIME ZONE 'Asia/Tokyo')::date AS checkin_date,
-       COUNT(*) AS checkin_count
+-- JSTの日別。該当する日がなければAPIの当日件数は0。
+SELECT strftime('%Y-%m-%d', checked_in_at, '+9 hours') AS date,
+       COUNT(*) AS count
 FROM checkins
-GROUP BY 1
-ORDER BY 1;
-```
+WHERE checked_in_at <= :now
+GROUP BY date
+ORDER BY date;
 
-時間別集計は日付と時刻を組み合わせた1時間単位とし、異なる日付の同じ時間帯を合算しない。
-
-```sql
-SELECT date_trunc('hour', checked_in_at AT TIME ZONE 'Asia/Tokyo') AS checkin_hour,
-       COUNT(*) AS checkin_count
+-- 日付込みの1時間単位。異なる日付の同じ時刻を合算しない。
+SELECT strftime('%Y-%m-%dT%H:00:00+09:00', checked_in_at, '+9 hours') AS hour,
+       COUNT(*) AS count
 FROM checkins
-GROUP BY 1
-ORDER BY 1;
+WHERE checked_in_at <= :now
+GROUP BY hour
+ORDER BY hour;
 ```
 
-APIは推定値の取得ごとに再集計し、集計基準時刻も返す。画面には「推定滞在人数」「推定混雑率」と明記する（F-19）。画面側で一定間隔の再取得を行い（F-20）、更新間隔はNF-04の目標に従って30秒以内を目安とする。全来場者がチェックインするとは限らないため、推定値を実測の滞在人数として表示しない。
+- 当日はJST（Asia/Tokyo）の00:00以上・翌日00:00未満。JSTには夏時間がないため固定の `+9 hours` を使用する。
+- 直近20分は20分前以上・基準時刻以下で、両端を含む。未来の記録は全集計から除外する。
+- 開催時間が未確定のため、開催時間外も受け付けた記録は集計に含める。
+- 推定滞在人数は直近20分の件数。推定混雑率は `推定滞在人数 / 40 × 100` で、100%を超えても切り詰めない。
+- 混雑ラベルは50%未満「ゆったり」、50%以上80%未満「やや混雑」、80%以上「混雑」。判断理由・境界条件は `server/services/checkins.ts` とD1リポジトリのコメントに残す。
+- APIは計算時刻と最後の記録時刻（記録なしなら `null`）を返す。画面は「推定」と明記し、30秒ごとに再取得する。
 
-### 2.5 `reactions`（リアクション）
+## いいね
 
-作品への「いいね」を、1回につき1レコードで保存する。全レコードを「いいね」として扱い、種類を区別するカラムは設けない。
-
-| カラム       | 型          | 説明                                                  |
-| ------------ | ----------- | ----------------------------------------------------- |
-| `id`         | BIGINT      | PK                                                    |
-| `exhibit_id` | BIGINT      | FK → `exhibits.id`                                    |
-| `created_at` | TIMESTAMPTZ | リアクション日時。既定値は `CURRENT_TIMESTAMP` とする |
-
-利用者ごとのリアクション回数制限はMUST要件に定義されていないため、匿名識別子や利用者単位の一意制約を追加しない。
-
-作品詳細に表示するリアクション数は、対象作品のレコードを数えて求める。`:exhibit_id` はバインドパラメータとする。リアクションがない作品には0件を返す。
+存在する作品に対してのみ1行追加し、その後の合計件数を返す。D1のバッチで追加と集計を行い、同時更新による読み出し・上書き競合を避ける。作品なしならAPIは404を返す。
 
 ```sql
-SELECT COUNT(*) AS reaction_count
-FROM reactions
-WHERE exhibit_id = :exhibit_id;
+INSERT INTO likes (exhibition_id)
+SELECT id FROM exhibitions WHERE id = :exhibition_id;
+
+SELECT COUNT(*) AS count FROM likes WHERE exhibition_id = :exhibition_id;
 ```
 
-## 3. リレーション一覧
+すべてバインドパラメータを使用する。いいね0件の作品には0を返す。利用者識別・利用者ごとの回数制限・複数種類のリアクションは設けない。
 
-以下の外部キーで各テーブルを関連付ける。
+## 開発用データ
 
-| 親テーブル | 子テーブル  | 関係 | 意味                              |
-| ---------- | ----------- | ---- | --------------------------------- |
-| `teams`    | `exhibits`  | 1:N  | 各作品が1つの班に所属する         |
-| `desks`    | `exhibits`  | 1:N  | 各作品が1つの机に関連付く         |
-| `exhibits` | `reactions` | 1:N  | 1つの作品に複数の「いいね」が付く |
+[test.sql](../seeds/test.sql) は班・作品の登録元となるSQL。実データはこのファイルを編集して用意し、開発者が手動で投入する。`INSERT ... ON CONFLICT(id) DO UPDATE` により、再適用すると同じIDの班・作品の内容が更新される。行を削除・再作成する `REPLACE` は使わず、既存のチェックイン・いいねを保持する。来場・いいねはシードで作成せず、初回は両方0件から始める。
 
-`desks` と `exhibits` の1:Nはデータ上の関係を表す。複数作品の閲覧機能（F-05）を今回の実装対象に含めるものではない。
-
-`checkins` はブース全体への入場イベントを記録するため、展示作品や班への外部キーを持たせない。
-
-## 4. インデックス・制約
-
-主キー・外部キー・`NOT NULL` に加え、以下の制約とインデックスを作成する。
-
-| テーブル    | 対象カラム      | 設定   |
-| ----------- | --------------- | ------ |
-| `desks`     | `map_key`       | UNIQUE |
-| `exhibits`  | `team_id`       | INDEX  |
-| `exhibits`  | `desk_id`       | INDEX  |
-| `checkins`  | `checked_in_at` | INDEX  |
-| `reactions` | `exhibit_id`    | INDEX  |
-
-`checkins.checked_in_at` のインデックスは、直近20分間および当日の時刻範囲による検索に使用する。利用者識別用のインデックス、タグ用の制約、複数種類のリアクション用の制約は追加しない。
-
-## 5. 今回、テーブルを作る必要がない情報
-
-以下の情報は既存レコードから算出するか、アプリケーション側で管理する。集計専用・設定変更用のテーブルは作成しない。
-
-| 情報                             | 保存・管理方法                                 |
-| -------------------------------- | ---------------------------------------------- |
-| 当日・日別・時間別チェックイン数 | `checkins` を日本時間基準で集計                |
-| 推定滞在人数                     | 直近20分間の `checkins` から算出               |
-| 推定混雑率                       | 推定滞在人数 ÷ 40人 × 100%で算出               |
-| 定員・推定滞在時間               | アプリケーションの固定値として40人・20分を定義 |
-| 作品別リアクション数             | `reactions` から集計                           |
-| SVGマップの描画情報              | フロントエンド側で保持                         |
-| QRコード画像                     | チェックイン用URLから生成                      |
-| 管理者アカウント                 | 管理者向け機能はMUST要件にないため作成しない   |
+すべての環境でCloudflareの `DB` バインディングを必須とする。アプリケーション内の班・作品データや仮の件数による代替は行わず、シード等で開発者がD1へ登録した内容だけを取得する。D1未接続・障害は503とし、空のDBでは空配列・0件を返す。

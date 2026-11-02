@@ -1,0 +1,11 @@
+node_modules/
+.nuxt/
+.output/
+.wrangler/
+coverage/
+package-lock.json
+doc/
+.env
+.env.*
+.dev.vars*
+public/
