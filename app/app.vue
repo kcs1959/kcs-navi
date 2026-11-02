@@ -22,7 +22,7 @@ watch(() => route.path, closeExhibition)
 </script>
 
 <template>
-  <div class="site-shell">
+  <div>
     <FestivalBackground />
     <a class="skip-link" href="#main-content">本文へスキップ</a>
     <header class="site-header">
@@ -49,26 +49,6 @@ watch(() => route.path, closeExhibition)
     <main id="main-content" :class="{ 'with-navigation': showNavigation }">
       <NuxtPage />
     </main>
-    <nav v-if="showNavigation" class="bottom-navigation" aria-label="メインナビゲーション">
-      <NuxtLink to="/" :class="{ active: route.path === '/' }"
-        ><img src="/figma/crowd-icon-map.svg" width="18" height="18" alt="" />マップ</NuxtLink
-      >
-      <NuxtLink
-        to="/exhibitions"
-        :class="{
-          active: route.path.startsWith('/exhibitions') || route.path.startsWith('/teams'),
-        }"
-        ><img src="/figma/crowd-icon-layout-grid.svg" width="18" height="18" alt="" />展示</NuxtLink
-      >
-      <NuxtLink to="/crowd" :class="{ active: route.path === '/crowd' }"
-        ><img
-          src="/figma/crowd-icon-chart-no-axes-column.svg"
-          width="18"
-          height="18"
-          alt=""
-        />混雑</NuxtLink
-      >
-    </nav>
     <ExhibitionModal
       v-if="selectedExhibition"
       :exhibition="selectedExhibition"
