@@ -13,7 +13,7 @@ describe('write request origin policy', () => {
   })
   it('rejects cross-site, cross-port, absent and malformed origins', () => {
     expect(isSameOriginPost('https://attacker.example', 'cross-site', siteUrl)).toBe(false)
-    expect(isSameOriginPost('http://localhost:3000', undefined, siteUrl)).toBe(false)
+    expect(isSameOriginPost('http://localhost:3001', undefined, siteUrl)).toBe(false)
     expect(isSameOriginPost(undefined, undefined, siteUrl)).toBe(false)
     expect(isSameOriginPost('null', undefined, siteUrl)).toBe(false)
     expect(isSameOriginPost('http://sub.localhost:3001', 'same-site', siteUrl)).toBe(false)
