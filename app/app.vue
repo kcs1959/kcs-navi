@@ -15,7 +15,7 @@ const showNavigation = computed(() => !['/', '/menu', '/checkin', '/welcome'].in
 // URLの組み立てを環境変数に集約し、ローカルURLが公開環境のcanonicalに残るのを防ぐ。
 useHead(() => ({
   htmlAttrs: { lang: 'ja' },
-  titleTemplate: (title) => (title ? `${title} | KCSナビ` : 'KCSナビ | 三田祭2026'),
+  titleTemplate: (title) => (title ? `${title} | KCS Navi` : 'KCS Navi | 三田祭2026'),
   link: [{ rel: 'canonical', href: new URL(route.path, config.public.siteUrl).href }],
 }))
 watch(() => route.path, closeExhibition)
@@ -26,9 +26,9 @@ watch(() => route.path, closeExhibition)
     <FestivalBackground />
     <a class="skip-link" href="#main-content">本文へスキップ</a>
     <header class="site-header">
-      <NuxtLink class="brand" to="/" aria-label="KCSナビ 会場マップへ">
+      <NuxtLink class="brand" to="/" aria-label="KCS Navi 会場マップへ">
         <KcsLogo />
-        <span class="brand-copy"><strong>KCSナビ</strong><small>三田祭 2026</small></span>
+        <span class="brand-copy"><strong>KCS Navi</strong><small>三田祭 2026</small></span>
       </NuxtLink>
       <NuxtLink
         class="icon-button"

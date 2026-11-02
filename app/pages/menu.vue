@@ -9,23 +9,29 @@ const links = [
     icon: '/figma/menu-icon-map.svg',
   },
   {
-    to: '/exhibitions',
-    title: '展示紹介',
-    description: '作品・班をもっと知る',
-    icon: '/figma/menu-icon-layout-grid.svg',
-  },
-  {
     to: '/crowd',
     title: '来場者数・混雑状況',
     description: '混雑の目安をチェック',
     icon: '/figma/menu-icon-chart-no-axes-column.svg',
+  },
+  {
+    to: '/exhibitions',
+    title: '展示紹介',
+    description: '三田祭に展示されている作品をまとめました！',
+    icon: '/figma/menu-icon-layout-grid.svg',
+  },
+  {
+    to: '/teams',
+    title: '班紹介',
+    description: 'KCSの班活動について',
+    icon: '/figma/menu-icon-layout-grid.svg',
   },
 ]
 </script>
 
 <template>
   <div class="page-content stack menu-page">
-    <PageHeading eyebrow="MENU" title="つぎ、どこに行く？" />
+    <PageHeading eyebrow="MENU" title="メニュー" />
 
     <nav class="card menu-links" aria-label="サイトメニュー">
       <NuxtLink v-for="link in links" :key="link.to" :to="link.to" class="menu-link">
