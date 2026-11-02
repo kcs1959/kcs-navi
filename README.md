@@ -32,7 +32,7 @@ cp .env.example .env
 cp .dev.vars.example .dev.vars
 ```
 
-両ファイルの `NUXT_PUBLIC_SITE_URL` を、開発・プレビューサーバーのURL `http://localhost:3000` に一致させる。実際にアクセスするURLと異なると、チェックイン・いいねのPOSTが403で拒否される。本番環境では実際の公開URLを設定する。データ参照先のモードは、ローカルD1とする。
+両ファイルの `NUXT_PUBLIC_SITE_URL` を一致させる。データ参照先のモードは、ローカルD1とする。
 
 ## 3. ローカルD1（データベース）を準備する
 
