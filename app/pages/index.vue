@@ -58,7 +58,7 @@ function selectDesk(key: string) {
     <PageHeading
       eyebrow="EXPLORE KCS"
       title="KCS ブースマップ"
-      description="机をタップして、作品を見てみよう。"
+      description="机をタップすると作品の詳細が表示されます。"
     />
     <CrowdCard
       :stats="stats"
