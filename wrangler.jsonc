@@ -6,7 +6,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": ".output/public",
-    "binding": "ASSETS",
+    "binding": "ASSETS"
   },
   "d1_databases": [
     {
@@ -14,7 +14,7 @@
       "database_name": "kcs-navi",
       // Replace this placeholder after creating the D1 database yourself.
       "database_id": "00000000-0000-4000-8000-000000000001",
-      "migrations_dir": "migrations",
-    },
-  ],
+      "migrations_dir": "migrations"
+    }
+  ]
 }
