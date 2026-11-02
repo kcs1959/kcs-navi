@@ -32,7 +32,6 @@ const receiptTime = computed(() =>
         ご来場ありがとうございます。<br />気になる作品を、見つけてみてね。
       </p>
       <span v-if="receiptTime" class="chip receipt-time">受付日時 {{ receiptTime }}</span>
-      <span v-if="route.query.mode === 'demo'" class="chip receipt-time">サンプル受付</span>
       <NuxtLink to="/" class="primary-button map-button">会場マップへ</NuxtLink>
       <p class="welcome-note">展示マップから、各作品の詳細を見られます。</p>
     </section>

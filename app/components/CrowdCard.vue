@@ -37,8 +37,7 @@ const updatedAt = computed(() =>
       />
       <div class="crowd-heading">
         <span class="chip" :class="current.congestion.level">{{ current.congestion.label }}</span
-        ><span class="text-muted">混雑目安（推定）</span
-        ><span v-if="current.mode === 'demo'" class="sample-label">サンプル</span>
+        ><span class="text-muted">混雑目安（推定）</span>
       </div>
       <div class="occupancy">
         <strong>{{ current.congestion.estimatedVisitors }}</strong
@@ -94,11 +93,6 @@ const updatedAt = computed(() =>
   gap: 8px;
   font-size: 12px;
   flex-wrap: wrap;
-}
-.sample-label {
-  font-size: 9px;
-  color: var(--muted);
-  margin-left: auto;
 }
 .chip.relaxed {
   background: var(--mint);

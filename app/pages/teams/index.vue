@@ -1,22 +1,21 @@
 <script setup lang="ts">
 import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
+import { getTeamPresentation } from '../../utils/teamPresentation'
 
 useHead({ title: '班紹介' })
 const { data, error, refresh } = await useFetch<TeamsResponse>('/api/teams', { key: 'teams' })
-const { data: works } = await useFetch<ExhibitionsResponse>('/api/exhibitions', {
+const { data: works, error: worksError } = await useFetch<ExhibitionsResponse>('/api/exhibitions', {
   key: 'exhibitions',
 })
 const countWorks = (teamId: number) =>
-  works.value?.exhibitions.filter((work) => work.teamId === teamId).length ?? 0
+  !worksError.value && works.value
+    ? works.value.exhibitions.filter((work) => work.teamId === teamId).length
+    : null
 </script>
 
 <template>
   <div class="page-content stack teams-page">
-    <PageHeading
-      eyebrow="KCS TEAMS"
-      title="班紹介"
-      description="KCSの班活動について"
-    />
+    <PageHeading eyebrow="KCS TEAMS" title="班紹介" description="KCSの班活動について" />
     <div v-if="error" class="error-card" role="alert">
       <p>班の情報を読み込めませんでした。</p>
       <button type="button" class="secondary-button" @click="refresh()">再読み込み</button>
@@ -26,16 +25,24 @@ const countWorks = (teamId: number) =>
       :key="team.id"
       :to="`/teams/${team.id}`"
       class="card team-card"
-      :class="`team-${team.key}`"
     >
       <div class="team-card-top">
-        <span class="chip">{{ team.name }}</span>
-        <span class="work-count">{{ countWorks(team.id) }} 作品 →</span>
+        <span class="chip" :style="{ background: getTeamPresentation(team.key).tint }">{{
+          team.name
+        }}</span>
+        <span class="work-count"
+          >{{
+            countWorks(team.id) === null ? '作品数未取得' : `${countWorks(team.id)} 作品`
+          }}
+          →</span
+        >
       </div>
       <h2>{{ team.name }}</h2>
       <p>{{ team.description }}</p>
     </NuxtLink>
-    <p v-if="data && !data.teams.length" class="card text-muted">班の情報は準備中です。</p>
+    <p v-if="data && !error && !data.teams.length" class="card text-muted">
+      班の情報はまだ登録されていません。
+    </p>
   </div>
 </template>
 
@@ -69,14 +76,5 @@ const countWorks = (teamId: number) =>
 .work-count {
   font-size: 10px;
   color: var(--kcs-muted, #7d5b49);
-}
-.team-vr .chip {
-  background: var(--kcs-lavender, #e5dcf9);
-}
-.team-game .chip {
-  background: var(--kcs-mint, #d5e9d5);
-}
-.team-dtm .chip {
-  background: var(--kcs-lemon, #ffe8a3);
 }
 </style>

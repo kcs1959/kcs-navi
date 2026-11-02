@@ -1,9 +1,4 @@
-import type {
-  CheckinSnapshot,
-  CheckinStatsResponse,
-  Congestion,
-  DataMode,
-} from '../../shared/types'
+import type { CheckinSnapshot, CheckinStatsResponse, Congestion } from '../../shared/types'
 
 export const CAPACITY = 40 as const
 export const WINDOW_MINUTES = 20 as const
@@ -11,10 +6,6 @@ const JST_OFFSET_MS = 9 * 60 * 60 * 1_000
 
 export function jstDate(timestamp: string): string {
   return new Date(Date.parse(timestamp) + JST_OFFSET_MS).toISOString().slice(0, 10)
-}
-
-export function jstHour(timestamp: string): string {
-  return `${new Date(Date.parse(timestamp) + JST_OFFSET_MS).toISOString().slice(0, 13)}:00:00+09:00`
 }
 
 export function congestionFor(
@@ -29,10 +20,9 @@ export function congestionFor(
   return { estimatedRate, level: 'busy', label: '混雑' }
 }
 
-export function buildStats(snapshot: CheckinSnapshot, mode: DataMode): CheckinStatsResponse {
+export function buildStats(snapshot: CheckinSnapshot): CheckinStatsResponse {
   const date = jstDate(snapshot.calculatedAt)
   return {
-    mode,
     today: { date, count: snapshot.daily.find((day) => day.date === date)?.count ?? 0 },
     daily: snapshot.daily,
     hourly: snapshot.hourly,
@@ -44,42 +34,5 @@ export function buildStats(snapshot: CheckinSnapshot, mode: DataMode): CheckinSt
       calculatedAt: snapshot.calculatedAt,
       lastCheckinAt: snapshot.lastCheckinAt,
     },
-  }
-}
-
-export function snapshotFromTimestamps(
-  timestamps: readonly string[],
-  calculatedAt: string,
-): CheckinSnapshot {
-  const now = Date.parse(calculatedAt)
-  const windowStart = now - WINDOW_MINUTES * 60 * 1_000
-  const daily = new Map<string, number>()
-  const hourly = new Map<string, number>()
-  let estimatedVisitors = 0
-  let lastCheckinAt: string | null = null
-
-  // A day is JST midnight-inclusive / next-midnight-exclusive; hours include their date.
-  // Opening hours are deliberately not filtered: no confirmed festival schedule exists,
-  // and a successfully accepted entry must remain visible even outside opening hours.
-  for (const timestamp of timestamps) {
-    const at = Date.parse(timestamp)
-    if (!Number.isFinite(at) || at > now) continue
-    daily.set(jstDate(timestamp), (daily.get(jstDate(timestamp)) ?? 0) + 1)
-    hourly.set(jstHour(timestamp), (hourly.get(jstHour(timestamp)) ?? 0) + 1)
-    // Both 20-minutes-ago and now are included; future records cannot inflate the estimate.
-    if (at >= windowStart) estimatedVisitors += 1
-    if (lastCheckinAt === null || at > Date.parse(lastCheckinAt)) lastCheckinAt = timestamp
-  }
-
-  return {
-    calculatedAt,
-    estimatedVisitors,
-    lastCheckinAt,
-    daily: [...daily]
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, count]) => ({ date, count })),
-    hourly: [...hourly]
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([hour, count]) => ({ hour, count })),
   }
 }

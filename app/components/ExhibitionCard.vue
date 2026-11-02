@@ -1,30 +1,21 @@
 <script setup lang="ts">
 import type { Exhibition, Team } from '../../shared/types'
+import { getTeamPresentation } from '../utils/teamPresentation'
 const props = withDefaults(
   defineProps<{
     exhibition: Exhibition
     team?: Team
-    illustration?: string
+    teamView?: boolean
     showDescription?: boolean
   }>(),
-  { team: undefined, illustration: undefined, showDescription: true },
+  { team: undefined, teamView: false, showDescription: true },
 )
 defineEmits<{ select: [] }>()
-const artwork = computed(
-  () =>
-    props.illustration ??
-    (props.exhibition.deskKey === 'desk-b'
-      ? '/figma/works-frame1.svg'
-      : props.exhibition.deskKey === 'desk-c'
-        ? '/figma/works-frame2.svg'
-        : '/figma/works-frame.svg'),
-)
-const tint = computed(() =>
-  props.exhibition.deskKey === 'desk-b'
-    ? 'var(--mint)'
-    : props.exhibition.deskKey === 'desk-c'
-      ? 'var(--lemon)'
-      : 'var(--lavender)',
+const presentation = computed(() => getTeamPresentation(props.team?.key))
+const artwork = computed(() =>
+  props.teamView
+    ? (presentation.value.teamCard ?? presentation.value.card)
+    : presentation.value.card,
 )
 </script>
 <template>
@@ -33,11 +24,18 @@ const tint = computed(() =>
     :aria-label="`${exhibition.title}の詳細を見る`"
     @click="$emit('select')"
   >
-    <span class="artwork" :style="{ background: tint }"
-      ><img :src="artwork" alt="" width="302" height="124" loading="lazy"
+    <span v-if="artwork" class="artwork" :style="{ background: presentation.tint }"
+      ><img
+        :src="artwork.src"
+        alt=""
+        :width="artwork.width"
+        :height="artwork.height"
+        loading="lazy"
     /></span>
     <span class="work-meta"
-      ><span class="chip" :style="{ background: tint }">{{ team?.name ?? '展示作品' }}</span
+      ><span class="chip" :style="{ background: presentation.tint }">{{
+        team?.name ?? '展示作品'
+      }}</span
       ><span>展示 {{ exhibition.deskKey.replace('desk-', '').toUpperCase() }}</span></span
     >
     <strong class="work-title">{{ exhibition.title }}</strong>

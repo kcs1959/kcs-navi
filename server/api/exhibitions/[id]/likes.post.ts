@@ -20,6 +20,6 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'Not Found',
         message: '作品が見つかりません。',
       })
-    return { mode: repository.mode, exhibitionId: id, likes }
+    return { exhibitionId: id, likes }
   })
 })

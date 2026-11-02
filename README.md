@@ -2,14 +2,15 @@
 
 ## 1. Node.js と npm を入れる
 
-Node.js のバージョン管理ツール（nvm）をインストールする。
-
 ```sh
 git clone https://github.com/kcs1959/kcs-navi.git
 cd kcs-navi
-nvm install
-nvm use
-npm install --global npm@11.13.0
+
+nvm install # Node.jsのインストール
+nvm use # Node.jsのバージョンを設定ファイル通りに切り替える
+npm install --global npm@11.13.0 # npmパッケージのインストール
+
+# 入ったか確認
 node --version
 npm --version
 ```
@@ -20,44 +21,50 @@ npm --version
 
 `package-lock.json`をもとに、npmパッケージ（依存ライブラリ）をインストールする。
 
-また、環境変数を設定した`.env`ファイルも作成する。
-
 ```sh
 npm ci
+```
+
+また、Nuxt用の`.env`と、Wrangler用の`.dev.vars`を作成する。
+
+```sh
 cp .env.example .env
-```
-
-## 3. 開発サーバーを起動する
-
-```sh
-npm run dev
-```
-
-出力されたlocalhostのURLをブラウザで開く。
-
-## 4. ローカル D1 を利用する
-
-ローカルDBの接続情報を`.dev.vars`（`.env`のようなもの）に設定してから、DBのマイグレーションを行う。
-
-```sh
 cp .dev.vars.example .dev.vars
+```
+
+両ファイルの `NUXT_PUBLIC_SITE_URL` を一致させる。データ参照先のモードは、ローカルD1とする。
+
+## 3. ローカルD1（データベース）を準備する
+
+DBのマイグレーションを行う。
+
+```sh
 npx wrangler d1 migrations apply kcs-navi --local
 ```
 
-シードデータを、ローカルDBに投入する。
+ローカルDBに、シードデータ（`seeds/test.sql`）を投入する。同じIDを再投入すると内容が更新される。
 
 ```sh
 npx wrangler d1 execute kcs-navi --local --file seeds/test.sql
 ```
 
-Cloudflare Workers 用にビルドして、ローカルで起動する。
+## 4. 開発サーバーを起動する
 
 ```sh
-npm run build
-npm run preview:workers
+npm run dev
 ```
 
-Wrangler が使用するローカル DB は `.wrangler/` 内に保存される。
+出力されたlocalhostのURLを開く。
+（開発サーバーにおいても、 `wrangler.jsonc` の `DB` バインディングを使用している）
+
+## 5. データベースをGUIで確認する（バックエンド開発者向け）
+
+`d1studio`を使って、Cloudflare D1データベースの内容を管理できる。
+
+```sh
+npm install --global d1s@0.3.16
+d1studio
+```
 
 # 通常開発時のコマンド
 
@@ -77,6 +84,10 @@ npm install
 npm run dev
 ```
 
-## 3. バックエンド（DB）開発者向け
+## 3. 班・作品のデータを変更したとき
 
-Coming soon...
+`seeds/` 内のSQLを編集し、編集したファイルを指定して手動で投入する。
+
+```sh
+npx wrangler d1 execute kcs-navi --local --file seeds/test.sql
+```

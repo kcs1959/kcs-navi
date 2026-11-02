@@ -15,7 +15,7 @@
 
 `teams.id → exhibitions.team_id` は1対多、`exhibitions.id → likes.exhibition_id` は1対多。チェックインは作品・班に紐づけない。`INTEGER PRIMARY KEY` はSQLiteの自動採番を使用する。
 
-机の座標・表示名はアプリケーションの固定設定で管理し、`desk_key` は `desk-a`、`desk-b`、`desk-c` のいずれか。1つの机に複数作品を表示できるよう、`desk_key` に一意制約は設けない。制作者名を載せるときは、登録者が `creator_comment` の本文に含める。
+机の座標・識別子はアプリケーションの固定設定で管理し、`desk_key` は `desk-a`、`desk-b`、`desk-c` のいずれか。表示名はD1に登録した班名・作品名から組み立てる。1つの机に複数作品を表示できるよう、`desk_key` に一意制約は設けない。制作者名を載せるときは、登録者が `creator_comment` の本文に含める。
 
 ## 制約・インデックス
 
@@ -94,6 +94,6 @@ SELECT COUNT(*) AS count FROM likes WHERE exhibition_id = :exhibition_id;
 
 ## 開発用データ
 
-[test.sql](../seeds/test.sql) は架空の7班・4作品（机Aに2作品、机B・Cに1作品ずつ）を登録するローカル検証用SQL。`INSERT OR IGNORE` により既存IDの編集済み行は上書きしない。架空の来場・いいねはD1へ投入せず、両方0件から始める。
+[test.sql](../seeds/test.sql) は班・作品の登録元となるSQL。実データはこのファイルを編集して用意し、開発者が手動で投入する。`INSERT ... ON CONFLICT(id) DO UPDATE` により、再適用すると同じIDの班・作品の内容が更新される。行を削除・再作成する `REPLACE` は使わず、既存のチェックイン・いいねを保持する。来場・いいねはシードで作成せず、初回は両方0件から始める。
 
-`NUXT_DATA_MODE=demo` はD1を使わず、プロセス内の架空データで動作する。デモの記録は再起動で消え、APIの `mode` と画面でデモと明記する。実際の記録を保存する運用は `d1` モードを使い、接続失敗時にデモへ切り替えない。
+すべての環境でCloudflareの `DB` バインディングを必須とする。アプリケーション内の班・作品データや仮の件数による代替は行わず、シード等で開発者がD1へ登録した内容だけを取得する。D1未接続・障害は503とし、空のDBでは空配列・0件を返す。

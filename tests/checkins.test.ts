@@ -1,74 +1,67 @@
 import { describe, expect, it } from 'vitest'
-import {
-  buildStats,
-  congestionFor,
-  jstDate,
-  jstHour,
-  snapshotFromTimestamps,
-} from '../server/services/checkins'
-import { createDemoRepository } from '../server/repositories/demo'
+import { buildStats, congestionFor, jstDate } from '../server/services/checkins'
+import type { CheckinSnapshot } from '../shared/types'
 
-describe('JST check-in aggregates', () => {
-  it('uses JST midnight and date-specific hourly buckets', () => {
+describe('JST check-in statistics', () => {
+  it('changes dates at JST midnight, rather than UTC midnight', () => {
     expect(jstDate('2026-10-31T14:59:59.999Z')).toBe('2026-10-31')
     expect(jstDate('2026-10-31T15:00:00.000Z')).toBe('2026-11-01')
-    expect(jstHour('2026-10-31T15:35:00.000Z')).toBe('2026-11-01T00:00:00+09:00')
-    const snapshot = snapshotFromTimestamps(
-      [
-        '2026-10-31T14:59:59.999Z',
-        '2026-10-31T15:00:00.000Z',
-        '2026-10-31T15:59:59.999Z',
-        '2026-11-01T15:00:00.000Z',
+  })
+
+  it('selects the JST current day while preserving D1 daily and date-specific hourly counts', () => {
+    const snapshot: CheckinSnapshot = {
+      calculatedAt: '2026-11-01T15:00:00.000Z',
+      lastCheckinAt: '2026-11-01T15:00:00.000Z',
+      estimatedVisitors: 3,
+      daily: [
+        { date: '2026-11-01', count: 21 },
+        { date: '2026-11-02', count: 1 },
       ],
-      '2026-11-01T16:00:00.000Z',
-    )
-    expect(snapshot.daily).toEqual([
-      { date: '2026-10-31', count: 1 },
-      { date: '2026-11-01', count: 2 },
-      { date: '2026-11-02', count: 1 },
-    ])
-    expect(snapshot.hourly).toEqual([
-      { hour: '2026-10-31T23:00:00+09:00', count: 1 },
-      { hour: '2026-11-01T00:00:00+09:00', count: 2 },
-      { hour: '2026-11-02T00:00:00+09:00', count: 1 },
-    ])
-    expect(buildStats(snapshot, 'demo').today).toEqual({ date: '2026-11-02', count: 1 })
-  })
-
-  it('includes both 20-minute boundaries and ignores future/invalid timestamps', () => {
-    const snapshot = snapshotFromTimestamps(
-      [
-        '2026-11-01T00:39:59.999Z',
-        '2026-11-01T00:40:00.000Z',
-        '2026-11-01T00:50:00.000Z',
-        '2026-11-01T01:00:00.000Z',
-        '2026-11-01T01:00:00.001Z',
-        'invalid',
+      hourly: [
+        { hour: '2026-11-01T00:00:00+09:00', count: 2 },
+        { hour: '2026-11-01T23:00:00+09:00', count: 19 },
+        { hour: '2026-11-02T00:00:00+09:00', count: 1 },
       ],
-      '2026-11-01T01:00:00.000Z',
-    )
-    expect(snapshot.estimatedVisitors).toBe(3)
-    expect(snapshot.daily).toEqual([{ date: '2026-11-01', count: 4 }])
-    expect(snapshot.lastCheckinAt).toBe('2026-11-01T01:00:00.000Z')
+    }
+    const stats = buildStats(snapshot)
+    expect(stats.today).toEqual({ date: '2026-11-02', count: 1 })
+    expect(stats.daily).toEqual(snapshot.daily)
+    expect(stats.hourly).toEqual(snapshot.hourly)
+    expect(stats.congestion).toMatchObject({
+      estimatedVisitors: 3,
+      estimatedRate: 7.5,
+      capacity: 40,
+      windowMinutes: 20,
+      calculatedAt: snapshot.calculatedAt,
+      lastCheckinAt: snapshot.lastCheckinAt,
+    })
   })
 
-  it('counts accepted entries outside typical festival hours', () => {
-    const snapshot = snapshotFromTimestamps(
-      ['2026-10-31T18:00:00.000Z'],
-      '2026-10-31T18:01:00.000Z',
-    )
-    expect(snapshot.hourly).toEqual([{ hour: '2026-11-01T03:00:00+09:00', count: 1 }])
-    expect(snapshot.estimatedVisitors).toBe(1)
-  })
-
-  it('returns a true zero state without fabricated last update time', () => {
-    const stats = buildStats(snapshotFromTimestamps([], '2026-11-01T00:00:00.000Z'), 'd1')
+  it('returns zeros and a null last-check-in timestamp for an empty database result', () => {
+    const stats = buildStats({
+      calculatedAt: '2026-11-01T00:00:00.000Z',
+      lastCheckinAt: null,
+      estimatedVisitors: 0,
+      daily: [],
+      hourly: [],
+    })
     expect(stats.today).toEqual({ date: '2026-11-01', count: 0 })
     expect(stats.daily).toEqual([])
     expect(stats.hourly).toEqual([])
     expect(stats.congestion.lastCheckinAt).toBeNull()
     expect(stats.congestion.estimatedRate).toBe(0)
-    expect(stats.mode).toBe('d1')
+  })
+
+  it("does not treat a previous day's entries as today's count", () => {
+    const stats = buildStats({
+      calculatedAt: '2026-11-01T15:00:00.000Z',
+      lastCheckinAt: '2026-11-01T14:59:00.000Z',
+      estimatedVisitors: 1,
+      daily: [{ date: '2026-11-01', count: 9 }],
+      hourly: [{ hour: '2026-11-01T23:00:00+09:00', count: 9 }],
+    })
+    expect(stats.today).toEqual({ date: '2026-11-02', count: 0 })
+    expect(stats.congestion.estimatedVisitors).toBe(1)
   })
 })
 
@@ -84,29 +77,5 @@ describe('congestion thresholds', () => {
     [42, 105, 'busy', '混雑'],
   ])('%i people gives %s%% with the expected label', (visitors, rate, level, label) => {
     expect(congestionFor(visitors)).toEqual({ estimatedRate: rate, level, label })
-  })
-})
-
-describe('anonymous demo check-in behavior (no database)', () => {
-  it('adds one for every accepted post even at the same timestamp', async () => {
-    const repository = createDemoRepository(() => new Date('2026-11-01T01:00:00.000Z'))
-    const before = buildStats(await repository.getCheckinSnapshot(), 'demo')
-    expect(await repository.addCheckin()).toBe('2026-11-01T01:00:00.000Z')
-    await repository.addCheckin()
-    const after = buildStats(await repository.getCheckinSnapshot(), 'demo')
-    expect(after.today.count).toBe(before.today.count + 2)
-    expect(after.congestion.estimatedVisitors).toBe(before.congestion.estimatedVisitors + 2)
-  })
-
-  it('only explicit mutations change counts; repeated GETs leave them unchanged', async () => {
-    const repository = createDemoRepository(() => new Date('2026-11-01T01:00:00.000Z'))
-    const first = await repository.getCheckinSnapshot()
-    await repository.listExhibitions()
-    await repository.listTeams()
-    expect(await repository.getCheckinSnapshot()).toEqual(first)
-    expect(await repository.addLike(999)).toBeNull()
-    const exhibition = (await repository.listExhibitions())[0]!
-    expect(await repository.addLike(exhibition.id)).toBe(exhibition.likes + 1)
-    expect(await repository.getCheckinSnapshot()).toEqual(first)
   })
 })

@@ -2,11 +2,9 @@
 
 `requirements.md` の開発スコープ（第3節）を優先したプロトタイプ仕様。旧案の `/api/v1`、QRトークン、利用者ID、重複排除、制作者名、`desks` テーブルは使用しない。
 
-## データモード
+## データソース
 
-- `NUXT_DATA_MODE=demo`: プロセス内の架空データ。再起動でチェックイン・いいねはリセットされる。JSONには `mode: "demo"` を返す。
-- `NUXT_DATA_MODE=d1`: Cloudflareの `DB` バインディングを使う。D1未接続・読み書き失敗時は503とし、デモへ自動切替しない。
-- 本番ではモードの既定値を空にする。実データの運用はD1を選択し、明示した `demo` 設定ではCloudflare上でも架空データのプレビューを表示できる。
+すべての環境でCloudflareの `DB` バインディングからD1を利用する。班・作品は開発者がシード等で登録したD1の行だけを返し、来場数・いいねはD1の記録を集計する。アプリケーション内に代替データやモード切替は持たない。D1未接続・読み書き失敗時は503とする。DBが空の場合は班・作品は空配列、件数は0を返す。
 
 全APIは認証不要。読み取り結果と書き込み結果には `Cache-Control: no-store` を付ける。
 
@@ -14,7 +12,6 @@
 
 ```json
 {
-  "mode": "demo",
   "exhibitions": [
     {
       "id": 1,
@@ -23,7 +20,7 @@
       "title": "空を歩くVR",
       "description": "作品の説明",
       "creatorComment": "制作者コメント",
-      "likes": 24
+      "likes": 0
     }
   ]
 }
@@ -35,7 +32,6 @@
 
 ```json
 {
-  "mode": "demo",
   "teams": [
     {
       "id": 1,
@@ -52,7 +48,7 @@
 リクエスト本文なし。作品IDは正の安全な整数。1リクエストでいいねを1件追加し、更新後の合計を返す。匿名識別や利用者ごとの一意制約は設けない。
 
 ```json
-{ "mode": "demo", "exhibitionId": 1, "likes": 25 }
+{ "exhibitionId": 1, "likes": 1 }
 ```
 
 成功200、ID不正400、作品なし404。
@@ -61,7 +57,7 @@
 
 入口QRのURLは `NUXT_PUBLIC_SITE_URL` + `/checkin`。受付ページの読み込み時にJavaScriptが空のフォームを1回自動POSTする。利用者が操作する登録・確認ボタンは設けない。
 
-`POST /api/checkins` は本文を受け取らず、保存成功後に **303、Location: /welcome?checkedInAt=<サーバー時刻>&mode=demo|d1** を返す。時刻は受付時刻の表示用途に限り、識別子や入場証明として扱わない。受け付けたPOSTは毎回1件増やす。利用者ID・識別Cookie・QRトークン・再入場判定・二重登録抑制は設けない。日時はクライアント値を受け付けず、D1の時刻を保存する。WelcomeのGETや再読込では追加登録しない。
+`POST /api/checkins` は本文を受け取らず、保存成功後に **303、Location: /welcome?checkedInAt=<サーバー時刻>** を返す。時刻は受付時刻の表示用途に限り、識別子や入場証明として扱わない。受け付けたPOSTは毎回1件増やす。利用者ID・識別Cookie・QRトークン・再入場判定・二重登録抑制は設けない。日時はクライアント値を受け付けず、D1の時刻を保存する。WelcomeのGETや再読込では追加登録しない。
 
 JavaScript無効時や通信失敗時は受付ページで状態を伝える。HTMLフォームのエラーは `/checkin?error=busy|forbidden|unavailable` へ303で戻し、自動POSTを停止して再試行リンクを表示する。JSONクライアントには元のエラーステータスを返す。識別情報を持たせないため、Welcomeの直アクセスだけではチェックインの成否を証明しない。
 
@@ -69,7 +65,6 @@ JavaScript無効時や通信失敗時は受付ページで状態を伝える。H
 
 ```json
 {
-  "mode": "demo",
   "today": { "date": "2026-11-01", "count": 18 },
   "daily": [{ "date": "2026-11-01", "count": 18 }],
   "hourly": [{ "hour": "2026-11-01T10:00:00+09:00", "count": 18 }],
@@ -106,7 +101,7 @@ DB障害は503。DBの例外詳細はサーバーログに記録し、レスポ�
 
 - `server/api`: HTTP、入力検証、Origin、リダイレクト。
 - `server/services`: JST集計・推定値・混雑しきい値、入力・連続送信ポリシー。
-- `server/repositories`: デモメモリとD1の読み書き。D1のパラメータはバインドする。
+- `server/repositories`: D1の読み書き。SQLのパラメータはバインドする。
 - `shared/types.ts`: フロントエンドとAPI間の型。
 
-DBスキーマは `migrations/0001_create_exhibitions.sql` が実装上の定義。4テーブルは `teams`、`exhibitions`、`checkins`、`likes`。`seeds/test.sql` はローカル検証用の架空の班・作品のみを含み、実際のDB投入は開発者が行う。
+DBスキーマは `migrations/0001_create_exhibitions.sql` が実装上の定義。4テーブルは `teams`、`exhibitions`、`checkins`、`likes`。班・作品のデータは `seeds/test.sql` に記述し、実際のDB投入は開発者が手動で行う。

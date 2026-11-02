@@ -9,7 +9,6 @@ function rows<T>(result: D1Result<T>): T[] {
 
 export function createD1Repository(db: NaviD1Database): NaviRepository {
   return {
-    mode: 'd1',
     async listTeams() {
       return rows(
         await db.prepare('SELECT id, key, name, description FROM teams ORDER BY id').all<Team>(),

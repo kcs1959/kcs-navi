@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-07-01',
   devtools: { enabled: false },
@@ -9,9 +11,6 @@ export default defineNuxtConfig({
     '~/assets/css/main.css',
   ],
   runtimeConfig: {
-    // Production must explicitly select a data source; an omitted D1 binding must
-    // never silently replace real visitor records with disposable demo data.
-    dataMode: process.env.NUXT_DATA_MODE || (process.env.NODE_ENV === 'development' ? 'demo' : ''),
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3001',
     },
@@ -30,11 +29,17 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
-    // Ordinary Nuxt development uses the in-memory demo repository. Only the
-    // developer's explicit Wrangler invocation may create/open a local D1 file.
-    // Nitro's Cloudflare preset otherwise automatically creates a D1 proxy in dev.
-    preset: process.env.NODE_ENV === 'development' ? 'node-server' : 'cloudflare_module',
-    cloudflare: { deployConfig: false, nodeCompat: true },
+    preset: 'cloudflare_module',
+    cloudflare: {
+      deployConfig: false,
+      nodeCompat: true,
+      dev: {
+        // Nuxt開発時もD1を使い、Wranglerのマイグレーション・プレビューと同じDBを開く。
+        // 起動時のマイグレーションやシード投入は行わず、開発者が手動で実行する。
+        configPath: fileURLToPath(new URL('./wrangler.jsonc', import.meta.url)),
+        persistDir: '.wrangler/state/v3',
+      },
+    },
   },
   typescript: { strict: true },
 })

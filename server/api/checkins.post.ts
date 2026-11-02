@@ -7,7 +7,6 @@ export default defineEventHandler(async (event) => {
     await protectMutation(event, 'checkin')
     const receipt = await withRepository(event, async (repository) => ({
       checkedInAt: await repository.addCheckin(),
-      mode: repository.mode,
     }))
     // POST/Redirect/GET keeps reloading Welcome from posting again. The timestamp is only
     // a human-readable receipt, not an identity, deduplication token or proof of admission.

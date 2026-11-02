@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
+import { getTeamPresentation } from '../../utils/teamPresentation'
 
 const route = useRoute()
 const { data, error, refresh } = await useFetch<TeamsResponse>('/api/teams', { key: 'teams' })
@@ -8,18 +9,21 @@ const {
   error: worksError,
   refresh: refreshWorks,
 } = await useFetch<ExhibitionsResponse>('/api/exhibitions', { key: 'exhibitions' })
-const team = computed(() =>
-  data.value?.teams.find(
-    (item) => String(item.id) === route.params.id || item.key === route.params.id,
-  ),
-)
+const team = computed(() => {
+  // サイト内リンクのIDを優先し、数字のkeyを持つ別の班が同じURLに割り込むのを防ぐ。
+  const teams = data.value?.teams
+  return (
+    teams?.find((item) => String(item.id) === route.params.id) ??
+    teams?.find((item) => item.key === route.params.id)
+  )
+})
 const teamWorks = computed(
   () => works.value?.exhibitions.filter((work) => work.teamId === team.value?.id) ?? [],
 )
 const { openExhibition } = useExhibitionDialog()
+const presentation = computed(() => getTeamPresentation(team.value?.key))
 
 useHead(() => ({ title: team.value?.name ?? '班紹介' }))
-
 </script>
 
 <template>
@@ -36,13 +40,22 @@ useHead(() => ({ title: team.value?.name ?? '班紹介' }))
     </div>
     <template v-else-if="team">
       <section class="card team-about">
-        <div v-if="team.key === 'vr'" class="team-artwork">
-          <img src="/figma/team-frame.svg" alt="" width="302" height="140" />
+        <div
+          v-if="presentation.hero"
+          class="team-artwork"
+          :style="{ background: presentation.tint }"
+        >
+          <img
+            :src="presentation.hero.src"
+            alt=""
+            :width="presentation.hero.width"
+            :height="presentation.hero.height"
+          />
         </div>
         <p>{{ team.description }}</p>
       </section>
       <h2 class="section-heading">
-        この班の作品 <span>{{ teamWorks.length }}</span>
+        この班の作品 <span v-if="works && !worksError">{{ teamWorks.length }}</span>
       </h2>
       <div v-if="worksError" class="error-card" role="alert">
         <p>作品を読み込めませんでした。</p>
@@ -53,11 +66,13 @@ useHead(() => ({ title: team.value?.name ?? '班紹介' }))
         :key="exhibition.id"
         :exhibition="exhibition"
         :team="team"
-        :illustration="team.key === 'vr' ? '/figma/team-frame1.svg' : undefined"
+        :team-view="true"
         :show-description="false"
         @select="openExhibition(exhibition)"
       />
-      <p v-if="works && !teamWorks.length" class="card text-muted">この班の作品は準備中です。</p>
+      <p v-if="works && !worksError && !teamWorks.length" class="card text-muted">
+        この班の作品はまだ登録されていません。
+      </p>
     </template>
     <div v-else-if="data" class="card missing-team">
       <p>この班は見つかりませんでした。</p>
@@ -95,7 +110,6 @@ useHead(() => ({ title: team.value?.name ?? '班紹介' }))
   overflow: hidden;
   border-radius: 20px;
   height: 140px;
-  background: var(--kcs-lavender, #e5dcf9);
 }
 .team-artwork img {
   display: block;

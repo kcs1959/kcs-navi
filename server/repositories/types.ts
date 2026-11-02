@@ -1,7 +1,6 @@
-import type { CheckinSnapshot, DataMode, Exhibition, Team } from '../../shared/types'
+import type { CheckinSnapshot, Exhibition, Team } from '../../shared/types'
 
 export interface NaviRepository {
-  readonly mode: DataMode
   listTeams(): Promise<Team[]>
   listExhibitions(): Promise<Exhibition[]>
   addLike(exhibitionId: number): Promise<number | null>

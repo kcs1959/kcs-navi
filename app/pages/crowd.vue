@@ -87,7 +87,6 @@ const todayLabel = computed(() => {
     >
       <div class="attendance-heading">
         <h2 id="attendance-heading">今日の来場者数</h2>
-        <span v-if="data.mode === 'demo'" class="chip demo-chip">サンプル</span>
       </div>
       <p class="attendance-count">
         <strong>{{ data.today.count.toLocaleString('ja-JP') }}</strong
@@ -156,8 +155,7 @@ const todayLabel = computed(() => {
       </div>
 
       <p class="chart-caption">
-        {{ selectedTab === 'hourly' ? `${todayLabel}（日本時間）` : '日別集計（日本時間）'
-        }}<span v-if="data.mode === 'demo'">の表示例</span>
+        {{ selectedTab === 'hourly' ? `${todayLabel}（日本時間）` : '日別集計（日本時間）' }}
       </p>
     </section>
 
@@ -194,9 +192,6 @@ const todayLabel = computed(() => {
   font-size: 12px;
   font-weight: 400;
   color: var(--kcs-muted, #7d5b49);
-}
-.demo-chip {
-  background: var(--kcs-paper, #fff6ea);
 }
 .attendance-count {
   display: flex;

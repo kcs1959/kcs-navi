@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Exhibition, Team } from '../../shared/types'
+import { getTeamPresentation } from '../utils/teamPresentation'
 const props = defineProps<{
   exhibition: Exhibition
   team?: Team
@@ -13,20 +14,8 @@ const submitting = ref(false)
 const likeError = ref('')
 const liked = ref(false)
 const { updateLikes } = useExhibitionDialog()
-const artwork = computed(() =>
-  props.exhibition.deskKey === 'desk-b'
-    ? '/figma/works-frame1.svg'
-    : props.exhibition.deskKey === 'desk-c'
-      ? '/figma/works-frame2.svg'
-      : '/figma/detail-frame.svg',
-)
-const tint = computed(() =>
-  props.exhibition.deskKey === 'desk-b'
-    ? 'var(--mint)'
-    : props.exhibition.deskKey === 'desk-c'
-      ? 'var(--lemon)'
-      : 'var(--lavender)',
-)
+const presentation = computed(() => getTeamPresentation(props.team?.key))
+const artwork = computed(() => presentation.value.detail)
 watch(
   () => props.exhibition.id,
   () => {
@@ -98,21 +87,16 @@ function dismissBackdrop(event: MouseEvent) {
           {{ index + 1 }}. {{ item.title }}
         </button>
       </div>
-      <div class="detail-artwork" :style="{ background: tint }">
-        <img
-          :src="artwork"
-          alt=""
-          :width="302"
-          :height="exhibition.deskKey === 'desk-a' ? 140 : 124"
-        />
+      <div v-if="artwork" class="detail-artwork" :style="{ background: presentation.tint }">
+        <img :src="artwork.src" alt="" :width="artwork.width" :height="artwork.height" />
       </div>
       <div class="detail-tags">
         <NuxtLink
           class="chip"
-          :style="{ background: tint }"
+          :style="{ background: presentation.tint }"
           :to="`/teams/${team?.id ?? exhibition.teamId}`"
           >{{ team?.name ?? '班紹介' }} ↗</NuxtLink
-        ><span class="chip">体験展示</span>
+        >
       </div>
       <p class="description">{{ exhibition.description }}</p>
       <p class="detail-location">
@@ -123,7 +107,7 @@ function dismissBackdrop(event: MouseEvent) {
         <p>班の情報を取得できませんでした。</p>
         <button class="secondary-button" @click="emit('retryTeams')">班の情報を再読み込み</button>
       </div>
-      <section class="creator-comment" :style="{ background: tint }">
+      <section class="creator-comment" :style="{ background: presentation.tint }">
         <h3>制作者より</h3>
         <p>{{ exhibition.creatorComment }}</p>
       </section>
