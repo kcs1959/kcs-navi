@@ -9,10 +9,10 @@
   },
   "packageManager": "npm@11.13.0",
   "scripts": {
-    "dev": "nuxt dev --host 0.0.0.0 --port 3001",
+    "dev": "nuxt dev --host 0.0.0.0 --port 3000",
     "build": "nuxt build",
     "preview": "npm run preview:workers",
-    "preview:workers": "wrangler dev --port 3001",
+    "preview:workers": "wrangler dev --port 3000",
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
     "test": "vitest run",
