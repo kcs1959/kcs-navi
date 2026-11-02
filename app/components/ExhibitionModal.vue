@@ -39,7 +39,7 @@ async function like() {
     void refreshNuxtData('exhibitions')
   } catch {
     if (props.exhibition.id === requestedId)
-      likeError.value = 'いいねを送信できませんでした。少し待ってからお試しください。'
+      likeError.value = 'いいねを送信できませんでした。もう一度試してください。'
   } finally {
     submitting.value = false
   }
@@ -107,7 +107,7 @@ function dismissBackdrop(event: MouseEvent) {
         {{ submitting ? '送信中…' : 'いいね！' }} <strong>{{ likes }}</strong>
       </button>
       <p class="like-feedback" aria-live="polite">
-        {{ liked ? '応援ありがとうございます！' : '気に入った作品を、そっと応援しよう。' }}
+        {{ liked ? '応援ありがとうございます！' : '気に入った作品を応援しよう！' }}
       </p>
       <p v-if="likeError" class="inline-error" role="alert">{{ likeError }}</p>
     </div>
