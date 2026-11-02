@@ -20,11 +20,6 @@ const { openExhibition } = useExhibitionDialog()
 
 useHead(() => ({ title: team.value?.name ?? '班紹介' }))
 
-const taglines: Record<string, string> = {
-  vr: '現実の、その先へ。',
-  game: '「楽しい」を、つくろう。',
-  dtm: '好きな音から、広がる世界。',
-}
 </script>
 
 <template>
@@ -44,7 +39,6 @@ const taglines: Record<string, string> = {
         <div v-if="team.key === 'vr'" class="team-artwork">
           <img src="/figma/team-frame.svg" alt="" width="302" height="140" />
         </div>
-        <h2>{{ taglines[team.key] ?? team.name }}</h2>
         <p>{{ team.description }}</p>
       </section>
       <h2 class="section-heading">
