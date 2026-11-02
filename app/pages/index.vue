@@ -78,7 +78,6 @@ function selectDesk(key: string) {
           >
         </button>
       </div>
-      <p class="map-caption">※ 配置はイメージです</p>
     </section>
     <div v-if="error" class="error-card" role="alert">
       <p>展示情報を読み込めませんでした。</p>
@@ -90,12 +89,6 @@ function selectDesk(key: string) {
     <p v-else-if="!data?.exhibitions.length" class="demo-notice">
       展示情報はまだ登録されていません。
     </p>
-    <p v-if="data?.mode === 'demo'" class="demo-notice">プロトタイプ · 展示と人数はサンプルです</p>
-    <NuxtLink class="play-fab" to="/games"
-      ><img src="/figma/map-icon-gamepad3.svg" alt="" width="24" height="24" /><span
-        >あそぶ</span
-      ></NuxtLink
-    >
   </div>
 </template>
 <style scoped>

@@ -20,12 +20,6 @@ const links = [
     description: '混雑の目安をチェック',
     icon: '/figma/menu-icon-chart-no-axes-column.svg',
   },
-  {
-    to: '/games',
-    title: 'Webゲーム',
-    description: '待ち時間も楽しもう',
-    icon: '/figma/menu-icon-gamepad2.svg',
-  },
 ]
 </script>
 
