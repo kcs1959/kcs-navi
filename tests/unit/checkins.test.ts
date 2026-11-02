@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { buildStats, congestionFor, jstDate } from '../server/services/checkins'
-import type { CheckinSnapshot } from '../shared/types'
+import { buildStats, congestionFor, jstDate } from '../../server/services/checkins'
+import type { CheckinSnapshot } from '../../shared/types'
 
 describe('JST check-in statistics', () => {
   it('changes dates at JST midnight, rather than UTC midnight', () => {

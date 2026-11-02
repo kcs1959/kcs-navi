@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { isSameOriginPost, parseExhibitionId, takeToken } from '../server/services/request-policy'
+import {
+  isSameOriginPost,
+  parseExhibitionId,
+  takeToken,
+} from '../../server/services/request-policy'
 
 describe('write request origin policy', () => {
-  const siteUrl = 'http://localhost:3001'
+  const siteUrl = 'http://localhost:3000' // TODO: ハードコーディングしない
   it('allows native forms and fetch from the configured origin', () => {
     expect(isSameOriginPost(siteUrl, 'same-origin', siteUrl)).toBe(true)
     expect(isSameOriginPost(undefined, 'same-origin', siteUrl)).toBe(true)

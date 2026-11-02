@@ -91,3 +91,10 @@ npm run dev
 ```sh
 npx wrangler d1 execute kcs-navi --local --file seeds/test.sql
 ```
+
+## 4. ユニットテストを行う
+
+```sh
+npm install -D vitest @nuxt/test-utils @vue/test-utils happy-dom @cloudflare/vitest-plugin
+npm test
+```
