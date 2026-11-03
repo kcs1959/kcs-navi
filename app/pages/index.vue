@@ -142,7 +142,8 @@ function selectDesk(key: string) {
 }
 .desk {
   position: absolute;
-  background: white;
+  background: var(--white);
+  color: var(--ink);
   border: 1px solid var(--line);
   border-radius: 12px;
   /* DBの長い班名が2行になっても、件数とともに固定サイズの机内に収める。 */

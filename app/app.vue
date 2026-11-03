@@ -30,22 +30,25 @@ watch(() => route.path, closeExhibition)
         <KcsLogo />
         <span class="brand-copy"><strong>KCS Navi</strong><small>三田祭 2026</small></span>
       </NuxtLink>
-      <!--TODO: ハンバーガーメニューを改良。別ページ`/menu`ではなく、アニメーションでポップアップを表示させる-->
-      <NuxtLink
-        class="icon-button"
-        :to="route.path === '/menu' ? '/' : '/menu'"
-        :aria-label="route.path === '/menu' ? 'メニューを閉じる' : 'メニューを開く'"
-        :aria-expanded="route.path === '/menu'"
-      >
-        <img
-          v-if="route.path === '/menu'"
-          src="/figma/menu-icon-x.svg"
-          alt=""
-          width="22"
-          height="22"
-        />
-        <img v-else src="/figma/map-icon-menu.svg" alt="" width="24" height="24" />
-      </NuxtLink>
+      <div class="header-actions">
+        <ThemeToggle />
+        <!--TODO: ハンバーガーメニューを改良。別ページ`/menu`ではなく、アニメーションでポップアップを表示させる-->
+        <NuxtLink
+          class="icon-button"
+          :to="route.path === '/menu' ? '/' : '/menu'"
+          :aria-label="route.path === '/menu' ? 'メニューを閉じる' : 'メニューを開く'"
+          :aria-expanded="route.path === '/menu'"
+        >
+          <img
+            v-if="route.path === '/menu'"
+            src="/figma/menu-icon-x.svg"
+            alt=""
+            width="22"
+            height="22"
+          />
+          <img v-else src="/figma/map-icon-menu.svg" alt="" width="24" height="24" />
+        </NuxtLink>
+      </div>
     </header>
     <main id="main-content" :class="{ 'with-navigation': showNavigation }">
       <NuxtPage />

@@ -191,7 +191,7 @@ const todayLabel = computed(() => {
   margin: 0;
   font-size: 12px;
   font-weight: 400;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
 }
 .attendance-count {
   display: flex;
@@ -215,14 +215,14 @@ const todayLabel = computed(() => {
   min-height: 40px;
   border: none;
   border-radius: 12px;
-  background: var(--kcs-paper, #fff6ea);
-  color: var(--kcs-ink, #4b2d22);
+  background: var(--paper);
+  color: var(--ink);
   font: inherit;
   font-size: 12px;
   cursor: pointer;
 }
 .chart-tabs button.active {
-  background: var(--kcs-peach, #ffd8bc);
+  background: var(--peach);
 }
 .chart-scroll {
   overflow-x: auto;
@@ -248,18 +248,18 @@ const todayLabel = computed(() => {
   align-items: end;
   justify-content: center;
   padding: 0 8px 1px;
-  border-bottom: 1px solid var(--kcs-line, #ead6c5);
+  border-bottom: 1px solid var(--line);
 }
 .bar {
   position: relative;
   min-height: 1px;
   width: 28px;
   max-width: 100%;
-  background: var(--kcs-peach, #ffd8bc);
+  background: var(--peach);
   border-radius: 6px 6px 0 0;
 }
 .bar.latest {
-  background: var(--kcs-orange, #ee8b4a);
+  background: var(--orange);
 }
 .bar-value {
   position: absolute;
@@ -267,19 +267,19 @@ const todayLabel = computed(() => {
   transform: translateX(-50%);
   bottom: calc(100% + 3px);
   font-size: 10px;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
   white-space: nowrap;
 }
 .bar-label {
   align-self: center;
   font-size: 10px;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
   white-space: nowrap;
 }
 .chart-caption {
   margin: 0;
   font-size: 10px;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
 }
 .empty-chart {
   min-height: 147px;
@@ -287,7 +287,7 @@ const todayLabel = computed(() => {
   place-items: center;
   margin: 0;
   font-size: 12px;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
 }
 .estimate-note {
   display: grid;
@@ -301,7 +301,7 @@ const todayLabel = computed(() => {
 .estimate-note p {
   margin: 0;
   font-size: 12px;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
   line-height: 1.5;
 }
 </style>

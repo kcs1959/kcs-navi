@@ -11,12 +11,39 @@
   --ink: #4b2d22;
   --muted: #7d5b49;
   --line: #ead6c5;
+  --focus: #9c5b30;
+  --navigation-shadow: #4b2d2214;
+  --error: #a43d27;
+  --on-primary: var(--ink);
+  --on-primary-hover: var(--ink);
+  --icon-filter: none;
+  color-scheme: light;
   font-family: 'Noto Sans JP', sans-serif;
   color: var(--ink);
   background: var(--paper);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+:root[data-theme='dark'] {
+  --paper: #211c19;
+  --glass: #2b2420;
+  --white: #342b26;
+  --orange: #eea16c;
+  --strong: #875033;
+  --peach: #63422f;
+  --lemon: #625332;
+  --mint: #344e3b;
+  --lavender: #4c405e;
+  --ink: #fff0e2;
+  --muted: #cfb6a5;
+  --line: #655044;
+  --focus: #ffbd88;
+  --navigation-shadow: #00000045;
+  --error: #ffad99;
+  --on-primary-hover: #211c19;
+  --icon-filter: brightness(0) invert(1);
+  color-scheme: dark;
 }
 * {
   box-sizing: border-box;
@@ -59,7 +86,7 @@ img {
   vertical-align: middle;
 }
 :focus-visible {
-  outline: 3px solid #9c5b30;
+  outline: 3px solid var(--focus);
   outline-offset: 4px;
 }
 .site-shell {
@@ -92,6 +119,15 @@ img {
   gap: 10px;
   min-width: 0;
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.site-header .icon-button img {
+  filter: var(--icon-filter);
+}
 .brand-copy {
   display: flex;
   flex-direction: column;
@@ -113,7 +149,7 @@ img {
   display: grid;
   place-items: center;
   border-radius: 12px;
-  background: white;
+  background: var(--white);
 }
 .page-content {
   padding: 16px 24px 36px;
@@ -145,7 +181,7 @@ img {
   line-height: 1.5;
 }
 .card {
-  background: white;
+  background: var(--white);
   border: 1px solid var(--line);
   border-radius: 20px;
 }
@@ -185,12 +221,15 @@ img {
 }
 .primary-button {
   background: var(--strong);
+  color: var(--on-primary);
 }
 .primary-button:hover {
   background: var(--orange);
+  color: var(--on-primary-hover);
 }
 .secondary-button {
   background: var(--paper);
+  color: var(--ink);
   border: 1px solid var(--line);
 }
 .primary-button:disabled {
@@ -200,7 +239,7 @@ img {
   padding: 20px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: white;
+  background: var(--white);
   font-size: 13px;
 }
 .error-card p {
@@ -224,7 +263,7 @@ img {
   padding: 8px;
   border-radius: 32px;
   background: var(--glass);
-  box-shadow: 0 6px 20px #4b2d2214;
+  box-shadow: 0 6px 20px var(--navigation-shadow);
 }
 .bottom-navigation a {
   flex: 1;
@@ -256,7 +295,7 @@ img {
   z-index: 100;
   top: 6px;
   left: 12px;
-  background: white;
+  background: var(--white);
   padding: 12px;
   transform: translateY(-150%);
 }

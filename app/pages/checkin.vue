@@ -63,13 +63,13 @@ onMounted(() => {
   font-size: 12px;
   line-height: 1.5;
   margin: 0;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
 }
 .checkin-spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid var(--kcs-peach, #ffd8bc);
-  border-top-color: var(--kcs-orange, #ee8b4a);
+  border: 4px solid var(--peach);
+  border-top-color: var(--orange);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

@@ -190,7 +190,7 @@ function dismissBackdrop(event: MouseEvent) {
 }
 .inline-error {
   font-size: 12px;
-  color: #a43d27;
+  color: var(--error);
 }
 .work-switcher {
   display: flex;
@@ -203,7 +203,8 @@ function dismissBackdrop(event: MouseEvent) {
   border-radius: 12px;
   padding: 6px 9px;
   font-size: 10px;
-  background: white;
+  background: var(--white);
+  color: var(--ink);
 }
 .work-switcher button.selected {
   background: var(--lavender);
@@ -214,5 +215,8 @@ function dismissBackdrop(event: MouseEvent) {
     margin-top: 24px;
     max-height: calc(100dvh - 48px);
   }
+}
+.close-detail img {
+  filter: var(--icon-filter);
 }
 </style>
