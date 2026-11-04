@@ -36,7 +36,6 @@ async function like() {
       liked.value = true
     }
     updateLikes(requestedId, result.likes)
-    void refreshNuxtData('exhibitions')
   } catch {
     if (props.exhibition.id === requestedId)
       likeError.value = 'いいねを送信できませんでした。少し待ってからお試しください。'
