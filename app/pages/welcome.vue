@@ -29,7 +29,7 @@ const receiptTime = computed(() =>
       </div>
       <h1 id="welcome-title">{{ checkedInAt ? 'チェックインしました！' : 'KCSへようこそ！' }}</h1>
       <p class="welcome-message">
-        ご来場ありがとうございます。<br />気になる作品を見つけてみてね。
+        三田祭KCSブースへのご来場、ありがとうございます！<br />
       </p>
       <span v-if="receiptTime" class="chip receipt-time">受付日時 {{ receiptTime }}</span>
       <NuxtLink to="/" class="primary-button map-button">会場マップへ</NuxtLink>
