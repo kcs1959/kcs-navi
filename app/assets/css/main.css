@@ -121,6 +121,30 @@ img {
   flex-direction: column;
   gap: 16px;
 }
+/* Sequential fade-out and fade-in take 0.2 seconds in total. */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.1s ease;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+.menu-enter-active {
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms ease-out;
+}
+.menu-leave-active {
+  transition: opacity 100ms ease-in;
+}
+.menu-enter-from {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.menu-leave-to {
+  opacity: 0;
+}
 .page-heading {
   display: flex;
   flex-direction: column;

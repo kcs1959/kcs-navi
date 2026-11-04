@@ -127,6 +127,19 @@ function dismissBackdrop(event: MouseEvent) {
   box-shadow: 0 12px 60px #4b2d2229;
   overscroll-behavior: contain;
 }
+.exhibition-dialog[open] {
+  animation: exhibition-pop-in 0.2s ease-out;
+}
+@keyframes exhibition-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 .exhibition-dialog::backdrop {
   background: #4b2d2245;
   backdrop-filter: blur(3px);

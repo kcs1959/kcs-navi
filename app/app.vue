@@ -48,7 +48,7 @@ watch(() => route.path, closeExhibition)
       </NuxtLink>
     </header>
     <main id="main-content" :class="{ 'with-navigation': showNavigation }">
-      <NuxtPage />
+      <NuxtPage :transition="{ name: route.path === '/menu' ? 'menu' : 'page', mode: 'out-in' }" />
     </main>
     <ExhibitionModal
       v-if="selectedExhibition"
