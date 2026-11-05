@@ -27,6 +27,8 @@ export interface TeamsResponse {
   teams: Team[]
 }
 
+export const LIKE_LIMIT = 10
+
 export interface LikeResponse {
   exhibitionId: number
   likes: number
