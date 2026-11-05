@@ -37,6 +37,11 @@ export interface DailyCount {
   count: number
 }
 
+export interface CheckinReceipt {
+  checkedInAt: string
+  visitorNumber: number
+}
+
 export interface HourlyCount {
   hour: string
   count: number
