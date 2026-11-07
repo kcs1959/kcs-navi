@@ -24,7 +24,7 @@
 body {
   margin: 0;
 }
-body:has(dialog[open]) {
+body.exhibition-open {
   overflow: hidden;
 }
 button,
