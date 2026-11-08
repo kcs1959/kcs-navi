@@ -124,11 +124,11 @@ function dismissBackdrop(event: MouseEvent) {
   background: var(--glass);
   border: 1px solid var(--line);
   border-radius: 28px;
-  box-shadow: 0 12px 60px #4b2d2229;
+  box-shadow: 0 12px 60px var(--dialog-shadow);
   overscroll-behavior: contain;
 }
 .exhibition-dialog::backdrop {
-  background: #4b2d2245;
+  background: var(--dialog-backdrop);
   backdrop-filter: blur(3px);
 }
 .detail-body {
@@ -208,7 +208,7 @@ function dismissBackdrop(event: MouseEvent) {
 }
 .work-switcher button.selected {
   background: var(--lavender);
-  border-color: #b4a0da;
+  border-color: var(--selected-work-border);
 }
 @media (max-height: 600px) {
   .exhibition-dialog {

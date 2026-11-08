@@ -13,6 +13,9 @@
   --line: #ead6c5;
   --focus: #9c5b30;
   --navigation-shadow: #4b2d2214;
+  --dialog-shadow: #4b2d2229;
+  --dialog-backdrop: #4b2d2245;
+  --selected-work-border: #b4a0da;
   --error: #a43d27;
   --on-primary: var(--ink);
   --on-primary-hover: var(--ink);
