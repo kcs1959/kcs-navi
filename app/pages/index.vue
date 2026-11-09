@@ -15,6 +15,14 @@ const {
 } = useCrowdStats()
 
 // TODO: 地図表示ロジック要検討（3D?）
+// 地図の描画完了を待ってからローディングを外す。3D地図はクライアントでしか描画できず、
+// SSRのHTMLと初回描画では常に未完了とする（ハイドレーションの不一致を防ぐ）。
+// 現在の2D地図はマウント時点で描画済み。3D化後は描画側の読み込み完了で true にする。
+const mapRendered = ref(false)
+onMounted(() => {
+  mapRendered.value = true
+})
+const mapLoading = computed(() => status.value === 'pending' || !mapRendered.value)
 // deskKeyはDBの作品に対応する固定キー（仮）
 const deskPositions = ['desk-a', 'desk-b', 'desk-c']
 const worksAvailable = computed(
@@ -66,7 +74,7 @@ function selectDesk(key: string) {
       :loading="statsStatus === 'pending'"
       @retry="refreshStats()"
     />
-    <section class="card booth-map" aria-labelledby="map-title" :aria-busy="status === 'pending'">
+    <section class="card booth-map" aria-labelledby="map-title" :aria-busy="mapLoading">
       <div class="map-heading">
         <h2 id="map-title">展示マップ</h2>
         <span class="chip lemon">机をタップ</span>
@@ -85,16 +93,16 @@ function selectDesk(key: string) {
           <span class="desk-label">{{ desk.label }}</span>
           <span class="chip desk-count">{{ desk.number }} · {{ desk.countLabel }}</span>
         </button>
+        <Transition name="loading-fade">
+          <LoadingIndicator v-if="mapLoading" overlay label="マップを準備しています" />
+        </Transition>
       </div>
     </section>
     <div v-if="error" class="error-card" role="alert">
       <p>展示情報を読み込めませんでした。</p>
       <button class="secondary-button" @click="refresh()">もう一度読み込む</button>
     </div>
-    <p v-else-if="status === 'pending'" class="data-notice" role="status">
-      展示情報を読み込んでいます…
-    </p>
-    <p v-else-if="!data?.exhibitions.length" class="data-notice">
+    <p v-else-if="status !== 'pending' && !data?.exhibitions.length" class="data-notice">
       展示情報はまだ登録されていません。
     </p>
   </div>
@@ -214,6 +222,12 @@ function selectDesk(key: string) {
   font-size: 10px;
   margin: 0 4px;
   line-height: 1.5;
+}
+.loading-fade-leave-active {
+  transition: opacity 0.3s;
+}
+.loading-fade-leave-to {
+  opacity: 0;
 }
 .data-notice {
   font-size: 10px;
