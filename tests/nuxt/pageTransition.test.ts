@@ -25,9 +25,13 @@ describe('menu page transitions', () => {
     })
   })
 
+  it.each(['/', '/crowd'])('slides into the menu from %s', (from) => {
+    expect(transitionFor('/menu', from)).toMatchObject({
+      pageTransition: { name: 'menu', mode: 'out-in' },
+    })
+  })
+
   it.each([
-    ['/menu', '/'],
-    ['/menu', '/crowd'],
     ['/teams', '/exhibitions'],
     ['/teams/1', '/menu'],
     ['/checkin', '/menu'],

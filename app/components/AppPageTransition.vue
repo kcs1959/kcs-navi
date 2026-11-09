@@ -1,13 +1,15 @@
 <script setup lang="ts">
 const router = useRouter()
+const transition = computed(() => router.currentRoute.value.meta.pageTransition)
+const fadeEnabled = computed(
+  () => typeof transition.value === 'object' && transition.value.name === 'page-fade',
+)
 </script>
 
 <template>
-  <div
-    :class="{ 'page-transition-enabled': Boolean(router.currentRoute.value.meta.pageTransition) }"
-  >
+  <div :class="{ 'page-transition-enabled': fadeEnabled }">
     <!-- ラッパーを常設し、遷移元のページにもleaveフックを登録する。 -->
-    <NuxtPage :transition="{ name: 'page-fade', mode: 'out-in' }" />
+    <NuxtPage :transition="transition || { name: 'page-fade', mode: 'out-in' }" />
   </div>
 </template>
 
