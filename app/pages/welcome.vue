@@ -64,7 +64,7 @@ const receiptTime = computed(() =>
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: var(--kcs-mint, #d5e9d5);
+  background: var(--mint);
   display: grid;
   place-items: center;
 }
@@ -79,10 +79,10 @@ const receiptTime = computed(() =>
   font-size: 14px;
   line-height: 1.5;
   text-align: center;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
 }
 .receipt-time {
-  background: var(--kcs-paper, #fff6ea);
+  background: var(--paper);
 }
 .visitor-message {
   display: grid;
@@ -107,7 +107,10 @@ const receiptTime = computed(() =>
   margin: 0;
   align-self: stretch;
   font-size: 10px;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
   line-height: 1.5;
+}
+.success-badge img {
+  filter: var(--icon-filter);
 }
 </style>

@@ -128,7 +128,7 @@ describe('D1 likes repository', () => {
   })
   it('preserves totals when exhibition metadata is reseeded', async () => {
     await repository.addLike(1)
-    await executeFile('../../seeds/test.sql')
+    await executeSqlFile('../../seeds/test.sql')
     expect((await repository.listExhibitions())[0]?.likes).toBe(1)
   })
 })

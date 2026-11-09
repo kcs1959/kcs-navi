@@ -175,7 +175,7 @@ function dismissBackdrop(event: MouseEvent) {
   background: var(--glass);
   border: 1px solid var(--line);
   border-radius: 28px;
-  box-shadow: 0 12px 60px #4b2d2229;
+  box-shadow: 0 12px 60px var(--dialog-shadow);
   overscroll-behavior: contain;
 }
 .exhibition-dialog[open] {
@@ -192,7 +192,7 @@ function dismissBackdrop(event: MouseEvent) {
   }
 }
 .exhibition-dialog::backdrop {
-  background: #4b2d2245;
+  background: var(--dialog-backdrop);
   backdrop-filter: blur(3px);
 }
 .detail-body {
@@ -246,7 +246,6 @@ function dismissBackdrop(event: MouseEvent) {
   white-space: pre-line;
 }
 .like-area {
-  --like-accent: #b94b25;
   display: grid;
   justify-items: center;
   gap: 10px;
@@ -269,9 +268,9 @@ function dismissBackdrop(event: MouseEvent) {
   padding: 14px;
   border: 2px solid var(--white);
   border-radius: 50%;
-  color: white;
+  color: var(--on-like-accent);
   background: var(--like-accent);
-  box-shadow: 0 4px 12px #b94b2526;
+  box-shadow: 0 4px 12px var(--like-shadow);
   touch-action: manipulation;
   transition:
     transform 120ms ease,
@@ -279,7 +278,7 @@ function dismissBackdrop(event: MouseEvent) {
 }
 .like-button:not(:disabled):active {
   transform: scale(0.94);
-  box-shadow: 0 1px 4px #b94b2526;
+  box-shadow: 0 1px 4px var(--like-shadow);
 }
 .like-button:disabled {
   cursor: default;
@@ -333,7 +332,7 @@ function dismissBackdrop(event: MouseEvent) {
 }
 .inline-error {
   font-size: 12px;
-  color: #a43d27;
+  color: var(--error);
 }
 .work-switcher {
   display: flex;
@@ -346,16 +345,20 @@ function dismissBackdrop(event: MouseEvent) {
   border-radius: 12px;
   padding: 6px 9px;
   font-size: 10px;
-  background: white;
+  background: var(--white);
+  color: var(--ink);
 }
 .work-switcher button.selected {
   background: var(--lavender);
-  border-color: #b4a0da;
+  border-color: var(--selected-work-border);
 }
 @media (max-height: 600px) {
   .exhibition-dialog {
     margin-top: 24px;
     max-height: calc(100dvh - 48px);
   }
+}
+.close-detail img {
+  filter: var(--icon-filter);
 }
 </style>
