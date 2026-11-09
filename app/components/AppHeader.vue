@@ -8,8 +8,6 @@ const headerSlot = ref<HTMLElement>()
 const header = ref<HTMLElement>()
 const isFloating = ref(false)
 const headerHeight = ref(0)
-const floatingLeft = ref(0)
-const floatingWidth = ref(0)
 let resizeObserver: ResizeObserver | undefined
 let scrollFrame = 0
 
@@ -18,8 +16,6 @@ function updatePosition() {
 
   const slot = headerSlot.value.getBoundingClientRect()
   headerHeight.value = header.value.getBoundingClientRect().height
-  floatingLeft.value = slot.left
-  floatingWidth.value = slot.width
 
   // 元の位置に戻るまでは固定表示を保ち、途中でヘッダーが消えないようにする。
   if (slot.top >= 0) isFloating.value = false
@@ -69,12 +65,7 @@ const externalLinks = [
     class="header-slot"
     :style="isFloating ? { height: `${headerHeight}px` } : undefined"
   >
-    <header
-      ref="header"
-      class="site-header"
-      :class="{ 'is-floating': isFloating }"
-      :style="isFloating ? { left: `${floatingLeft}px`, width: `${floatingWidth}px` } : undefined"
-    >
+    <header ref="header" class="site-header" :class="{ 'is-floating': isFloating }">
       <NuxtLink class="brand" to="/" aria-label="KCS Navi 会場マップへ">
         <KcsLogo />
         <span class="brand-copy">
@@ -149,6 +140,11 @@ const externalLinks = [
 .site-header.is-floating {
   position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  border-radius: 0;
+  padding-inline: max(24px, calc((100% - 480px) / 2 + 24px));
+  background: var(--glass);
   animation: header-slide-in 220ms ease-out;
 }
 @keyframes header-slide-in {
@@ -226,7 +222,8 @@ const externalLinks = [
   }
 }
 @media (max-width: 359px) {
-  .site-header {
+  .site-header,
+  .site-header.is-floating {
     padding-inline: 16px;
   }
 }

@@ -40,7 +40,6 @@ describe('AppHeader', () => {
       await scrollTo(-76)
       expect(wrapper.get('header').classes()).toContain('is-floating')
       expect(wrapper.get('.header-slot').attributes('style')).toContain('height: 76px')
-      expect(wrapper.get('header').attributes('style')).toContain('width: 480px')
       expect(wrapper.findAll('header')).toHaveLength(1)
 
       await scrollTo(-30)
@@ -51,7 +50,6 @@ describe('AppHeader', () => {
       window.dispatchEvent(new Event('resize'))
       await nextTick()
       expect(wrapper.get('.header-slot').attributes('style')).toContain('height: 127px')
-      expect(wrapper.get('header').attributes('style')).toContain('width: 350px')
 
       await scrollTo(0)
       expect(wrapper.get('header').classes()).not.toContain('is-floating')
