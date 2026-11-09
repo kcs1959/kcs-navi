@@ -37,6 +37,16 @@ beforeEach(async () => {
   await db.prepare('DELETE FROM checkins').run()
 })
 
+async function executeSqlFile(relativePath: string) {
+  const sql = await readFile(new URL(relativePath, import.meta.url), 'utf8')
+  const statements = sql
+    .replace(/^--.*$/gm, '')
+    .split(';')
+    .map((part) => part.trim())
+    .filter(Boolean)
+  await db.batch(statements.map((statement) => db.prepare(statement)))
+}
+
 function repositoryAt(timestamp: string) {
   return createD1Repository({
     prepare(sql) {
@@ -85,5 +95,40 @@ describe('daily check-in receipt', () => {
     ])
     expect((await repositoryAt('2026-11-05T14:59:59.998Z').addCheckin()).visitorNumber).toBe(2)
     expect((await repositoryAt('2026-11-05T15:00:00.000Z').addCheckin()).visitorNumber).toBe(1)
+  })
+})
+
+describe('D1 likes repository', () => {
+  beforeEach(async () => {
+    await db.batch(
+      ['likes', 'exhibitions', 'teams'].map((table) => db.prepare(`DELETE FROM ${table}`)),
+    )
+    await executeSqlFile('../../seeds/test.sql')
+  })
+  it('starts at zero and increments only the requested work', async () => {
+    expect((await repository.listExhibitions())[0]?.likes).toBe(0)
+    expect(await repository.addLike(1)).toBe(1)
+    expect(await repository.addLike(1)).toBe(2)
+    expect(await repository.addLike(2)).toBe(1)
+    expect((await repository.listExhibitions()).slice(0, 2).map((work) => work.likes)).toEqual([
+      2, 1,
+    ])
+    expect(await db.prepare('SELECT COUNT(*) AS count FROM likes').first()).toEqual({ count: 3 })
+  })
+  it('keeps all concurrent increments without a server-side personal cap', async () => {
+    const results = await Promise.all(Array.from({ length: 25 }, () => repository.addLike(1)))
+    expect(results.sort((a, b) => a! - b!)).toEqual(
+      Array.from({ length: 25 }, (_, index) => index + 1),
+    )
+    expect((await createD1Repository(db).listExhibitions())[0]?.likes).toBe(25)
+  })
+  it('does not change totals for a missing work', async () => {
+    expect(await repository.addLike(999)).toBeNull()
+    expect((await repository.listExhibitions()).every((work) => work.likes === 0)).toBe(true)
+  })
+  it('preserves totals when exhibition metadata is reseeded', async () => {
+    await repository.addLike(1)
+    await executeFile('../../seeds/test.sql')
+    expect((await repository.listExhibitions())[0]?.likes).toBe(1)
   })
 })
