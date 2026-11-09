@@ -1,0 +1,41 @@
+{
+  "menu": {
+    "meta": {
+      "title": "Menu"
+    },
+    "heading": "Menu",
+    "navigationLabel": "Site menu",
+    "links": {
+      "map": {
+        "title": "Booth map",
+        "description": "View the booth layout"
+      },
+      "crowd": {
+        "title": "Attendance and crowd levels",
+        "description": "Check the estimated crowd level"
+      },
+      "exhibitions": {
+        "title": "Exhibitions",
+        "description": "Explore works created for the Mita Festival"
+      },
+      "teams": {
+        "title": "Teams",
+        "description": "Learn about the teams at KCS"
+      }
+    },
+    "officialSite": {
+      "title": "KCS official website",
+      "ariaLabel": "KCS official website (opens in a new tab)"
+    },
+    "follow": "Follow KCS",
+    "social": {
+      "xAriaLabel": "Official KCS X account (opens in a new tab)",
+      "youtubeAriaLabel": "Official KCS YouTube channel (opens in a new tab)"
+    }
+  },
+  "localeSwitcher": {
+    "ariaLabel": "Select display language",
+    "japanese": "Switch to Japanese",
+    "english": "Switch to English"
+  }
+}

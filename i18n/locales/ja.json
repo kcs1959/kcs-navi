@@ -1,0 +1,41 @@
+{
+  "menu": {
+    "meta": {
+      "title": "メニュー"
+    },
+    "heading": "メニュー",
+    "navigationLabel": "サイトメニュー",
+    "links": {
+      "map": {
+        "title": "ブースマップ",
+        "description": "ブースの配置を見ることができます"
+      },
+      "crowd": {
+        "title": "来場者数・混雑状況",
+        "description": "混雑の目安をチェックできます"
+      },
+      "exhibitions": {
+        "title": "展示紹介",
+        "description": "三田祭に展示されている作品をまとめました！"
+      },
+      "teams": {
+        "title": "班紹介",
+        "description": "KCSの班活動の紹介ページ"
+      }
+    },
+    "officialSite": {
+      "title": "KCS公式サイト",
+      "ariaLabel": "KCS公式サイト（新しいタブで開く）"
+    },
+    "follow": "KCSをフォロー",
+    "social": {
+      "xAriaLabel": "KCS公式X（新しいタブで開く）",
+      "youtubeAriaLabel": "KCS公式YouTube（新しいタブで開く）"
+    }
+  },
+  "localeSwitcher": {
+    "ariaLabel": "表示言語を選択",
+    "japanese": "日本語に切り替える",
+    "english": "英語に切り替える"
+  }
+}

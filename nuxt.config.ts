@@ -3,7 +3,17 @@ import { fileURLToPath } from 'node:url'
 export default defineNuxtConfig({
   compatibilityDate: '2026-07-01',
   devtools: { enabled: false },
-  modules: ['@nuxt/eslint'],
+  modules: ['@nuxt/eslint', '@nuxtjs/i18n'],
+  i18n: {
+    strategy: 'no_prefix',
+    defaultLocale: 'ja',
+    detectBrowserLanguage: false,
+    locales: [
+      { code: 'ja', name: '日本語', language: 'ja-JP', file: 'ja.json' },
+      { code: 'en', name: 'English', language: 'en-US', file: 'en.json' },
+    ],
+    vueI18n: 'i18n.config.ts',
+  },
   css: [
     '@fontsource/noto-sans-jp/400.css',
     '@fontsource/noto-sans-jp/500.css',

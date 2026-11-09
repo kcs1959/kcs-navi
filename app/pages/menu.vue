@@ -1,29 +1,34 @@
 <script setup lang="ts">
-useHead({ title: 'メニュー' })
+const { locale, t } = useI18n()
+
+useHead(() => ({
+  title: t('menu.meta.title'),
+  htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
+}))
 
 const links = [
   {
     to: '/',
-    title: 'ブースマップ',
-    description: 'ブースの配置を見ることができます',
+    titleKey: 'menu.links.map.title',
+    descriptionKey: 'menu.links.map.description',
     icon: '/figma/menu-icon-map.svg',
   },
   {
     to: '/crowd',
-    title: '来場者数・混雑状況',
-    description: '混雑の目安をチェックできます',
+    titleKey: 'menu.links.crowd.title',
+    descriptionKey: 'menu.links.crowd.description',
     icon: '/figma/menu-icon-chart-no-axes-column.svg',
   },
   {
     to: '/exhibitions',
-    title: '展示紹介',
-    description: '三田祭に展示されている作品をまとめました！',
+    titleKey: 'menu.links.exhibitions.title',
+    descriptionKey: 'menu.links.exhibitions.description',
     icon: '/figma/menu-icon-layout-grid.svg',
   },
   {
     to: '/teams',
-    title: '班紹介',
-    description: 'KCSの班活動の紹介ページ',
+    titleKey: 'menu.links.teams.title',
+    descriptionKey: 'menu.links.teams.description',
     icon: '/figma/menu-icon-layout-grid.svg',
   },
 ]
@@ -31,14 +36,14 @@ const links = [
 
 <template>
   <div class="page-content stack menu-page">
-    <PageHeading eyebrow="MENU" title="メニュー" />
+    <PageHeading eyebrow="MENU" :title="$t('menu.heading')" />
 
-    <nav class="card menu-links" aria-label="サイトメニュー">
+    <nav class="card menu-links" :aria-label="$t('menu.navigationLabel')">
       <NuxtLink v-for="link in links" :key="link.to" :to="link.to" class="menu-link">
         <img :src="link.icon" alt="" width="24" height="24" />
         <span class="menu-link-text"
-          ><strong>{{ link.title }}</strong
-          ><span>{{ link.description }}</span></span
+          ><strong>{{ $t(link.titleKey) }}</strong
+          ><span>{{ $t(link.descriptionKey) }}</span></span
         >
         <img src="/figma/menu-icon-chevron-right.svg" alt="" width="16" height="16" />
       </NuxtLink>
@@ -47,22 +52,25 @@ const links = [
         target="_blank"
         rel="noopener noreferrer"
         class="menu-link"
-        aria-label="KCS公式サイト（新しいタブで開く）"
+        :aria-label="$t('menu.officialSite.ariaLabel')"
       >
         <img src="/figma/menu-icon-external-link.svg" alt="" width="24" height="24" />
-        <span class="menu-link-text"><strong>KCS公式サイト</strong><span>kcs1959.jp ↗</span></span>
+        <span class="menu-link-text"
+          ><strong>{{ $t('menu.officialSite.title') }}</strong
+          ><span>kcs1959.jp ↗</span></span
+        >
         <img src="/figma/menu-icon-chevron-right.svg" alt="" width="16" height="16" />
       </a>
     </nav>
 
     <section class="card social-card" aria-labelledby="follow-heading">
-      <h2 id="follow-heading">KCSをフォロー</h2>
+      <h2 id="follow-heading">{{ $t('menu.follow') }}</h2>
       <div class="social-links">
         <a
           href="https://x.com/kcs1959"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="KCS公式X（新しいタブで開く）"
+          :aria-label="$t('menu.social.xAriaLabel')"
         >
           <img src="/figma/menu-icon-xbrand.svg" alt="" width="20" height="20" />
           <span>X ↗</span>
@@ -71,7 +79,7 @@ const links = [
           href="https://www.youtube.com/c/KCSKeioComputerSociety"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="KCS公式YouTube（新しいタブで開く）"
+          :aria-label="$t('menu.social.youtubeAriaLabel')"
         >
           <img src="/figma/menu-icon-youtube.svg" alt="" width="20" height="20" />
           <span>YouTube ↗</span>
