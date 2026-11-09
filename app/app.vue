@@ -15,6 +15,7 @@ const showNavigation = computed(() => !['/', '/menu', '/checkin', '/welcome'].in
 // URLの組み立てを環境変数に集約し、ローカルURLが公開環境のcanonicalに残るのを防ぐ。
 useHead(() => ({
   htmlAttrs: { lang: 'ja' },
+  bodyAttrs: { class: selectedExhibition.value ? 'exhibition-open' : '' },
   titleTemplate: (title) => (title ? `${title} | KCS Navi` : 'KCS Navi | 三田祭2026'),
   link: [{ rel: 'canonical', href: new URL(route.path, config.public.siteUrl).href }],
 }))
@@ -51,7 +52,7 @@ watch(() => route.path, closeExhibition)
       </div>
     </header>
     <main id="main-content" :class="{ 'with-navigation': showNavigation }">
-      <NuxtPage />
+      <AppPageTransition />
     </main>
     <ExhibitionModal
       v-if="selectedExhibition"

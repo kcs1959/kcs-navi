@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
+import { deskKeys, type ExhibitionsResponse, type TeamsResponse } from '~~/shared/types'
 
 useHead({ title: '会場マップ' })
 const { data, error, status, refresh } = await useFetch<ExhibitionsResponse>('/api/exhibitions', {
@@ -14,9 +14,13 @@ const {
   refresh: refreshStats,
 } = useCrowdStats()
 
-// TODO: 地図表示ロジック要検討（3D?）
-// deskKeyはDBの作品に対応する固定キー（仮）
-const deskPositions = ['desk-a', 'desk-b', 'desk-c']
+// 初回のクライアント描画が完了するまでローディングを維持する。
+// マウント前はSSR側と同じ状態にし、ハイドレーションの不一致を防ぐ。
+const mapRendered = ref(false)
+onMounted(() => {
+  mapRendered.value = true
+})
+const mapLoading = computed(() => status.value === 'pending' || !mapRendered.value)
 const worksAvailable = computed(
   () => Boolean(data.value) && !error.value && status.value !== 'pending',
 )
@@ -25,7 +29,7 @@ const worksAt = (key: string) =>
     ? []
     : (data.value?.exhibitions.filter((exhibition) => exhibition.deskKey === key) ?? [])
 const desks = computed(() =>
-  deskPositions.map((key, index) => {
+  deskKeys.map((key, index) => {
     const works = worksAt(key)
     const teams =
       teamData.value?.teams.filter((team) => works.some((work) => work.teamId === team.id)) ?? []
@@ -44,7 +48,6 @@ const desks = computed(() =>
       countLabel:
         count === null ? (status.value === 'pending' ? '読み込み中' : '未取得') : `${count}作品`,
       titles: works.map((work) => work.title).join('、'),
-      class: `desk-position-${index + 1}`,
     }
   }),
 )
@@ -58,7 +61,7 @@ function selectDesk(key: string) {
     <PageHeading
       eyebrow="EXPLORE KCS"
       title="KCS ブースマップ"
-      description="机をタップして、作品を見てみよう。"
+      description="机をタップすると作品の詳細が表示されます。"
     />
     <CrowdCard
       :stats="stats"
@@ -66,35 +69,23 @@ function selectDesk(key: string) {
       :loading="statsStatus === 'pending'"
       @retry="refreshStats()"
     />
-    <section class="card booth-map" aria-labelledby="map-title" :aria-busy="status === 'pending'">
+    <section class="card booth-map" aria-labelledby="map-title" :aria-busy="mapLoading">
       <div class="map-heading">
         <h2 id="map-title">展示マップ</h2>
         <span class="chip lemon">机をタップ</span>
       </div>
-      <div class="room">
-        <span class="entrance">入口 ↓</span><span class="exit">↑ 出口</span>
-        <button
-          v-for="desk in desks"
-          :key="desk.key"
-          class="desk"
-          :class="desk.class"
-          :disabled="!desk.count"
-          :aria-label="`${desk.label}、展示机${desk.letter}、${desk.countLabel}${desk.titles ? `：${desk.titles}の詳細を見る` : ''}`"
-          @click="selectDesk(desk.key)"
-        >
-          <span class="desk-label">{{ desk.label }}</span>
-          <span class="chip desk-count">{{ desk.number }} · {{ desk.countLabel }}</span>
-        </button>
+      <div class="map-surface">
+        <BoothMap :desks="desks" @select="selectDesk" />
+        <Transition name="loading-fade">
+          <LoadingIndicator v-if="mapLoading" overlay label="マップを準備しています" />
+        </Transition>
       </div>
     </section>
     <div v-if="error" class="error-card" role="alert">
       <p>展示情報を読み込めませんでした。</p>
       <button class="secondary-button" @click="refresh()">もう一度読み込む</button>
     </div>
-    <p v-else-if="status === 'pending'" class="data-notice" role="status">
-      展示情報を読み込んでいます…
-    </p>
-    <p v-else-if="!data?.exhibitions.length" class="data-notice">
+    <p v-else-if="status !== 'pending' && !data?.exhibitions.length" class="data-notice">
       展示情報はまだ登録されていません。
     </p>
   </div>
@@ -121,100 +112,15 @@ function selectDesk(key: string) {
 .lemon {
   background: var(--lemon);
 }
-.room {
+.map-surface {
   position: relative;
-  height: 315px;
-  background: var(--paper);
-  border: 1px solid var(--line);
   border-radius: 20px;
 }
-.entrance,
-.exit {
-  position: absolute;
-  top: 7px;
-  font-size: 12px;
+.loading-fade-leave-active {
+  transition: opacity 0.3s;
 }
-.entrance {
-  left: 17px;
-}
-.exit {
-  right: 26px;
-}
-.desk {
-  position: absolute;
-  background: var(--white);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  /* DBの長い班名が2行になっても、件数とともに固定サイズの机内に収める。 */
-  padding: 8px 4px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-size: 12px;
-  transition:
-    transform 0.15s,
-    box-shadow 0.15s;
-}
-.desk-position-1 {
-  left: 5.5%;
-  top: 79px;
-  width: 34.2%;
-  height: 116px;
-  box-shadow: 0 7px var(--lavender);
-}
-.desk-position-2 {
-  right: 5%;
-  top: 49px;
-  width: 34.2%;
-  height: 116px;
-  box-shadow: 0 7px var(--mint);
-}
-.desk-position-3 {
-  left: 28%;
-  top: 221px;
-  width: 44.5%;
-  height: 60px;
-  padding: 2px 4px;
-  gap: 2px;
-  box-shadow: 0 7px var(--lemon);
-}
-.desk-position-1 .desk-count {
-  background: var(--lavender);
-}
-.desk-position-2 .desk-count {
-  background: var(--mint);
-}
-.desk:hover:not(:disabled) {
-  transform: translateY(-3px);
-  border-color: var(--orange);
-}
-.desk:active:not(:disabled) {
-  transform: translateY(3px);
-}
-.desk:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-.desk-label {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  max-width: 100%;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-}
-.desk-position-3 .desk-label {
-  -webkit-line-clamp: 1;
-}
-.map-caption {
-  color: var(--muted);
-  font-size: 10px;
-  margin: 0 4px;
-  line-height: 1.5;
+.loading-fade-leave-to {
+  opacity: 0;
 }
 .data-notice {
   font-size: 10px;

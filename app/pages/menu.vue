@@ -5,13 +5,13 @@ const links = [
   {
     to: '/',
     title: 'ブースマップ',
-    description: 'KCS のブースを確認しよう',
+    description: 'ブースの配置を見ることができます',
     icon: '/figma/menu-icon-map.svg',
   },
   {
     to: '/crowd',
     title: '来場者数・混雑状況',
-    description: '混雑の目安をチェック',
+    description: '混雑の目安をチェックできます',
     icon: '/figma/menu-icon-chart-no-axes-column.svg',
   },
   {
@@ -23,7 +23,7 @@ const links = [
   {
     to: '/teams',
     title: '班紹介',
-    description: 'KCSの班活動について',
+    description: 'KCSの班活動の紹介ページ',
     icon: '/figma/menu-icon-layout-grid.svg',
   },
 ]
