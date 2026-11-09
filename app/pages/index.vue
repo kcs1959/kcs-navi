@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
 
-useHead({ title: '会場マップ' })
+const { locale, t } = useI18n()
+
+useHead(() => ({
+  title: t('map.meta.title'),
+  htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
+}))
+
 const { data, error, status, refresh } = await useFetch<ExhibitionsResponse>('/api/exhibitions', {
   key: 'exhibitions',
 })
@@ -39,10 +45,16 @@ const desks = computed(() =>
       label: teamNames.length
         ? teamNames.join('・')
         : (works[0]?.title ??
-          (status.value === 'pending' ? '読み込み中' : error.value ? '情報未取得' : '未登録')),
+          (status.value === 'pending'
+            ? t('map.states.loading')
+            : error.value
+              ? t('map.states.unavailable')
+              : t('map.states.unregistered'))),
       count,
       countLabel:
-        count === null ? (status.value === 'pending' ? '読み込み中' : '未取得') : `${count}作品`,
+        count === null
+          ? t(status.value === 'pending' ? 'map.states.loading' : 'map.states.notRetrieved')
+          : t('map.workCount', { count }),
       titles: works.map((work) => work.title).join('、'),
       class: `desk-position-${index + 1}`,
     }
@@ -52,13 +64,26 @@ function selectDesk(key: string) {
   const works = worksAt(key)
   if (works[0]) openExhibition(works[0], works)
 }
+function deskAriaLabel(desk: {
+  label: string
+  letter: string
+  countLabel: string
+  titles: string
+}) {
+  return t(desk.titles ? 'map.deskAriaWithTitles' : 'map.deskAria', {
+    label: desk.label,
+    letter: desk.letter,
+    countLabel: desk.countLabel,
+    titles: desk.titles,
+  })
+}
 </script>
 <template>
   <div class="page-content map-page">
     <PageHeading
       eyebrow="EXPLORE KCS"
-      title="KCS ブースマップ"
-      description="机をタップすると作品の詳細が表示されます。"
+      :title="$t('map.heading')"
+      :description="$t('map.description')"
     />
     <CrowdCard
       :stats="stats"
@@ -68,18 +93,19 @@ function selectDesk(key: string) {
     />
     <section class="card booth-map" aria-labelledby="map-title" :aria-busy="status === 'pending'">
       <div class="map-heading">
-        <h2 id="map-title">展示マップ</h2>
-        <span class="chip lemon">机をタップ</span>
+        <h2 id="map-title">{{ $t('map.mapHeading') }}</h2>
+        <span class="chip lemon">{{ $t('map.tapDesk') }}</span>
       </div>
       <div class="room">
-        <span class="entrance">入口 ↓</span><span class="exit">↑ 出口</span>
+        <span class="entrance">{{ $t('map.entrance') }}</span
+        ><span class="exit">{{ $t('map.exit') }}</span>
         <button
           v-for="desk in desks"
           :key="desk.key"
           class="desk"
           :class="desk.class"
           :disabled="!desk.count"
-          :aria-label="`${desk.label}、展示机${desk.letter}、${desk.countLabel}${desk.titles ? `：${desk.titles}の詳細を見る` : ''}`"
+          :aria-label="deskAriaLabel(desk)"
           @click="selectDesk(desk.key)"
         >
           <span class="desk-label">{{ desk.label }}</span>
@@ -88,14 +114,14 @@ function selectDesk(key: string) {
       </div>
     </section>
     <div v-if="error" class="error-card" role="alert">
-      <p>展示情報を読み込めませんでした。</p>
-      <button class="secondary-button" @click="refresh()">もう一度読み込む</button>
+      <p>{{ $t('map.loadError') }}</p>
+      <button class="secondary-button" @click="refresh()">{{ $t('map.retry') }}</button>
     </div>
     <p v-else-if="status === 'pending'" class="data-notice" role="status">
-      展示情報を読み込んでいます…
+      {{ $t('map.loadingExhibitions') }}
     </p>
     <p v-else-if="!data?.exhibitions.length" class="data-notice">
-      展示情報はまだ登録されていません。
+      {{ $t('map.empty') }}
     </p>
   </div>
 </template>

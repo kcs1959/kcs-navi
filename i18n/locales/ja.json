@@ -116,5 +116,40 @@
     "detailsAriaLabel": "{title}の詳細を見る",
     "fallbackTeam": "展示作品",
     "desk": "展示 {desk}"
+  },
+  "map": {
+    "meta": {
+      "title": "会場マップ"
+    },
+    "heading": "KCS ブースマップ",
+    "description": "机をタップすると作品の詳細が表示されます。",
+    "mapHeading": "展示マップ",
+    "tapDesk": "机をタップ",
+    "entrance": "入口 ↓",
+    "exit": "↑ 出口",
+    "states": {
+      "loading": "読み込み中",
+      "unavailable": "情報未取得",
+      "unregistered": "未登録",
+      "notRetrieved": "未取得"
+    },
+    "workCount": "{count}作品",
+    "deskAria": "{label}、展示机{letter}、{countLabel}",
+    "deskAriaWithTitles": "{label}、展示机{letter}、{countLabel}：{titles}の詳細を見る",
+    "loadError": "展示情報を読み込めませんでした。",
+    "retry": "もう一度読み込む",
+    "loadingExhibitions": "展示情報を読み込んでいます…",
+    "empty": "展示情報はまだ登録されていません。"
+  },
+  "teamDetail": {
+    "fallbackTitle": "班紹介",
+    "backAriaLabel": "班一覧に戻る",
+    "loadError": "班の情報を読み込めませんでした。",
+    "reload": "再読み込み",
+    "worksHeading": "この班の作品",
+    "worksLoadError": "作品を読み込めませんでした。",
+    "emptyWorks": "この班の作品はまだ登録されていません。",
+    "notFound": "この班は見つかりませんでした。",
+    "teamsLink": "班一覧へ"
   }
 }

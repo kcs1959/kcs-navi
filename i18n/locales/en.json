@@ -116,5 +116,40 @@
     "detailsAriaLabel": "View details for {title}",
     "fallbackTeam": "Exhibition",
     "desk": "Exhibition {desk}"
+  },
+  "map": {
+    "meta": {
+      "title": "Venue map"
+    },
+    "heading": "KCS booth map",
+    "description": "Tap a desk to view details about its exhibitions.",
+    "mapHeading": "Exhibition map",
+    "tapDesk": "Tap a desk",
+    "entrance": "Entrance ↓",
+    "exit": "↑ Exit",
+    "states": {
+      "loading": "Loading",
+      "unavailable": "Unavailable",
+      "unregistered": "Not registered",
+      "notRetrieved": "Unavailable"
+    },
+    "workCount": "Works: {count}",
+    "deskAria": "{label}, exhibition desk {letter}, {countLabel}",
+    "deskAriaWithTitles": "{label}, exhibition desk {letter}, {countLabel}: View details for {titles}",
+    "loadError": "We couldn't load the exhibition information.",
+    "retry": "Try again",
+    "loadingExhibitions": "Loading exhibition information…",
+    "empty": "No exhibition information has been added yet."
+  },
+  "teamDetail": {
+    "fallbackTitle": "Team",
+    "backAriaLabel": "Back to the team list",
+    "loadError": "We couldn't load the team information.",
+    "reload": "Reload",
+    "worksHeading": "Works by this team",
+    "worksLoadError": "We couldn't load the works.",
+    "emptyWorks": "No works have been added for this team yet.",
+    "notFound": "This team could not be found.",
+    "teamsLink": "Team list"
   }
 }
