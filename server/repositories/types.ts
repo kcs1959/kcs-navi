@@ -1,10 +1,10 @@
-import type { CheckinSnapshot, Exhibition, Team } from '../../shared/types'
+import type { CheckinReceipt, CheckinSnapshot, Exhibition, Team } from '../../shared/types'
 
 export interface NaviRepository {
   listTeams(): Promise<Team[]>
   listExhibitions(): Promise<Exhibition[]>
   addLike(exhibitionId: number): Promise<number | null>
-  addCheckin(): Promise<string>
+  addCheckin(): Promise<CheckinReceipt>
   getCheckinSnapshot(): Promise<CheckinSnapshot>
 }
 

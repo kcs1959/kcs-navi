@@ -45,11 +45,20 @@ export function createD1Repository(db: NaviD1Database): NaviRepository {
     },
     async addCheckin() {
       // The database owns the timestamp. No visitor identity or client-supplied time is stored.
-      const result = await db
-        .prepare('INSERT INTO checkins DEFAULT VALUES RETURNING checked_in_at AS checkedInAt')
-        .first<{ checkedInAt: string }>()
-      if (!result) throw new Error('D1 check-in insert failed')
-      return result.checkedInAt
+      // Return this check-in's JST daily position in the same transaction as its insert.
+      // The newest ID is this insert within the batch. Derive the date from that row so
+      // a midnight boundary between statements cannot move the receipt into the next day.
+      const results = await db.batch([
+        db.prepare('INSERT INTO checkins DEFAULT VALUES RETURNING checked_in_at AS checkedInAt'),
+        db.prepare(`SELECT COUNT(*) AS visitorNumber FROM checkins
+          WHERE date(checked_in_at, '+9 hours') = (
+            SELECT date(checked_in_at, '+9 hours') FROM checkins ORDER BY id DESC LIMIT 1
+          ) AND checked_in_at <= (SELECT checked_in_at FROM checkins ORDER BY id DESC LIMIT 1)`),
+      ])
+      const receipt = rows(results[0]!)[0] as { checkedInAt: string } | undefined
+      const position = rows(results[1]!)[0] as { visitorNumber: number } | undefined
+      if (!receipt || !position) throw new Error('D1 check-in insert failed')
+      return { ...receipt, ...position }
     },
     async getCheckinSnapshot(): Promise<CheckinSnapshot> {
       const clock = await db

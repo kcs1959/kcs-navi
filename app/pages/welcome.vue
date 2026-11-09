@@ -6,6 +6,12 @@ const checkedInAt = computed(() => {
   const date = new Date(value)
   return value && Number.isFinite(date.getTime()) ? date : null
 })
+const visitorNumber = computed(() => {
+  const raw = route.query.visitorNumber
+  if (!checkedInAt.value || typeof raw !== 'string' || !/^[1-9]\d*$/.test(raw)) return null
+  const value = Number(raw)
+  return Number.isSafeInteger(value) ? value : null
+})
 const receiptTime = computed(() =>
   checkedInAt.value
     ? new Intl.DateTimeFormat('ja-JP', {
@@ -28,9 +34,14 @@ const receiptTime = computed(() =>
         <img src="/figma/welcome-icon-check.svg" alt="" width="48" height="48" />
       </div>
       <h1 id="welcome-title">{{ checkedInAt ? 'チェックインしました！' : 'KCSへようこそ！' }}</h1>
-      <p class="welcome-message">
-        三田祭KCSブースへのご来場、ありがとうございます！<br />
+      <p v-if="visitorNumber" class="welcome-message visitor-message">
+        <span>あなたは本日</span>
+        <strong class="visitor-number"
+          >{{ visitorNumber.toLocaleString('ja-JP') }}<span>人目</span></strong
+        >
+        <span>の来場者です！</span>
       </p>
+      <p class="welcome-message">三田祭KCSブースへのご来場、ありがとうございます！<br /></p>
       <span v-if="receiptTime" class="chip receipt-time">受付日時 {{ receiptTime }}</span>
       <NuxtLink to="/" class="primary-button map-button">会場マップへ</NuxtLink>
       <p class="welcome-note">展示マップから、各作品の詳細を見られます。</p>
@@ -72,6 +83,22 @@ const receiptTime = computed(() =>
 }
 .receipt-time {
   background: var(--kcs-paper, #fff6ea);
+}
+.visitor-message {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+}
+.visitor-number {
+  color: var(--ink);
+  font-size: clamp(36px, 10vw, 48px);
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.visitor-number span {
+  margin-left: 4px;
+  font-size: 0.58em;
 }
 .map-button {
   width: 100%;
