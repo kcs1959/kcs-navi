@@ -115,6 +115,6 @@ jobs:
           if [[ "$EVENT_NAME" == "pull_request" ]]; then
             name="pr-$PR_NUMBER"
           else
-            name="$(node .github/scripts/preview-name.mjs "$DELETED_BRANCH")"
+            name="$(BRANCH_TO_HASH="$DELETED_BRANCH" node -e 'const {createHash}=require("node:crypto"); const b=process.env.BRANCH_TO_HASH; const s=b.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,30).replace(/-+$/g,"")||"branch"; process.stdout.write("branch-"+s+"-"+createHash("sha256").update(b).digest("hex").slice(0,8))')"
           fi
           npx wrangler preview delete --name "$name" --skip-confirmation
