@@ -53,7 +53,6 @@ async function like() {
     if (!result) return
     // A completed request belongs to its original work, including after closing the dialog.
     updateLikes(requestedId, result.likes)
-    void refreshNuxtData('exhibitions')
   } catch {
     if (version === viewVersion)
       likeError.value = 'いいねを送信できませんでした。もう一度試してください。'
