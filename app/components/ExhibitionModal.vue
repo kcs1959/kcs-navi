@@ -100,7 +100,8 @@ function dismissBackdrop(event: MouseEvent) {
       </div>
       <section class="creator-comment">
         <h3>制作者より</h3>
-        <p>{{ exhibition.creatorComment }}</p>
+        <p v-if="exhibition.creatorComment.trim()">{{ exhibition.creatorComment }}</p>
+        <p v-else>コメントはありません。</p>
       </section>
       <button class="primary-button like-button" :disabled="submitting" @click="like">
         <span aria-hidden="true">{{ liked ? '♥' : '♡' }}</span>
