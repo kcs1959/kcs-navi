@@ -25,28 +25,7 @@ watch(() => route.path, closeExhibition)
   <div>
     <FestivalBackground />
     <a class="skip-link" href="#main-content">本文へスキップ</a>
-    <header class="site-header">
-      <NuxtLink class="brand" to="/" aria-label="KCS Navi 会場マップへ">
-        <KcsLogo />
-        <span class="brand-copy"><strong>KCS Navi</strong><small>三田祭 2026</small></span>
-      </NuxtLink>
-      <!--TODO: ハンバーガーメニューを改良。別ページ`/menu`ではなく、アニメーションでポップアップを表示させる-->
-      <NuxtLink
-        class="icon-button"
-        :to="route.path === '/menu' ? '/' : '/menu'"
-        :aria-label="route.path === '/menu' ? 'メニューを閉じる' : 'メニューを開く'"
-        :aria-expanded="route.path === '/menu'"
-      >
-        <img
-          v-if="route.path === '/menu'"
-          src="/figma/menu-icon-x.svg"
-          alt=""
-          width="22"
-          height="22"
-        />
-        <img v-else src="/figma/map-icon-menu.svg" alt="" width="24" height="24" />
-      </NuxtLink>
-    </header>
+    <AppHeader />
     <main id="main-content" :class="{ 'with-navigation': showNavigation }">
       <NuxtPage />
     </main>
