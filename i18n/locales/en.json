@@ -37,5 +37,30 @@
     "ariaLabel": "Select display language",
     "japanese": "Switch to Japanese",
     "english": "Switch to English"
+  },
+  "exhibitions": {
+    "meta": {
+      "title": "Exhibitions"
+    },
+    "heading": "Exhibitions",
+    "description": "Created by KCS members!",
+    "loadError": "We couldn't load the exhibition information.",
+    "reload": "Reload",
+    "loading": "Loading exhibitions…",
+    "resultCount": "Works: {count}",
+    "empty": "No exhibition information has been added yet.",
+    "teamsLink": "Meet the creators · Teams →"
+  },
+  "teams": {
+    "meta": {
+      "title": "Teams"
+    },
+    "heading": "Teams",
+    "description": "Learn about the teams at KCS",
+    "loadError": "We couldn't load the team information.",
+    "reload": "Reload",
+    "workCountUnavailable": "Work count unavailable",
+    "workCount": "Works: {count}",
+    "empty": "No team information has been added yet."
   }
 }

@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
 
-useHead({ title: '班紹介' })
+const { locale, t } = useI18n()
+
+useHead(() => ({
+  title: t('teams.meta.title'),
+  htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
+}))
+
 const { data, error, refresh } = await useFetch<TeamsResponse>('/api/teams', { key: 'teams' })
 const { data: works, error: worksError } = await useFetch<ExhibitionsResponse>('/api/exhibitions', {
   key: 'exhibitions',
@@ -10,14 +16,24 @@ const countWorks = (teamId: number) =>
   !worksError.value && works.value
     ? works.value.exhibitions.filter((work) => work.teamId === teamId).length
     : null
+function workCountLabel(teamId: number) {
+  const count = countWorks(teamId)
+  return count === null ? t('teams.workCountUnavailable') : t('teams.workCount', { count })
+}
 </script>
 
 <template>
   <div class="page-content stack teams-page">
-    <PageHeading eyebrow="KCS TEAMS" title="班紹介" description="KCSの班活動について" />
+    <PageHeading
+      eyebrow="KCS TEAMS"
+      :title="$t('teams.heading')"
+      :description="$t('teams.description')"
+    />
     <div v-if="error" class="error-card" role="alert">
-      <p>班の情報を読み込めませんでした。</p>
-      <button type="button" class="secondary-button" @click="refresh()">再読み込み</button>
+      <p>{{ $t('teams.loadError') }}</p>
+      <button type="button" class="secondary-button" @click="refresh()">
+        {{ $t('teams.reload') }}
+      </button>
     </div>
     <NuxtLink
       v-for="team in data?.teams"
@@ -27,18 +43,13 @@ const countWorks = (teamId: number) =>
     >
       <div class="team-card-top">
         <span class="chip">{{ team.name }}</span>
-        <span class="work-count"
-          >{{
-            countWorks(team.id) === null ? '作品数未取得' : `${countWorks(team.id)} 作品`
-          }}
-          →</span
-        >
+        <span class="work-count">{{ workCountLabel(team.id) }} →</span>
       </div>
       <h2>{{ team.name }}</h2>
       <p>{{ team.description }}</p>
     </NuxtLink>
     <p v-if="data && !error && !data.teams.length" class="card text-muted">
-      班の情報はまだ登録されていません。
+      {{ $t('teams.empty') }}
     </p>
   </div>
 </template>

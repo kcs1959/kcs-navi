@@ -37,5 +37,30 @@
     "ariaLabel": "表示言語を選択",
     "japanese": "日本語に切り替える",
     "english": "英語に切り替える"
+  },
+  "exhibitions": {
+    "meta": {
+      "title": "展示作品"
+    },
+    "heading": "展示作品",
+    "description": "KCSのメンバーが制作しました！",
+    "loadError": "展示情報を読み込めませんでした。",
+    "reload": "再読み込み",
+    "loading": "展示作品を読み込んでいます…",
+    "resultCount": "{count} 件の作品",
+    "empty": "展示情報はまだ登録されていません。",
+    "teamsLink": "つくった人たちを知る · 班紹介 →"
+  },
+  "teams": {
+    "meta": {
+      "title": "班紹介"
+    },
+    "heading": "班紹介",
+    "description": "KCSの班活動について",
+    "loadError": "班の情報を読み込めませんでした。",
+    "reload": "再読み込み",
+    "workCountUnavailable": "作品数未取得",
+    "workCount": "{count} 作品",
+    "empty": "班の情報はまだ登録されていません。"
   }
 }

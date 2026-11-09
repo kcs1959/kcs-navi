@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
 
-useHead({ title: '展示作品' })
+const { locale, t } = useI18n()
+
+useHead(() => ({
+  title: t('exhibitions.meta.title'),
+  htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
+}))
 
 const { openExhibition } = useExhibitionDialog()
 const {
@@ -27,19 +32,23 @@ async function retry() {
   <div class="page-content works-page stack">
     <PageHeading
       eyebrow="EXHIBITIONS"
-      title="展示作品"
-      description="KCSのメンバーが制作しました！"
+      :title="$t('exhibitions.heading')"
+      :description="$t('exhibitions.description')"
     />
 
     <div v-if="worksError || teamsError" class="error-card" role="alert">
-      <p>展示情報を読み込めませんでした。</p>
-      <button class="secondary-button" type="button" @click="retry">再読み込み</button>
+      <p>{{ $t('exhibitions.loadError') }}</p>
+      <button class="secondary-button" type="button" @click="retry">
+        {{ $t('exhibitions.reload') }}
+      </button>
     </div>
     <p v-else-if="status === 'pending'" class="text-muted" role="status">
-      展示作品を読み込んでいます…
+      {{ $t('exhibitions.loading') }}
     </p>
     <template v-else>
-      <p class="result-count text-muted" role="status">{{ exhibitions.length }} 件の作品</p>
+      <p class="result-count text-muted" role="status">
+        {{ $t('exhibitions.resultCount', { count: exhibitions.length }) }}
+      </p>
       <ExhibitionCard
         v-for="exhibition in exhibitions"
         :key="exhibition.id"
@@ -48,9 +57,9 @@ async function retry() {
         @select="openExhibition(exhibition)"
       />
       <div v-if="!exhibitions.length" class="card empty-state">
-        <p>展示情報はまだ登録されていません。</p>
+        <p>{{ $t('exhibitions.empty') }}</p>
       </div>
-      <NuxtLink class="teams-link" to="/teams">つくった人たちを知る · 班紹介 →</NuxtLink>
+      <NuxtLink class="teams-link" to="/teams">{{ $t('exhibitions.teamsLink') }}</NuxtLink>
     </template>
   </div>
 </template>
