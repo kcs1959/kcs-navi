@@ -93,7 +93,12 @@ const todayLabel = computed(() => {
         ><span>人（延べ）</span>
       </p>
 
-      <div class="chart-tabs" role="tablist" aria-label="来場者数の集計単位">
+      <div
+        class="chart-tabs"
+        :class="{ 'is-daily': selectedTab === 'daily' }"
+        role="tablist"
+        aria-label="来場者数の集計単位"
+      >
         <button
           id="hourly-tab"
           type="button"
@@ -124,34 +129,42 @@ const todayLabel = computed(() => {
 
       <div
         id="attendance-panel"
+        class="attendance-panel"
         role="tabpanel"
         :aria-labelledby="selectedTab === 'hourly' ? 'hourly-tab' : 'daily-tab'"
         tabindex="0"
       >
-        <div v-if="chartItems.length" class="chart-scroll" :aria-label="chartTitle">
-          <ol class="bar-chart" :style="{ minWidth: `${Math.max(0, chartItems.length * 44)}px` }">
-            <li
-              v-for="(item, index) in chartItems"
-              :key="item.key"
-              class="chart-item"
-              :aria-label="`${item.label}：${item.count}人`"
-            >
-              <div class="bar-track" aria-hidden="true">
-                <div
-                  class="bar"
-                  :class="{ latest: index === chartItems.length - 1 }"
-                  :style="{ height: `${(item.count / maximum) * 92}px` }"
+        <Transition name="attendance-chart" mode="out-in">
+          <div :key="selectedTab">
+            <div v-if="chartItems.length" class="chart-scroll" :aria-label="chartTitle">
+              <ol
+                class="bar-chart"
+                :style="{ minWidth: `${Math.max(0, chartItems.length * 44)}px` }"
+              >
+                <li
+                  v-for="(item, index) in chartItems"
+                  :key="item.key"
+                  class="chart-item"
+                  :aria-label="`${item.label}：${item.count}人`"
                 >
-                  <span class="bar-value">{{ item.count }}</span>
-                </div>
-              </div>
-              <span class="bar-label" aria-hidden="true">{{ item.label }}</span>
-            </li>
-          </ol>
-        </div>
-        <p v-else class="empty-chart">
-          {{ selectedTab === 'hourly' ? '今日の' : '' }}チェックイン記録はまだありません。
-        </p>
+                  <div class="bar-track" aria-hidden="true">
+                    <div
+                      class="bar"
+                      :class="{ latest: index === chartItems.length - 1 }"
+                      :style="{ height: `${(item.count / maximum) * 92}px` }"
+                    >
+                      <span class="bar-value">{{ item.count }}</span>
+                    </div>
+                  </div>
+                  <span class="bar-label" aria-hidden="true">{{ item.label }}</span>
+                </li>
+              </ol>
+            </div>
+            <p v-else class="empty-chart">
+              {{ selectedTab === 'hourly' ? '今日の' : '' }}チェックイン記録はまだありません。
+            </p>
+          </div>
+        </Transition>
       </div>
 
       <p class="chart-caption">
@@ -208,22 +221,57 @@ const todayLabel = computed(() => {
   font-size: 12px;
 }
 .chart-tabs {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 4px;
+  background: var(--kcs-paper, #fff6ea);
+  border-radius: 12px;
+}
+.chart-tabs::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 auto 0 0;
+  width: calc((100% - 4px) / 2);
+  border-radius: 12px;
+  background: var(--kcs-peach, #ffd8bc);
+  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.chart-tabs.is-daily::before {
+  transform: translateX(calc(100% + 4px));
 }
 .chart-tabs button {
   min-height: 40px;
   border: none;
   border-radius: 12px;
-  background: var(--kcs-paper, #fff6ea);
+  background: transparent;
   color: var(--kcs-ink, #4b2d22);
   font: inherit;
   font-size: 12px;
   cursor: pointer;
 }
-.chart-tabs button.active {
-  background: var(--kcs-peach, #ffd8bc);
+.attendance-panel {
+  min-height: 151px;
+}
+.attendance-chart-enter-active {
+  transition:
+    opacity 180ms ease-out,
+    transform 180ms ease-out;
+}
+.attendance-chart-leave-active {
+  transition:
+    opacity 100ms ease-in,
+    transform 100ms ease-in;
+}
+.attendance-chart-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.attendance-chart-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 .chart-scroll {
   overflow-x: auto;

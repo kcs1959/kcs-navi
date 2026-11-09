@@ -4,6 +4,11 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-07-01',
   devtools: { enabled: false },
   modules: ['@nuxt/eslint'],
+  vite: {
+    build: {
+      target: ['chrome111', 'edge111', 'firefox115', 'safari16.4', 'ios16.4'],
+    },
+  },
   css: [
     '@fontsource/noto-sans-jp/400.css',
     '@fontsource/noto-sans-jp/500.css',
