@@ -4,6 +4,52 @@ withDefaults(defineProps<{ title?: string; subtitle?: string }>(), {
   subtitle: '三田祭 2026',
 })
 
+const headerSlot = ref<HTMLElement>()
+const header = ref<HTMLElement>()
+const isFloating = ref(false)
+const headerHeight = ref(0)
+const floatingLeft = ref(0)
+const floatingWidth = ref(0)
+let resizeObserver: ResizeObserver | undefined
+let scrollFrame = 0
+
+function updatePosition() {
+  if (!headerSlot.value || !header.value) return
+
+  const slot = headerSlot.value.getBoundingClientRect()
+  headerHeight.value = header.value.getBoundingClientRect().height
+  floatingLeft.value = slot.left
+  floatingWidth.value = slot.width
+
+  // 元の位置に戻るまでは固定表示を保ち、途中でヘッダーが消えないようにする。
+  if (slot.top >= 0) isFloating.value = false
+  else if (slot.top + headerHeight.value <= 0) isFloating.value = true
+}
+
+function schedulePositionUpdate() {
+  if (scrollFrame) return
+  scrollFrame = requestAnimationFrame(() => {
+    scrollFrame = 0
+    updatePosition()
+  })
+}
+
+onMounted(() => {
+  updatePosition()
+  resizeObserver = new ResizeObserver(schedulePositionUpdate)
+  if (header.value) resizeObserver.observe(header.value)
+  if (headerSlot.value) resizeObserver.observe(headerSlot.value)
+  window.addEventListener('scroll', schedulePositionUpdate, { passive: true })
+  window.addEventListener('resize', schedulePositionUpdate)
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+  cancelAnimationFrame(scrollFrame)
+  window.removeEventListener('scroll', schedulePositionUpdate)
+  window.removeEventListener('resize', schedulePositionUpdate)
+})
+
 const route = useRoute()
 const isMenu = computed(() => route.path === '/menu')
 const externalLinks = [
@@ -18,68 +64,101 @@ const externalLinks = [
 </script>
 
 <template>
-  <header class="site-header">
-    <NuxtLink class="brand" to="/" aria-label="KCS Navi 会場マップへ">
-      <KcsLogo />
-      <span class="brand-copy">
-        <strong>{{ title }}</strong>
-        <small v-if="subtitle">{{ subtitle }}</small>
-      </span>
-    </NuxtLink>
-    <nav class="header-navigation" aria-label="共通ナビゲーション">
-      <NuxtLink class="header-link" to="/" aria-label="Home（会場マップ）" title="Home（会場マップ）">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          aria-hidden="true"
-        >
-          <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-8H9v8H4a1 1 0 0 1-1-1Z" />
-        </svg>
+  <div
+    ref="headerSlot"
+    class="header-slot"
+    :style="isFloating ? { height: `${headerHeight}px` } : undefined"
+  >
+    <header
+      ref="header"
+      class="site-header"
+      :class="{ 'is-floating': isFloating }"
+      :style="isFloating ? { left: `${floatingLeft}px`, width: `${floatingWidth}px` } : undefined"
+    >
+      <NuxtLink class="brand" to="/" aria-label="KCS Navi 会場マップへ">
+        <KcsLogo />
+        <span class="brand-copy">
+          <strong>{{ title }}</strong>
+          <small v-if="subtitle">{{ subtitle }}</small>
+        </span>
       </NuxtLink>
-      <a
-        v-for="link in externalLinks"
-        :key="link.href"
-        class="header-link"
-        :href="link.href"
-        target="_blank"
-        rel="noopener noreferrer"
-        :aria-label="`${link.label}（新しいタブで開く）`"
-        :title="`${link.label}（新しいタブで開く）`"
-      >
-        <img v-if="link.icon" :src="link.icon" alt="" width="22" height="22" />
-        <svg
-          v-else
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          aria-hidden="true"
+      <nav class="header-navigation" aria-label="共通ナビゲーション">
+        <NuxtLink
+          class="header-link"
+          to="/"
+          aria-label="Home（会場マップ）"
+          title="Home（会場マップ）"
         >
-          <rect x="3" y="3" width="18" height="18" rx="5" />
-          <circle cx="12" cy="12" r="4" />
-          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-        </svg>
-      </a>
-      <NuxtLink
-        class="header-link"
-        :to="isMenu ? '/' : '/menu'"
-        :aria-label="isMenu ? 'メニューを閉じる' : 'メニューを開く'"
-        :title="isMenu ? 'メニューを閉じる' : 'メニューを開く'"
-      >
-        <img
-          :src="isMenu ? '/figma/menu-icon-x.svg' : '/figma/map-icon-menu.svg'"
-          alt=""
-          width="24"
-          height="24"
-        />
-      </NuxtLink>
-    </nav>
-  </header>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-8H9v8H4a1 1 0 0 1-1-1Z" />
+          </svg>
+        </NuxtLink>
+        <a
+          v-for="link in externalLinks"
+          :key="link.href"
+          class="header-link"
+          :href="link.href"
+          target="_blank"
+          rel="noopener noreferrer"
+          :aria-label="`${link.label}（新しいタブで開く）`"
+          :title="`${link.label}（新しいタブで開く）`"
+        >
+          <img v-if="link.icon" :src="link.icon" alt="" width="22" height="22" />
+          <svg
+            v-else
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="5" />
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+          </svg>
+        </a>
+        <NuxtLink
+          class="header-link"
+          :to="isMenu ? '/' : '/menu'"
+          :aria-label="isMenu ? 'メニューを閉じる' : 'メニューを開く'"
+          :title="isMenu ? 'メニューを閉じる' : 'メニューを開く'"
+        >
+          <img
+            :src="isMenu ? '/figma/menu-icon-x.svg' : '/figma/map-icon-menu.svg'"
+            alt=""
+            width="24"
+            height="24"
+          />
+        </NuxtLink>
+      </nav>
+    </header>
+  </div>
 </template>
 
 <style scoped>
+.header-slot {
+  position: relative;
+  z-index: 5;
+}
+.site-header.is-floating {
+  position: fixed;
+  top: 0;
+  animation: header-slide-in 220ms ease-out;
+}
+@keyframes header-slide-in {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
 .site-header {
   position: relative;
   min-height: 76px;
