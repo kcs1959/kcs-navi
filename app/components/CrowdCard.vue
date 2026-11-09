@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CheckinStatsResponse } from '../../shared/types'
 
+const { locale, t } = useI18n()
 const props = withDefaults(
   defineProps<{
     stats?: CheckinStatsResponse | null
@@ -18,54 +19,65 @@ const current = computed(() => props.stats)
 const unavailable = computed(() => props.failed || !current.value)
 const updatedAt = computed(() =>
   current.value
-    ? new Intl.DateTimeFormat('ja-JP', {
+    ? new Intl.DateTimeFormat(locale.value === 'en' ? 'en-US' : 'ja-JP', {
         timeZone: 'Asia/Tokyo',
         hour: '2-digit',
         minute: '2-digit',
       }).format(new Date(current.value.congestion.calculatedAt))
     : '',
 )
+function congestionLevelLabel(level: CheckinStatsResponse['congestion']['level']) {
+  return t('crowdCard.levels.' + level)
+}
 </script>
 <template>
-  <section class="card crowd-card" :aria-busy="loading" aria-label="混雑状況">
+  <section class="card crowd-card" :aria-busy="loading" :aria-label="$t('crowdCard.ariaLabel')">
     <template v-if="!unavailable && current">
       <NuxtLink
         v-if="linked"
         class="crowd-card-link"
         to="/crowd"
-        aria-label="来場状況を詳しく見る"
+        :aria-label="$t('crowdCard.detailsAriaLabel')"
       />
       <div class="crowd-heading">
-        <span class="chip" :class="current.congestion.level">{{ current.congestion.label }}</span
-        ><span class="text-muted">混雑目安（推定）</span>
+        <span class="chip" :class="current.congestion.level">{{
+          congestionLevelLabel(current.congestion.level)
+        }}</span
+        ><span class="text-muted">{{ $t('crowdCard.estimateLabel') }}</span>
       </div>
       <div class="occupancy">
         <strong>{{ current.congestion.estimatedVisitors }}</strong
-        ><span>/ {{ current.congestion.capacity }} 人</span
+        ><span>{{ $t('crowdCard.capacity', { count: current.congestion.capacity }) }}</span
         ><b>・ {{ current.congestion.estimatedRate }}%</b>
       </div>
       <div class="crowd-update">
-        <time :datetime="current.congestion.calculatedAt">{{ updatedAt }} 更新</time
-        ><span>30秒ごとに更新</span
+        <time :datetime="current.congestion.calculatedAt">{{
+          $t('crowdCard.updatedAt', { time: updatedAt })
+        }}</time
+        ><span>{{ $t('crowdCard.refreshInterval') }}</span
         ><img v-if="linked" src="/figma/map-icon-chevron-right.svg" width="14" height="14" alt="" />
       </div>
-      <span class="sr-only"
-        >推定滞在人数 {{ current.congestion.estimatedVisitors }}人、推定混雑率
-        {{ current.congestion.estimatedRate }}パーセント</span
-      >
+      <span class="sr-only">{{
+        $t('crowdCard.summary', {
+          visitors: current.congestion.estimatedVisitors,
+          rate: current.congestion.estimatedRate,
+        })
+      }}</span>
     </template>
     <template v-else>
       <div class="crowd-heading">
-        <span class="chip">{{ loading ? '読み込み中' : '情報未取得' }}</span
-        ><span class="text-muted">混雑目安（推定）</span>
+        <span class="chip">{{
+          $t(loading ? 'crowdCard.loadingChip' : 'crowdCard.unavailableChip')
+        }}</span
+        ><span class="text-muted">{{ $t('crowdCard.estimateLabel') }}</span>
       </div>
       <p class="unavailable-title">
-        {{ loading ? '混雑情報を確認しています' : '混雑情報を取得できません' }}
+        {{ $t(loading ? 'crowdCard.checking' : 'crowdCard.loadError') }}
       </p>
       <button v-if="!loading" class="secondary-button" @click="$emit('retry')">
-        もう一度読み込む
+        {{ $t('crowdCard.retry') }}
       </button>
-      <p class="micro text-muted">人数は未取得です。マップは利用できます。</p>
+      <p class="micro text-muted">{{ $t('crowdCard.unavailableNote') }}</p>
     </template>
   </section>
 </template>

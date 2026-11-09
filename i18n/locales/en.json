@@ -62,5 +62,59 @@
     "workCountUnavailable": "Work count unavailable",
     "workCount": "Works: {count}",
     "empty": "No team information has been added yet."
+  },
+  "crowd": {
+    "meta": {
+      "title": "Attendance and crowd levels"
+    },
+    "heading": "Welcome to KCS!",
+    "loadError": "We couldn't load the attendance data.",
+    "reload": "Reload",
+    "loading": "Loading attendance data…",
+    "todayAttendance": "Today's attendance",
+    "totalPeople": "total",
+    "chart": {
+      "hourlyTitle": "Check-ins by hour",
+      "dailyTitle": "Check-ins by day",
+      "tabListLabel": "Attendance aggregation interval",
+      "hourlyTab": "Hourly",
+      "dailyTab": "Daily",
+      "itemLabel": "{label}: {count} people",
+      "emptyHourly": "There are no check-ins recorded today yet.",
+      "emptyDaily": "There are no check-ins recorded yet.",
+      "todayCaption": "{date} (Japan time)",
+      "dailyCaption": "Daily totals (Japan time)"
+    },
+    "estimate": {
+      "heading": "About the estimates",
+      "method": "The number of check-ins in the last 20 minutes is used to estimate current attendance.",
+      "formula": "Crowd level = estimated attendance ÷ capacity of 40 × 100%.",
+      "disclaimer": "The actual number of visitors may differ."
+    }
+  },
+  "crowdCard": {
+    "ariaLabel": "Crowd level",
+    "detailsAriaLabel": "View attendance details",
+    "levels": {
+      "relaxed": "Relaxed",
+      "moderate": "Moderately busy",
+      "busy": "Busy"
+    },
+    "estimateLabel": "Estimated crowd level",
+    "capacity": "/ {count} people",
+    "updatedAt": "Updated {time}",
+    "refreshInterval": "Updated every 30 seconds",
+    "summary": "Estimated attendance: {visitors} people. Estimated crowd level: {rate} percent.",
+    "loadingChip": "Loading",
+    "unavailableChip": "Unavailable",
+    "checking": "Checking crowd information",
+    "loadError": "We couldn't load the crowd information",
+    "retry": "Try again",
+    "unavailableNote": "Attendance is unavailable. You can still use the map."
+  },
+  "exhibitionCard": {
+    "detailsAriaLabel": "View details for {title}",
+    "fallbackTeam": "Exhibition",
+    "desk": "Exhibition {desk}"
   }
 }

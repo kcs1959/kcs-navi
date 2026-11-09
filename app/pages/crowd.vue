@@ -1,9 +1,16 @@
 <script setup lang="ts">
-useHead({ title: '来場者数・混雑状況' })
+const { locale, t } = useI18n()
+const displayLocale = computed(() => (locale.value === 'en' ? 'en-US' : 'ja-JP'))
+
+useHead(() => ({
+  title: t('crowd.meta.title'),
+  htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
+}))
+
 const { data, error, status, refresh } = useCrowdStats()
 const selectedTab = ref<'hourly' | 'daily'>('hourly')
 const chartTitle = computed(() =>
-  selectedTab.value === 'hourly' ? '時間別のチェックイン数' : '日別のチェックイン数',
+  t(selectedTab.value === 'hourly' ? 'crowd.chart.hourlyTitle' : 'crowd.chart.dailyTitle'),
 )
 
 function handleTabKey(event: KeyboardEvent) {
@@ -22,7 +29,7 @@ function handleTabKey(event: KeyboardEvent) {
 
 function formatDay(date: string) {
   // 日付だけの値は JST の正午として扱い、閲覧端末のタイムゾーンによる前日へのずれを防ぐ。
-  return new Intl.DateTimeFormat('ja-JP', {
+  return new Intl.DateTimeFormat(displayLocale.value, {
     timeZone: 'Asia/Tokyo',
     month: 'numeric',
     day: 'numeric',
@@ -30,7 +37,7 @@ function formatDay(date: string) {
 }
 
 function formatHour(hour: string) {
-  return new Intl.DateTimeFormat('ja-JP', {
+  return new Intl.DateTimeFormat(displayLocale.value, {
     timeZone: 'Asia/Tokyo',
     hour: 'numeric',
     hour12: false,
@@ -53,18 +60,21 @@ const maximum = computed(() => Math.max(1, ...chartItems.value.map((item) => ite
 const todayLabel = computed(() => {
   const date = data.value?.today.date
   if (!date) return ''
-  return new Intl.DateTimeFormat('ja-JP', {
+  return new Intl.DateTimeFormat(displayLocale.value, {
     timeZone: 'Asia/Tokyo',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   }).format(new Date(`${date}T12:00:00+09:00`))
 })
+function formatNumber(value: number) {
+  return value.toLocaleString(displayLocale.value)
+}
 </script>
 
 <template>
   <div class="page-content stack crowd-page">
-    <PageHeading eyebrow="LIVE AT KCS" title="KCS @三田祭 へようこそ！" />
+    <PageHeading eyebrow="LIVE AT KCS" :title="$t('crowd.heading')" />
     <CrowdCard
       :stats="data"
       :linked="false"
@@ -74,11 +84,13 @@ const todayLabel = computed(() => {
     />
 
     <div v-if="error" class="error-card" role="alert">
-      <p>来場者数を取得できませんでした。</p>
-      <button type="button" class="secondary-button" @click="refresh()">再読み込み</button>
+      <p>{{ $t('crowd.loadError') }}</p>
+      <button type="button" class="secondary-button" @click="refresh()">
+        {{ $t('crowd.reload') }}
+      </button>
     </div>
     <p v-else-if="!data && status === 'pending'" class="text-muted" role="status">
-      来場者数を読み込んでいます…
+      {{ $t('crowd.loading') }}
     </p>
     <section
       v-if="data && !error"
@@ -86,14 +98,14 @@ const todayLabel = computed(() => {
       aria-labelledby="attendance-heading"
     >
       <div class="attendance-heading">
-        <h2 id="attendance-heading">今日の来場者数</h2>
+        <h2 id="attendance-heading">{{ $t('crowd.todayAttendance') }}</h2>
       </div>
       <p class="attendance-count">
-        <strong>{{ data.today.count.toLocaleString('ja-JP') }}</strong
-        ><span>人（延べ）</span>
+        <strong>{{ formatNumber(data.today.count) }}</strong
+        ><span>{{ $t('crowd.totalPeople') }}</span>
       </p>
 
-      <div class="chart-tabs" role="tablist" aria-label="来場者数の集計単位">
+      <div class="chart-tabs" role="tablist" :aria-label="$t('crowd.chart.tabListLabel')">
         <button
           id="hourly-tab"
           type="button"
@@ -105,7 +117,7 @@ const todayLabel = computed(() => {
           @click="selectedTab = 'hourly'"
           @keydown="handleTabKey"
         >
-          時間別
+          {{ $t('crowd.chart.hourlyTab') }}
         </button>
         <button
           id="daily-tab"
@@ -118,7 +130,7 @@ const todayLabel = computed(() => {
           @click="selectedTab = 'daily'"
           @keydown="handleTabKey"
         >
-          日別
+          {{ $t('crowd.chart.dailyTab') }}
         </button>
       </div>
 
@@ -134,7 +146,7 @@ const todayLabel = computed(() => {
               v-for="(item, index) in chartItems"
               :key="item.key"
               class="chart-item"
-              :aria-label="`${item.label}：${item.count}人`"
+              :aria-label="$t('crowd.chart.itemLabel', { label: item.label, count: item.count })"
             >
               <div class="bar-track" aria-hidden="true">
                 <div
@@ -150,19 +162,25 @@ const todayLabel = computed(() => {
           </ol>
         </div>
         <p v-else class="empty-chart">
-          {{ selectedTab === 'hourly' ? '今日の' : '' }}チェックイン記録はまだありません。
+          {{ $t(selectedTab === 'hourly' ? 'crowd.chart.emptyHourly' : 'crowd.chart.emptyDaily') }}
         </p>
       </div>
 
       <p class="chart-caption">
-        {{ selectedTab === 'hourly' ? `${todayLabel}（日本時間）` : '日別集計（日本時間）' }}
+        {{
+          selectedTab === 'hourly'
+            ? $t('crowd.chart.todayCaption', { date: todayLabel })
+            : $t('crowd.chart.dailyCaption')
+        }}
       </p>
     </section>
 
     <section class="estimate-note" aria-labelledby="estimate-heading">
-      <h2 id="estimate-heading">推定値について</h2>
+      <h2 id="estimate-heading">{{ $t('crowd.estimate.heading') }}</h2>
       <p>
-        直近20分のチェックイン数を滞在人数として推定。<br />混雑率 = 推定人数 ÷ 定員40人 × 100%。<br />実際の人数とは異なる場合があります。
+        {{ $t('crowd.estimate.method') }}<br />{{ $t('crowd.estimate.formula') }}<br />{{
+          $t('crowd.estimate.disclaimer')
+        }}
       </p>
     </section>
   </div>

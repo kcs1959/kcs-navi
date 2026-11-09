@@ -13,12 +13,16 @@ defineEmits<{ select: [] }>()
 <template>
   <button
     class="card exhibition-card"
-    :aria-label="`${exhibition.title}の詳細を見る`"
+    :aria-label="$t('exhibitionCard.detailsAriaLabel', { title: exhibition.title })"
     @click="$emit('select')"
   >
     <span class="work-meta"
-      ><span class="chip">{{ team?.name ?? '展示作品' }}</span
-      ><span>展示 {{ exhibition.deskKey.replace('desk-', '').toUpperCase() }}</span></span
+      ><span class="chip">{{ team?.name ?? $t('exhibitionCard.fallbackTeam') }}</span
+      ><span>{{
+        $t('exhibitionCard.desk', {
+          desk: exhibition.deskKey.replace('desk-', '').toUpperCase(),
+        })
+      }}</span></span
     >
     <strong class="work-title">{{ exhibition.title }}</strong>
     <span v-if="showDescription" class="work-description">{{ exhibition.description }}</span>
