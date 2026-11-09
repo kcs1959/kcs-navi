@@ -1,0 +1,120 @@
+name: Cloudflare Workers Preview
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+  delete:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: workers-preview-${{ github.event_name }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.event_name == 'delete' && github.event.ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: >-
+      (github.event_name == 'push' && !github.event.deleted) ||
+      (github.event_name == 'pull_request' && github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Determine Preview name
+        id: name
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            name="pr-$PR_NUMBER"
+          else
+            name="$(node .github/scripts/preview-name.mjs "$BRANCH_NAME")"
+          fi
+          echo "value=$name" >> "$GITHUB_OUTPUT"
+      - name: Configure Preview environment
+        env:
+          PREVIEW_NAME: ${{ steps.name.outputs.value }}
+          CLOUDFLARE_WORKERS_SUBDOMAIN: ${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}
+          CLOUDFLARE_PREVIEW_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_PREVIEW_D1_DATABASE_ID }}
+        run: |
+          url="$(node .github/scripts/configure-preview.mjs)"
+          echo "NUXT_PUBLIC_SITE_URL=$url" >> "$GITHUB_ENV"
+      - name: Build Nuxt application
+        run: npm run build
+      - name: Create or update Preview
+        id: preview
+        env:
+          PREVIEW_NAME: ${{ steps.name.outputs.value }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          output="$(npx wrangler preview --config wrangler.preview.jsonc --name "$PREVIEW_NAME" --json)"
+          url="$(printf '%s\n' "$output" | jq -er '.preview.urls[0]')"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Display Preview URL
+        env:
+          PREVIEW_NAME: ${{ steps.name.outputs.value }}
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+        run: |
+          printf '## Cloudflare Workers Preview\n\n[%s](%s)\n' "$PREVIEW_NAME" "$PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
+      - name: Comment Preview URL on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+        with:
+          script: |
+            const marker = '<!-- kcs-navi-workers-preview -->'
+            const issue_number = context.issue.number
+            const { owner, repo } = context.repo
+            const body = `${marker}\nCloudflare Workers Preview: ${process.env.PREVIEW_URL}`
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number, per_page: 100,
+            })
+            const previous = comments.find(comment =>
+              comment.user?.login === 'github-actions[bot]' && comment.body?.includes(marker)
+            )
+            if (previous) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: previous.id, body })
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body })
+            }
+
+  cleanup:
+    if: >-
+      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository) ||
+      (github.event_name == 'delete' && github.event.ref_type == 'branch' && github.event.ref != 'main')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Delete Preview
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          DELETED_BRANCH: ${{ github.event.ref }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            name="pr-$PR_NUMBER"
+          else
+            name="$(node .github/scripts/preview-name.mjs "$DELETED_BRANCH")"
+          fi
+          npx wrangler preview delete --name "$name" --skip-confirmation
