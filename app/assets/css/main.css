@@ -24,7 +24,7 @@
 body {
   margin: 0;
 }
-body:has(dialog[open]) {
+body.exhibition-open {
   overflow: hidden;
 }
 button,
@@ -120,15 +120,6 @@ img {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-/* Sequential fade-out and fade-in take 0.2 seconds in total. */
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 0.1s ease;
-}
-.page-enter-from,
-.page-leave-to {
-  opacity: 0;
 }
 .menu-enter-active {
   transition:
