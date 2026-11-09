@@ -92,6 +92,16 @@ npm run dev
 npx wrangler d1 execute kcs-navi --local --file seeds/test.sql
 ```
 
+混雑表示の確認用ダミー記録を投入する。混雑度は投入時刻を基準に直近20分で計算されるため、確認の直前に投入する。必ず `--local` で実行し、`--remote` では実行しない。まずリセットし、確認したい混雑度の seed を1つだけ投入する。
+
+```sh
+npx wrangler d1 execute kcs-navi --local --file seeds/checkins-reset.sql
+# 以下から確認したい混雑度を1つだけ実行する
+npx wrangler d1 execute kcs-navi --local --file seeds/checkins-relaxed.sql
+npx wrangler d1 execute kcs-navi --local --file seeds/checkins-moderate.sql
+npx wrangler d1 execute kcs-navi --local --file seeds/checkins-busy.sql
+```
+
 ## 4. ユニットテストを行う
 
 ```sh

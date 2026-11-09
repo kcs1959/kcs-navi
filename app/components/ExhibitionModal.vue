@@ -115,7 +115,8 @@ function dismissBackdrop(event: MouseEvent) {
       </div>
       <section class="creator-comment">
         <h3>制作者より</h3>
-        <p>{{ exhibition.creatorComment }}</p>
+        <p v-if="exhibition.creatorComment.trim()">{{ exhibition.creatorComment }}</p>
+        <p v-else>コメントはありません。</p>
       </section>
       <section class="like-area" aria-label="作品を応援">
         <p class="like-message">{{ myLikes > 0 ? 'ありがとう！' : 'いいね！で応援しよう' }}</p>

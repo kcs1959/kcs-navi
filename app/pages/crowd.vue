@@ -179,6 +179,7 @@ const todayLabel = computed(() => {
 }
 .attendance-card {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   padding: 16px;
 }
