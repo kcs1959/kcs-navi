@@ -53,7 +53,6 @@ const externalLinks = [
     label: 'KCS公式サイト',
     href: 'https://www.kcs1959.jp/',
     icon: '/figma/kcs_official_light.png',
-    iconSize: 36,
   },
   { label: 'KCS公式X', href: 'https://x.com/kcs1959', icon: '/figma/menu-icon-xbrand.svg' },
   { label: 'KCS Instagram', href: 'https://www.instagram.com/kcs1959/' },
@@ -105,8 +104,8 @@ const externalLinks = [
             v-if="link.icon"
             :src="link.icon"
             alt=""
-            :width="link.iconSize ?? 22"
-            :height="link.iconSize ?? 22"
+            width="22"
+            height="22"
           />
           <svg
             v-else
