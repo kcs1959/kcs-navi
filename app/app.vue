@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { $serwist } = useNuxtApp()
+void $serwist?.register({ immediate: true })
 const route = useRoute()
 const config = useRuntimeConfig()
 const { selectedExhibition, siblings, closeExhibition, openExhibition } = useExhibitionDialog()

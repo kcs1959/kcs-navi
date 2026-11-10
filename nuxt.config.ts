@@ -3,7 +3,10 @@ import { fileURLToPath } from 'node:url'
 export default defineNuxtConfig({
   compatibilityDate: '2026-07-01',
   devtools: { enabled: false },
-  modules: ['@nuxt/eslint'],
+  modules: ['@nuxt/eslint', '@serwist/nuxt'],
+  serwist: {
+    globPatterns: ['**/*.{js,css,html,svg}'],
+  },
   vite: {
     build: {
       target: ['chrome111', 'edge111', 'firefox115', 'safari16.4', 'ios16.4'],
