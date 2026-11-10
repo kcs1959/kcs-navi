@@ -55,6 +55,8 @@ const links = [
       </a>
     </nav>
 
+    <InstallGuide />
+
     <section class="card social-card" aria-labelledby="follow-heading">
       <h2 id="follow-heading">KCSをフォロー</h2>
       <div class="social-links">

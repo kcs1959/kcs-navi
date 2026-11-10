@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const { $serwist } = useNuxtApp()
 void $serwist?.register({ immediate: true })
+// beforeinstallprompt を取り逃がさないよう、メニューを開く前からアプリ初期化時に購読する
+if (import.meta.client) useInstallPrompt()
 const route = useRoute()
 const config = useRuntimeConfig()
 const { selectedExhibition, siblings, closeExhibition, openExhibition } = useExhibitionDialog()
