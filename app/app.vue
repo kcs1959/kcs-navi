@@ -54,6 +54,7 @@ watch(() => route.path, closeExhibition)
       </div>
     </header>
     <main id="main-content" :class="{ 'with-navigation': showNavigation }">
+      <OfflineBanner />
       <AppPageTransition />
     </main>
     <ExhibitionModal
