@@ -52,7 +52,8 @@ const externalLinks = [
   {
     label: 'KCS公式サイト',
     href: 'https://www.kcs1959.jp/',
-    icon: '/figma/menu-icon-external-link.svg',
+    icon: '/figma/kcs_official_light.png',
+    iconSize: 36,
   },
   { label: 'KCS公式X', href: 'https://x.com/kcs1959', icon: '/figma/menu-icon-xbrand.svg' },
   { label: 'KCS Instagram', href: 'https://www.instagram.com/kcs1959/' },
@@ -100,7 +101,13 @@ const externalLinks = [
           :aria-label="`${link.label}（新しいタブで開く）`"
           :title="`${link.label}（新しいタブで開く）`"
         >
-          <img v-if="link.icon" :src="link.icon" alt="" width="22" height="22" />
+          <img
+            v-if="link.icon"
+            :src="link.icon"
+            alt=""
+            :width="link.iconSize ?? 22"
+            :height="link.iconSize ?? 22"
+          />
           <svg
             v-else
             viewBox="0 0 24 24"
