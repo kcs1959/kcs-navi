@@ -30,6 +30,11 @@ export default defineNuxtConfig({
           content: 'KCSの展示を、もっと楽しむ。ブースマップと班紹介、混雑状況をチェック。',
         },
         { name: 'theme-color', content: '#f4f1e9' },
+        { name: 'apple-mobile-web-app-title', content: 'KCS Navi' },
+      ],
+      link: [
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+        { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' },
       ],
     },
   },
