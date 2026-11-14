@@ -45,6 +45,27 @@ describe('OfflineBanner', () => {
     await flushPromises()
     expect(wrapper.find('[role="status"]').exists()).toBe(false)
   })
+  it('appears while the service worker answers from cache', async () => {
+    const serviceWorker = Object.assign(new EventTarget(), { controller: { postMessage: vi.fn() } })
+    Object.defineProperty(navigator, 'serviceWorker', { value: serviceWorker, configurable: true })
+    const send = (stale: boolean) =>
+      serviceWorker.dispatchEvent(new MessageEvent('message', { data: { type: 'stale', stale } }))
+    try {
+      const wrapper = await mountSuspended(OfflineBanner)
+      wrappers.push(wrapper)
+      expect(serviceWorker.controller.postMessage).toHaveBeenCalledWith({ type: 'stale?' })
+
+      send(true)
+      await flushPromises()
+      expect(wrapper.get('[role="status"]').text()).toContain('オフラインです')
+
+      send(false)
+      await flushPromises()
+      expect(wrapper.find('[role="status"]').exists()).toBe(false)
+    } finally {
+      Reflect.deleteProperty(navigator, 'serviceWorker')
+    }
+  })
   it('reads the offline state present at mount', async () => {
     setOnline(false)
     const wrapper = await mountSuspended(OfflineBanner)

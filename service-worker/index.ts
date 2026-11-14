@@ -1,4 +1,9 @@
-import type { PrecacheEntry, RouteMatchCallbackOptions, SerwistGlobalConfig } from 'serwist'
+import type {
+  PrecacheEntry,
+  RouteMatchCallbackOptions,
+  SerwistGlobalConfig,
+  SerwistPlugin,
+} from 'serwist'
 import { CacheFirst, ExpirationPlugin, NetworkFirst, NetworkOnly, Serwist } from 'serwist'
 
 declare global {
@@ -13,11 +18,27 @@ const WEEK = 7 * 24 * 60 * 60
 const WARM_PAGES = ['/', '/menu', '/crowd', '/exhibitions', '/teams']
 const CHECKIN_PAGES = ['/checkin', '/welcome']
 
+let stale = false
+const setStale = async (value: boolean) => {
+  stale = value
+  for (const client of await self.clients.matchAll()) client.postMessage({ type: 'stale', stale })
+}
+const staleNotifier: SerwistPlugin = {
+  fetchDidSucceed: async ({ response }) => {
+    void setStale(false)
+    return response
+  },
+  cachedResponseWillBeUsed: async ({ cachedResponse }) => {
+    if (cachedResponse) void setStale(true)
+    return cachedResponse
+  },
+}
+
 const pagesExpiration = new ExpirationPlugin({ maxEntries: 40, maxAgeSeconds: WEEK })
 const pages = new NetworkFirst({
   cacheName: 'pages',
   networkTimeoutSeconds: 5,
-  plugins: [pagesExpiration],
+  plugins: [pagesExpiration, staleNotifier],
 })
 const isNavigation = ({ request, sameOrigin }: RouteMatchCallbackOptions) =>
   sameOrigin && request.mode === 'navigate'
@@ -39,7 +60,7 @@ const serwist = new Serwist({
       handler: new NetworkFirst({
         cacheName: 'api',
         networkTimeoutSeconds: 5,
-        plugins: [new ExpirationPlugin({ maxEntries: 10, maxAgeSeconds: WEEK })],
+        plugins: [new ExpirationPlugin({ maxEntries: 10, maxAgeSeconds: WEEK }), staleNotifier],
       }),
     },
     {
@@ -67,6 +88,10 @@ self.addEventListener('activate', (event) => {
         ),
       ),
   )
+})
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'stale?') event.source?.postMessage({ type: 'stale', stale })
 })
 
 serwist.addEventListeners()
