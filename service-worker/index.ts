@@ -3,6 +3,7 @@ import type {
   RouteMatchCallbackOptions,
   SerwistGlobalConfig,
   SerwistPlugin,
+  StrategyHandler,
 } from 'serwist'
 import { CacheFirst, ExpirationPlugin, NetworkFirst, NetworkOnly, Serwist } from 'serwist'
 
@@ -34,8 +35,15 @@ const staleNotifier: SerwistPlugin = {
   },
 }
 
+class StaleAwareNetworkFirst extends NetworkFirst {
+  private readonly whileStale = new NetworkFirst({ networkTimeoutSeconds: 1 })
+  override _handle(request: Request, handler: StrategyHandler) {
+    return stale ? this.whileStale._handle(request, handler) : super._handle(request, handler)
+  }
+}
+
 const pagesExpiration = new ExpirationPlugin({ maxEntries: 40, maxAgeSeconds: WEEK })
-const pages = new NetworkFirst({
+const pages = new StaleAwareNetworkFirst({
   cacheName: 'pages',
   networkTimeoutSeconds: 5,
   plugins: [pagesExpiration, staleNotifier],
@@ -57,7 +65,7 @@ const serwist = new Serwist({
     {
       matcher: ({ request, sameOrigin, url }) =>
         sameOrigin && request.method === 'GET' && url.pathname.startsWith('/api/'),
-      handler: new NetworkFirst({
+      handler: new StaleAwareNetworkFirst({
         cacheName: 'api',
         networkTimeoutSeconds: 5,
         plugins: [new ExpirationPlugin({ maxEntries: 10, maxAgeSeconds: WEEK }), staleNotifier],
