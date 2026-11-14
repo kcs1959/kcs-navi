@@ -122,7 +122,7 @@ function dismissBackdrop(event: MouseEvent) {
         <p class="like-message">{{ myLikes > 0 ? 'ありがとう！' : 'いいね！で応援しよう' }}</p>
         <button
           class="like-button"
-          :class="{ 'is-complete': atLimit }"
+          :class="{ 'is-complete': atLimit, 'is-offline': !online }"
           :disabled="!ready || submitting || atLimit || !online"
           :aria-busy="submitting"
           :aria-label="
@@ -285,6 +285,11 @@ function dismissBackdrop(event: MouseEvent) {
   cursor: default;
 }
 .like-button.is-complete {
+  box-shadow: none;
+}
+.like-button.is-offline {
+  color: var(--muted);
+  background: var(--line);
   box-shadow: none;
 }
 .like-icon {

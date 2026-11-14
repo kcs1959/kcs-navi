@@ -86,6 +86,7 @@ describe('ExhibitionModal offline', () => {
     setOnline(false, 'offline')
     await flushPromises()
     expect(wrapper.find('.like-button').attributes('disabled')).toBeDefined()
+    expect(wrapper.find('.like-button').classes()).toContain('is-offline')
     expect(wrapper.text()).toContain('オフラインのため送信できません')
   })
 })
