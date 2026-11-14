@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import { clearNuxtState, useNuxtApp } from '#app'
-import InstallGuide from '~/components/InstallGuide.vue'
+import MenuPage from '~/pages/menu.vue'
 
 const wrappers: Array<{ unmount(): void }> = []
 const stateKeys = [
@@ -32,7 +32,7 @@ function installPrompt() {
   return event
 }
 async function mountGuide() {
-  const wrapper = await mountSuspended(InstallGuide)
+  const wrapper = await mountSuspended(MenuPage)
   wrappers.push(wrapper)
   await flushPromises()
   return wrapper
@@ -53,25 +53,25 @@ afterEach(() => {
 describe('InstallGuide', () => {
   it('shows nothing in a browser without an install path', async () => {
     const wrapper = await mountGuide()
-    expect(wrapper.find('section').exists()).toBe(false)
+    expect(wrapper.find('.install-card').exists()).toBe(false)
   })
   it('offers an install button after beforeinstallprompt and prompts on click', async () => {
     const wrapper = await mountGuide()
     const event = installPrompt()
     await flushPromises()
     expect(event.defaultPrevented).toBe(true)
-    expect(wrapper.get('h2').text()).toBe('ホーム画面に追加')
+    expect(wrapper.get('#install-heading').text()).toBe('ホーム画面に追加')
     expect(wrapper.text()).not.toContain('共有')
-    await wrapper.get('button').trigger('click')
+    await wrapper.get('.install-card button').trigger('click')
     expect(event.prompt).toHaveBeenCalledTimes(1)
   })
   it('shows the share steps on iOS Safari without a button', async () => {
     setStandalone(false)
     const wrapper = await mountGuide()
-    expect(wrapper.get('h2').text()).toBe('ホーム画面に追加')
+    expect(wrapper.get('#install-heading').text()).toBe('ホーム画面に追加')
     expect(wrapper.text()).toContain('共有')
     expect(wrapper.text()).toContain('ホーム画面に追加')
-    expect(wrapper.find('button').exists()).toBe(false)
+    expect(wrapper.find('.install-card button').exists()).toBe(false)
   })
   it.each([
     ['display-mode standalone', () => setDisplayModeStandalone(true)],
@@ -81,15 +81,15 @@ describe('InstallGuide', () => {
     const wrapper = await mountGuide()
     installPrompt()
     await flushPromises()
-    expect(wrapper.find('section').exists()).toBe(false)
+    expect(wrapper.find('.install-card').exists()).toBe(false)
   })
   it('hides the guide once appinstalled fires', async () => {
     const wrapper = await mountGuide()
     installPrompt()
     await flushPromises()
-    expect(wrapper.find('section').exists()).toBe(true)
+    expect(wrapper.find('.install-card').exists()).toBe(true)
     window.dispatchEvent(new Event('appinstalled'))
     await flushPromises()
-    expect(wrapper.find('section').exists()).toBe(false)
+    expect(wrapper.find('.install-card').exists()).toBe(false)
   })
 })

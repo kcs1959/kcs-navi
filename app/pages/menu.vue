@@ -1,5 +1,6 @@
 <script setup lang="ts">
 useHead({ title: 'メニュー' })
+const { promptEvent, installed, iosSafari } = useInstallPrompt()
 
 const links = [
   {
@@ -55,7 +56,7 @@ const links = [
       </a>
     </nav>
 
-    <InstallGuide />
+    <InstallGuide v-if="!installed && (promptEvent || iosSafari)" />
 
     <section class="card social-card" aria-labelledby="follow-heading">
       <h2 id="follow-heading">KCSをフォロー</h2>

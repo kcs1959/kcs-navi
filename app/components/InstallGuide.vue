@@ -1,11 +1,9 @@
 <script setup lang="ts">
-const { promptEvent, installed, iosSafari, install } = useInstallPrompt()
-// インストール済みと、どちらの案内も出せないブラウザでは何も出さない。
-const visible = computed(() => !installed.value && (promptEvent.value !== null || iosSafari.value))
+const { promptEvent, install } = useInstallPrompt()
 </script>
 
 <template>
-  <section v-if="visible" class="card install-card" aria-labelledby="install-heading">
+  <section class="card install-card" aria-labelledby="install-heading">
     <h2 id="install-heading">ホーム画面に追加</h2>
     <p>アプリのように全画面で開けて、一度見たページは通信が不安定でも読めます。</p>
     <button v-if="promptEvent" type="button" class="primary-button" @click="install">
