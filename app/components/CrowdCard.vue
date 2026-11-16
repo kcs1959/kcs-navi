@@ -5,7 +5,7 @@ import type { CheckinStatsResponse, CongestionLevel } from '../../shared/types'
 const levelEmoji: Record<CongestionLevel, string> = {
   relaxed: '😄',
   moderate: '🙂',
-  busy: '😥',
+  busy: '😳',
 }
 
 const props = withDefaults(
