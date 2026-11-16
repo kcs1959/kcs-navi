@@ -10,6 +10,7 @@ const props = defineProps<{
 const emit = defineEmits<{ close: []; select: [exhibition: Exhibition]; retryTeams: [] }>()
 const dialog = ref<HTMLDialogElement>()
 const { counts, totals, pending, storageAvailable, syncCount, sendLike } = useLocalLikes()
+const online = useOnline()
 const likes = computed(() =>
   Math.max(props.exhibition.likes, totals.value[props.exhibition.id] ?? 0),
 )
@@ -44,7 +45,7 @@ onBeforeUnmount(() => {
   dialog.value?.close()
 })
 async function like() {
-  if (!ready.value || submitting.value || atLimit.value) return
+  if (!ready.value || submitting.value || atLimit.value || !online.value) return
   likeError.value = ''
   const requestedId = props.exhibition.id
   const version = viewVersion
@@ -121,8 +122,8 @@ function dismissBackdrop(event: MouseEvent) {
         <p class="like-message">{{ myLikes > 0 ? 'ありがとう！' : 'いいね！で応援しよう' }}</p>
         <button
           class="like-button"
-          :class="{ 'is-complete': atLimit }"
-          :disabled="!ready || submitting || atLimit"
+          :class="{ 'is-complete': atLimit, 'is-offline': !online }"
+          :disabled="!ready || submitting || atLimit || !online"
           :aria-busy="submitting"
           :aria-label="
             atLimit
@@ -156,6 +157,7 @@ function dismissBackdrop(event: MouseEvent) {
           <span class="sr-only">あなたのいいね {{ myLikes }} / {{ LIKE_LIMIT }} 回。</span>
         </p>
       </section>
+      <p v-if="!online" class="like-feedback" role="status">オフラインのため送信できません。</p>
       <p v-if="!storageAvailable" class="like-feedback" role="status">
         このブラウザでは回数を保存できません。再読み込みすると回数がリセットされます。
       </p>
@@ -283,6 +285,11 @@ function dismissBackdrop(event: MouseEvent) {
   cursor: default;
 }
 .like-button.is-complete {
+  box-shadow: none;
+}
+.like-button.is-offline {
+  color: var(--muted);
+  background: var(--line);
   box-shadow: none;
 }
 .like-icon {

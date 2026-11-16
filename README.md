@@ -113,6 +113,20 @@ npm install -D vitest @nuxt/test-utils @vue/test-utils happy-dom @cloudflare/vit
 npm test
 ```
 
+## 5. PWAの動作を確認する
+
+Service Workerは本番ビルドにだけ生成される（`npm run dev`では動かない）。ビルドしてWranglerで配信し、ブラウザで確認する。
+
+```sh
+npm run build
+npm run preview
+```
+
+1. `http://localhost:3000` を開き、DevToolsのApplicationタブで **Service Workers** に `sw.js` が activated で登録されていること、**Manifest** に名前とアイコンが出ていることを見る。
+2. Applicationタブの **Cache Storage** に `pages`（`/`・`/menu`・`/crowd`・`/exhibitions`・`/teams`）、`api`、`fonts`、precache が並ぶのを待つ。
+3. `wrangler dev` を止めるか、Networkタブで Offline にしてページを再読み込みする。開いたことのあるページはそのまま表示され、上部に「オフラインです」の帯が出る。開いたことのないURLは「オフラインです」の案内ページになる。
+4. Service Workerの型検査は `npx tsc --noEmit -p service-worker/tsconfig.json` で行う（`npm run typecheck` の対象外）。
+
 # Cloudflare Workersへの初回公開（作成済みのWorker・D1を使う場合）
 
 ## 1. 本番のIDとURLを確認する

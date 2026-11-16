@@ -1,5 +1,6 @@
 <script setup lang="ts">
 useHead({ title: 'メニュー' })
+const { promptEvent, installed, iosSafari } = useInstallPrompt()
 
 const links = [
   {
@@ -54,6 +55,8 @@ const links = [
         <img src="/figma/menu-icon-chevron-right.svg" alt="" width="16" height="16" />
       </a>
     </nav>
+
+    <InstallGuide v-if="!installed && (promptEvent || iosSafari)" />
 
     <section class="card social-card" aria-labelledby="follow-heading">
       <h2 id="follow-heading">KCSをフォロー</h2>

@@ -3,7 +3,10 @@ import { fileURLToPath } from 'node:url'
 export default defineNuxtConfig({
   compatibilityDate: '2026-07-01',
   devtools: { enabled: false },
-  modules: ['@nuxt/eslint'],
+  modules: ['@nuxt/eslint', '@serwist/nuxt'],
+  serwist: {
+    globPatterns: ['**/*.{js,css,html,svg}'],
+  },
   vite: {
     build: {
       target: ['chrome111', 'edge111', 'firefox115', 'safari16.4', 'ios16.4'],
@@ -30,6 +33,11 @@ export default defineNuxtConfig({
           content: 'KCSの展示を、もっと楽しむ。ブースマップと班紹介、混雑状況をチェック。',
         },
         { name: 'theme-color', content: '#f4f1e9' },
+        { name: 'apple-mobile-web-app-title', content: 'KCS Navi' },
+      ],
+      link: [
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+        { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' },
       ],
     },
   },
