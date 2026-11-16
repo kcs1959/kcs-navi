@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import type { CheckinStatsResponse } from '../../shared/types'
+import type { CheckinStatsResponse, CongestionLevel } from '../../shared/types'
+
+// 混雑度を一目で伝えるための絵文字。3段階の分岐はサーバー側の congestionFor と揃えている。
+const levelEmoji: Record<CongestionLevel, string> = {
+  relaxed: '😄',
+  moderate: '🙂',
+  busy: '😳',
+}
 
 const props = withDefaults(
   defineProps<{
@@ -16,6 +23,9 @@ defineEmits<{ retry: [] }>()
 const current = computed(() => props.stats)
 // 再取得失敗時は、前回の人数を「いま」の値として表示しない。
 const unavailable = computed(() => props.failed || !current.value)
+const emoji = computed(() =>
+  current.value ? levelEmoji[current.value.congestion.level] : '',
+)
 const updatedAt = computed(() =>
   current.value
     ? new Intl.DateTimeFormat('ja-JP', {
@@ -35,18 +45,15 @@ const updatedAt = computed(() =>
         to="/crowd"
         aria-label="来場状況を詳しく見る"
       />
-      <div class="crowd-heading">
-        <span class="chip" :class="current.congestion.level">{{ current.congestion.label }}</span
-        ><span class="text-muted">混雑目安（推定）</span>
-      </div>
-      <div class="occupancy">
-        <strong>{{ current.congestion.estimatedVisitors }}</strong
-        ><span>/ {{ current.congestion.capacity }} 人</span
-        ><b>・ {{ current.congestion.estimatedRate }}%</b>
+      <div class="status" :class="current.congestion.level">
+        <span class="status-emoji" aria-hidden="true">{{ emoji }}</span>
+        <div class="status-texts">
+          <span class="status-label">{{ current.congestion.label }}</span>
+          <span class="status-rate">混雑度 {{ current.congestion.estimatedRate }}%</span>
+        </div>
       </div>
       <div class="crowd-update">
-        <time :datetime="current.congestion.calculatedAt">{{ updatedAt }} 更新</time
-        ><span>30秒ごとに更新</span
+        <time :datetime="current.congestion.calculatedAt">{{ updatedAt }} 更新（自動）</time
         ><img v-if="linked" src="/figma/map-icon-chevron-right.svg" width="14" height="14" alt="" />
       </div>
       <span class="sr-only"
@@ -55,9 +62,12 @@ const updatedAt = computed(() =>
       >
     </template>
     <template v-else>
-      <div class="crowd-heading">
-        <span class="chip">{{ loading ? '読み込み中' : '情報未取得' }}</span
-        ><span class="text-muted">混雑目安（推定）</span>
+      <div class="status neutral">
+        <span class="status-emoji" aria-hidden="true">{{ loading ? '⏳' : '❔' }}</span>
+        <div class="status-texts">
+          <span class="status-label">{{ loading ? '読み込み中' : '未取得' }}</span>
+          <span class="status-rate">混雑度</span>
+        </div>
       </div>
       <p class="unavailable-title">
         {{ loading ? '混雑情報を確認しています' : '混雑情報を取得できません' }}
@@ -87,31 +97,56 @@ const updatedAt = computed(() =>
 .crowd-card:has(a:hover) {
   border-color: var(--orange);
 }
-.crowd-heading {
+/* 絵文字＋ラベル＋割合を1枚のパネルにまとめ、レベルごとの淡いグラデーションと
+   ラベル文字色で「空き=緑系・普通=黄系・混み=赤系」の印象を伝える。 */
+.status {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  flex-wrap: wrap;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 18px;
 }
-.chip.relaxed {
-  background: var(--mint);
+.status.relaxed {
+  background: linear-gradient(135deg, #eafbf1, var(--white));
 }
-.chip.moderate {
-  background: var(--lemon);
+.status.moderate {
+  background: linear-gradient(135deg, #fff7e0, var(--white));
 }
-.chip.busy {
-  background: var(--peach);
+.status.busy {
+  background: linear-gradient(135deg, #ffe9e4, var(--white));
 }
-.occupancy {
+.status.neutral {
+  background: var(--paper);
+}
+.status.relaxed .status-label {
+  color: #2f8f5b;
+}
+.status.moderate .status-label {
+  color: #b9790a;
+}
+.status.busy .status-label {
+  color: #d1483f;
+}
+.status-emoji {
+  font-size: 38px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.status-texts {
   display: flex;
-  gap: 8px;
-  align-items: baseline;
-  font-size: 14px;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
-.occupancy strong {
-  font-size: 28px;
-  line-height: 1.5;
+.status-label {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+.status-rate {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
 }
 .crowd-update {
   display: flex;
