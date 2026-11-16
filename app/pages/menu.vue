@@ -44,6 +44,17 @@ const links = [
         <img src="/figma/menu-icon-chevron-right.svg" alt="" width="16" height="16" />
       </NuxtLink>
       <a
+        href="https://mita-oni.kcs1959.workers.dev/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="menu-link"
+        aria-label="mita-oni 鬼ごっこサイト（新しいタブで開く）"
+      >
+        <img src="/figma/menu-icon-gamepad2.svg" alt="" width="24" height="24" />
+        <span class="menu-link-text"><strong>mita-oni</strong><span>鬼ごっこサイト ↗</span></span>
+        <img src="/figma/menu-icon-chevron-right.svg" alt="" width="16" height="16" />
+      </a>
+      <a
         href="https://www.kcs1959.jp/"
         target="_blank"
         rel="noopener noreferrer"
