@@ -45,12 +45,12 @@ const updatedAt = computed(() =>
         to="/crowd"
         aria-label="来場状況を詳しく見る"
       />
-      <div class="crowd-heading">
-        <span class="text-muted">混雑度：{{ current.congestion.estimatedRate }}%</span>
-      </div>
-      <div class="occupancy" :class="current.congestion.level">
-        <span class="occupancy-emoji" aria-hidden="true">{{ emoji }}</span>
-        <strong>{{ current.congestion.label }}</strong>
+      <div class="status" :class="current.congestion.level">
+        <span class="status-emoji" aria-hidden="true">{{ emoji }}</span>
+        <div class="status-texts">
+          <span class="status-label">{{ current.congestion.label }}</span>
+          <span class="status-rate">混雑度 {{ current.congestion.estimatedRate }}%</span>
+        </div>
       </div>
       <div class="crowd-update">
         <time :datetime="current.congestion.calculatedAt">{{ updatedAt }} 更新（自動）</time
@@ -62,8 +62,12 @@ const updatedAt = computed(() =>
       >
     </template>
     <template v-else>
-      <div class="crowd-heading">
-        <span class="text-muted">混雑度：{{ loading ? '読み込み中' : '未取得' }}</span>
+      <div class="status neutral">
+        <span class="status-emoji" aria-hidden="true">{{ loading ? '⏳' : '❔' }}</span>
+        <div class="status-texts">
+          <span class="status-label">{{ loading ? '読み込み中' : '未取得' }}</span>
+          <span class="status-rate">混雑度</span>
+        </div>
       </div>
       <p class="unavailable-title">
         {{ loading ? '混雑情報を確認しています' : '混雑情報を取得できません' }}
@@ -93,40 +97,56 @@ const updatedAt = computed(() =>
 .crowd-card:has(a:hover) {
   border-color: var(--orange);
 }
-.crowd-heading {
+/* 絵文字＋ラベル＋割合を1枚のパネルにまとめ、レベルごとの淡いグラデーションと
+   ラベル文字色で「空き=緑系・普通=黄系・混み=赤系」の印象を伝える。 */
+.status {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  flex-wrap: wrap;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 18px;
 }
-.occupancy {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding: 10px 18px;
-  margin: 2px 0;
-  width: fit-content;
-  border-radius: 16px;
+.status.relaxed {
+  background: linear-gradient(135deg, #eafbf1, var(--white));
 }
-/* 空き=緑系・普通=黄系・混み=赤系の印象になるよう、既存パレットの mint/lemon/peach を背景色として使う。 */
-.occupancy.relaxed {
-  background: var(--mint);
+.status.moderate {
+  background: linear-gradient(135deg, #fff7e0, var(--white));
 }
-.occupancy.moderate {
-  background: var(--lemon);
+.status.busy {
+  background: linear-gradient(135deg, #ffe9e4, var(--white));
 }
-.occupancy.busy {
-  background: var(--peach);
+.status.neutral {
+  background: var(--paper);
 }
-.occupancy-emoji {
-  font-size: 32px;
+.status.relaxed .status-label {
+  color: #2f8f5b;
+}
+.status.moderate .status-label {
+  color: #b9790a;
+}
+.status.busy .status-label {
+  color: #d1483f;
+}
+.status-emoji {
+  font-size: 38px;
   line-height: 1;
+  flex-shrink: 0;
 }
-.occupancy strong {
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.4;
+.status-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.status-label {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+.status-rate {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
 }
 .crowd-update {
   display: flex;
