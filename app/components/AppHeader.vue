@@ -1,8 +1,13 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ title?: string; subtitle?: string }>(), {
-  title: 'KCS Navi',
-  subtitle: '三田祭 2026',
-})
+const props = withDefaults(
+  defineProps<{ title?: string; subtitle?: string; isMenuOpen?: boolean }>(),
+  {
+    title: 'KCS Navi',
+    subtitle: '三田祭 2026',
+    isMenuOpen: false,
+  },
+)
+const emit = defineEmits<{ 'toggle-menu': [] }>()
 
 const headerSlot = ref<HTMLElement>()
 const header = ref<HTMLElement>()
@@ -46,8 +51,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', schedulePositionUpdate)
 })
 
-const route = useRoute()
-const isMenu = computed(() => route.path === '/menu')
 const externalLinks = [
   {
     label: 'KCS公式サイト',
@@ -100,13 +103,7 @@ const externalLinks = [
           :aria-label="`${link.label}（新しいタブで開く）`"
           :title="`${link.label}（新しいタブで開く）`"
         >
-          <img
-            v-if="link.icon"
-            :src="link.icon"
-            alt=""
-            width="22"
-            height="22"
-          />
+          <img v-if="link.icon" :src="link.icon" alt="" width="22" height="22" />
           <svg
             v-else
             viewBox="0 0 24 24"
@@ -121,19 +118,22 @@ const externalLinks = [
           </svg>
         </a>
         <ThemeToggle />
-        <NuxtLink
-          class="header-link"
-          :to="isMenu ? '/' : '/menu'"
-          :aria-label="isMenu ? 'メニューを閉じる' : 'メニューを開く'"
-          :title="isMenu ? 'メニューを閉じる' : 'メニューを開く'"
+        <button
+          type="button"
+          class="header-link menu-toggle-btn"
+          :aria-expanded="props.isMenuOpen"
+          aria-controls="menu-popup"
+          :aria-label="props.isMenuOpen ? 'メニューを閉じる' : 'メニューを開く'"
+          :title="props.isMenuOpen ? 'メニューを閉じる' : 'メニューを開く'"
+          @click="emit('toggle-menu')"
         >
           <img
-            :src="isMenu ? '/figma/menu-icon-x.svg' : '/figma/map-icon-menu.svg'"
+            :src="props.isMenuOpen ? '/figma/menu-icon-x.svg' : '/figma/map-icon-menu.svg'"
             alt=""
             width="24"
             height="24"
           />
-        </NuxtLink>
+        </button>
       </nav>
     </header>
   </div>
@@ -201,15 +201,20 @@ const externalLinks = [
   flex-wrap: wrap;
   gap: 4px;
 }
-.header-link {
+.header-link,
+.menu-toggle-btn {
   display: grid;
   place-items: center;
   width: 44px;
   height: 44px;
   border-radius: 12px;
   background: var(--white);
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
 .header-link:hover,
+.menu-toggle-btn:hover,
 .header-link[aria-current='page'] {
   background: var(--peach);
 }
