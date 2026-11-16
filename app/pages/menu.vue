@@ -1,6 +1,6 @@
 <script setup lang="ts">
 useHead({ title: 'メニュー' })
-const { promptEvent, installed, iosSafari } = useInstallPrompt()
+const { promptEvent, installed, iosSafari, mobileChrome } = useInstallPrompt()
 
 const links = [
   {
@@ -44,6 +44,17 @@ const links = [
         <img src="/figma/menu-icon-chevron-right.svg" alt="" width="16" height="16" />
       </NuxtLink>
       <a
+        href="https://mita-oni.kcs1959.workers.dev/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="menu-link"
+        aria-label="mita-oni 鬼ごっこサイト（新しいタブで開く）"
+      >
+        <img src="/figma/menu-icon-gamepad2.svg" alt="" width="24" height="24" />
+        <span class="menu-link-text"><strong>mita-oni</strong><span>鬼ごっこサイト ↗</span></span>
+        <img src="/figma/menu-icon-chevron-right.svg" alt="" width="16" height="16" />
+      </a>
+      <a
         href="https://www.kcs1959.jp/"
         target="_blank"
         rel="noopener noreferrer"
@@ -56,7 +67,7 @@ const links = [
       </a>
     </nav>
 
-    <InstallGuide v-if="!installed && (promptEvent || iosSafari)" />
+    <InstallGuide v-if="!installed && (promptEvent || iosSafari || mobileChrome)" />
 
     <section class="card social-card" aria-labelledby="follow-heading">
       <h2 id="follow-heading">KCSをフォロー</h2>

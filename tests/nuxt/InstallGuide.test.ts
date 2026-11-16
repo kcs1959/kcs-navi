@@ -9,8 +9,18 @@ const stateKeys = [
   'install-prompt-event',
   'install-prompt-installed',
   'install-prompt-ios',
+  'install-prompt-chrome',
   'install-prompt-listening',
 ]
+const safariUA =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'
+const androidChromeUA =
+  'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 Chrome/130.0.0.0 Mobile Safari/537.36'
+const iosChromeUA =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 CriOS/130.0.0.0 Mobile/15E148 Safari/604.1'
+function setUserAgent(value: string) {
+  vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(value)
+}
 function resetState() {
   useNuxtApp().runWithContext(() => clearNuxtState(stateKeys))
 }
@@ -46,6 +56,7 @@ beforeEach(() => {
 afterEach(() => {
   wrappers.splice(0).forEach((wrapper) => wrapper.unmount())
   vi.unstubAllGlobals()
+  vi.restoreAllMocks()
   setStandalone(undefined)
   resetState()
 })
@@ -66,6 +77,7 @@ describe('InstallGuide', () => {
     expect(event.prompt).toHaveBeenCalledTimes(1)
   })
   it('shows the share steps on iOS Safari without a button', async () => {
+    setUserAgent(safariUA)
     setStandalone(false)
     const wrapper = await mountGuide()
     expect(wrapper.get('#install-heading').text()).toBe('ホーム画面に追加')
@@ -74,9 +86,54 @@ describe('InstallGuide', () => {
     expect(wrapper.find('.install-card button').exists()).toBe(false)
   })
   it.each([
+    ['Android Chrome', androidChromeUA, undefined, '︙'],
+    ['iOS Chrome', iosChromeUA, false, '共有'],
+  ] as const)(
+    'shows a button and Chrome steps without a prompt on %s',
+    async (_name, ua, standalone, step) => {
+      setUserAgent(ua)
+      setStandalone(standalone)
+      const wrapper = await mountGuide()
+      const button = wrapper.get('.install-card button')
+      expect(button.text()).toBe('ホーム画面に追加する')
+      expect(wrapper.find('#chrome-install-steps').exists()).toBe(false)
+      expect(wrapper.text()).not.toContain('Safari 下部')
+      await button.trigger('click')
+      expect(wrapper.find('#chrome-install-steps').exists()).toBe(true)
+      expect(wrapper.get('#chrome-install-steps').text()).toContain(step)
+      expect(button.attributes('aria-expanded')).toBe('true')
+      await button.trigger('click')
+      expect(wrapper.find('#chrome-install-steps').exists()).toBe(false)
+    },
+  )
+  it('uses the native prompt when it arrives after showing Chrome steps', async () => {
+    setUserAgent(androidChromeUA)
+    const wrapper = await mountGuide()
+    await wrapper.get('.install-card button').trigger('click')
+    const event = installPrompt()
+    await flushPromises()
+    expect(wrapper.find('#chrome-install-steps').exists()).toBe(false)
+    await wrapper.get('.install-card button').trigger('click')
+    expect(event.prompt).toHaveBeenCalledTimes(1)
+  })
+  it.each([
+    ['Android Edge', `${androidChromeUA} EdgA/130.0.0.0`, undefined],
+    ['Android WebView', androidChromeUA.replace('Pixel 9)', 'Pixel 9; wv)'), undefined],
+    ['iOS Firefox', iosChromeUA.replace('CriOS/', 'FxiOS/'), false],
+  ] as const)(
+    'does not show Chrome or Safari instructions for %s',
+    async (_name, ua, standalone) => {
+      setUserAgent(ua)
+      setStandalone(standalone)
+      const wrapper = await mountGuide()
+      expect(wrapper.find('.install-card').exists()).toBe(false)
+    },
+  )
+  it.each([
     ['display-mode standalone', () => setDisplayModeStandalone(true)],
     ['navigator.standalone', () => setStandalone(true)],
   ])('hides the guide when already installed via %s', async (_label, arrange) => {
+    setUserAgent(androidChromeUA)
     arrange()
     const wrapper = await mountGuide()
     installPrompt()
