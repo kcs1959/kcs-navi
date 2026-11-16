@@ -7,6 +7,7 @@ export function useInstallPrompt() {
   const promptEvent = useState<BeforeInstallPromptEvent | null>('install-prompt-event', () => null)
   const installed = useState('install-prompt-installed', () => false)
   const iosSafari = useState('install-prompt-ios', () => false)
+  const mobileChrome = useState<'android' | 'ios' | null>('install-prompt-chrome', () => null)
   const listening = useState('install-prompt-listening', () => false)
 
   if (import.meta.client && !listening.value) {
@@ -25,8 +26,19 @@ export function useInstallPrompt() {
       const { standalone } = navigator as Navigator & { standalone?: boolean }
       installed.value =
         standalone === true || window.matchMedia('(display-mode: standalone)').matches
-      // iOS Safari 向け
-      iosSafari.value = standalone === false
+      const ua = navigator.userAgent
+      // iOS Chrome は Safari と同じ standalone プロパティを持つため先に区別する。
+      if (/CriOS\//.test(ua)) {
+        mobileChrome.value = 'ios'
+      } else if (
+        /Android/.test(ua) &&
+        /Chrome\//.test(ua) &&
+        !/EdgA\/|OPR\/|SamsungBrowser\/|; wv\)/.test(ua)
+      ) {
+        mobileChrome.value = 'android'
+      }
+      iosSafari.value =
+        standalone === false && /Safari\//.test(ua) && !/CriOS\/|FxiOS\/|EdgiOS\/|OPiOS\//.test(ua)
     })
   }
 
@@ -34,5 +46,5 @@ export function useInstallPrompt() {
     await promptEvent.value?.prompt()
   }
 
-  return { promptEvent, installed, iosSafari, install }
+  return { promptEvent, installed, iosSafari, mobileChrome, install }
 }
