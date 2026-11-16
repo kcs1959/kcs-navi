@@ -10,7 +10,10 @@ const props = defineProps<{
 const emit = defineEmits<{ close: []; select: [exhibition: Exhibition]; retryTeams: [] }>()
 const dialog = ref<HTMLDialogElement>()
 const { counts, totals, pending, storageAvailable, syncCount, sendLike } = useLocalLikes()
-const online = useOnline()
+const online = ref(true)
+function updateOnlineStatus() {
+  online.value = navigator.onLine
+}
 const likes = computed(() =>
   Math.max(props.exhibition.likes, totals.value[props.exhibition.id] ?? 0),
 )
@@ -27,6 +30,9 @@ function onStorage(event: StorageEvent) {
 }
 onMounted(() => {
   dialog.value?.showModal()
+  updateOnlineStatus()
+  window.addEventListener('online', updateOnlineStatus)
+  window.addEventListener('offline', updateOnlineStatus)
   watch(
     () => props.exhibition.id,
     (id) => {
@@ -41,6 +47,8 @@ onMounted(() => {
 })
 onBeforeUnmount(() => {
   viewVersion++
+  window.removeEventListener('online', updateOnlineStatus)
+  window.removeEventListener('offline', updateOnlineStatus)
   window.removeEventListener('storage', onStorage)
   dialog.value?.close()
 })
