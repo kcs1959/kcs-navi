@@ -1,5 +1,6 @@
 <script setup lang="ts">
 useHead({ title: 'メニュー' })
+const { promptEvent, installed, iosSafari } = useInstallPrompt()
 
 const links = [
   {
@@ -55,6 +56,8 @@ const links = [
       </a>
     </nav>
 
+    <InstallGuide v-if="!installed && (promptEvent || iosSafari)" />
+
     <section class="card social-card" aria-labelledby="follow-heading">
       <h2 id="follow-heading">KCSをフォロー</h2>
       <div class="social-links">
@@ -89,7 +92,8 @@ const links = [
   display: flex;
   flex-direction: column;
   padding: 12px;
-  background: var(--kcs-glass, #fffcf5);
+  background: var(--glass);
+  color: var(--ink);
 }
 .menu-link {
   display: flex;
@@ -112,7 +116,7 @@ const links = [
   line-height: 1.5;
 }
 .menu-link-text > span {
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
   font-size: 10px;
   line-height: 1.5;
 }
@@ -137,11 +141,16 @@ const links = [
   justify-content: center;
   gap: 8px;
   border-radius: 12px;
-  background: var(--kcs-paper, #fff6ea);
+  background: var(--paper);
+  color: var(--ink);
   font-size: 12px;
   text-decoration: none;
 }
 .social-links img {
   flex: none;
+}
+.menu-link > img,
+.social-links img {
+  filter: var(--icon-filter);
 }
 </style>

@@ -1,0 +1,21 @@
+{
+  "name": "KCS Navi",
+  "short_name": "KCS Navi",
+  "description": "KCSの展示を、もっと楽しむ。ブースマップと班紹介、混雑状況をチェック。",
+  "lang": "ja",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fff6ea",
+  "theme_color": "#f4f1e9",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

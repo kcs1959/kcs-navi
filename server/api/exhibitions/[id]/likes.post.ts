@@ -1,9 +1,10 @@
-import { createError, defineEventHandler, getRouterParam } from 'h3'
+import { createError, defineEventHandler, getRouterParam, setResponseHeader } from 'h3'
 import { parseExhibitionId } from '../../../services/request-policy'
 import { protectMutation } from '../../../utils/mutations'
 import { withRepository } from '../../../utils/repository'
 
 export default defineEventHandler(async (event) => {
+  setResponseHeader(event, 'Cache-Control', 'no-store')
   const id = parseExhibitionId(getRouterParam(event, 'id'))
   if (id === null)
     throw createError({

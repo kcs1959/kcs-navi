@@ -120,6 +120,7 @@ const externalLinks = [
             <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
           </svg>
         </a>
+        <ThemeToggle />
         <NuxtLink
           class="header-link"
           :to="isMenu ? '/' : '/menu'"
@@ -215,6 +216,9 @@ const externalLinks = [
 .header-link svg {
   width: 22px;
   height: 22px;
+}
+.theme-toggle {
+  flex-shrink: 0;
 }
 @media (min-width: 600px) {
   .site-header {

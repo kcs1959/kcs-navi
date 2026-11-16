@@ -44,7 +44,7 @@ withDefaults(
 .loading-desk {
   width: 24px;
   height: 16px;
-  background: white;
+  background: var(--white);
   border: 1px solid var(--line);
   border-radius: 6px;
   animation: desk-drop 1.6s cubic-bezier(0.3, 0, 0.2, 1) infinite;

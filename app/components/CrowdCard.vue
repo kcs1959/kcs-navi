@@ -127,4 +127,7 @@ const updatedAt = computed(() =>
 .micro {
   font-size: 10px;
 }
+.crowd-update img {
+  filter: var(--icon-filter);
+}
 </style>
