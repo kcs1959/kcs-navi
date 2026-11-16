@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// 混雑度の算出ロジック（旧「推定値について」セクションの内容）:
+// 直近20分のチェックイン数を推定滞在人数とし、混雑率 = 推定滞在人数 ÷ 定員40人 × 100% で算出する。
+// 画面上の説明表示は絵文字と色による直感的な表示へ置き換えたため削除し、
+// 算出根拠はこのコメントと server/services/checkins.ts の congestionFor に残す。
 useHead({ title: '来場者数・混雑状況' })
 const { data, error, status, refresh } = useCrowdStats()
 const selectedTab = ref<'hourly' | 'daily'>('hourly')
@@ -171,13 +175,6 @@ const todayLabel = computed(() => {
         {{ selectedTab === 'hourly' ? `${todayLabel}（日本時間）` : '日別集計（日本時間）' }}
       </p>
     </section>
-
-    <section class="estimate-note" aria-labelledby="estimate-heading">
-      <h2 id="estimate-heading">推定値について</h2>
-      <p>
-        直近20分のチェックイン数を滞在人数として推定。<br />混雑率 = 推定人数 ÷ 定員40人 × 100%。<br />実際の人数とは異なる場合があります。
-      </p>
-    </section>
   </div>
 </template>
 
@@ -337,20 +334,5 @@ const todayLabel = computed(() => {
   margin: 0;
   font-size: 12px;
   color: var(--muted);
-}
-.estimate-note {
-  display: grid;
-  gap: 4px;
-}
-.estimate-note h2 {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-}
-.estimate-note p {
-  margin: 0;
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.5;
 }
 </style>

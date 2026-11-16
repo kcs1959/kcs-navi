@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import type { CheckinStatsResponse } from '../../shared/types'
+import type { CheckinStatsResponse, CongestionLevel } from '../../shared/types'
+
+// 混雑度を一目で伝えるための絵文字。3段階の分岐はサーバー側の congestionFor と揃えている。
+const levelEmoji: Record<CongestionLevel, string> = {
+  relaxed: '😄',
+  moderate: '🙂',
+  busy: '😥',
+}
 
 const props = withDefaults(
   defineProps<{
@@ -16,6 +23,9 @@ defineEmits<{ retry: [] }>()
 const current = computed(() => props.stats)
 // 再取得失敗時は、前回の人数を「いま」の値として表示しない。
 const unavailable = computed(() => props.failed || !current.value)
+const emoji = computed(() =>
+  current.value ? levelEmoji[current.value.congestion.level] : '',
+)
 const updatedAt = computed(() =>
   current.value
     ? new Intl.DateTimeFormat('ja-JP', {
@@ -37,12 +47,11 @@ const updatedAt = computed(() =>
       />
       <div class="crowd-heading">
         <span class="chip" :class="current.congestion.level">{{ current.congestion.label }}</span
-        ><span class="text-muted">混雑目安（推定）</span>
+        ><span class="text-muted">混雑目安</span>
       </div>
-      <div class="occupancy">
-        <strong>{{ current.congestion.estimatedVisitors }}</strong
-        ><span>/ {{ current.congestion.capacity }} 人</span
-        ><b>・ {{ current.congestion.estimatedRate }}%</b>
+      <div class="occupancy" :class="current.congestion.level">
+        <span class="occupancy-emoji" aria-hidden="true">{{ emoji }}</span>
+        <strong>{{ current.congestion.estimatedRate }}%</strong>
       </div>
       <div class="crowd-update">
         <time :datetime="current.congestion.calculatedAt">{{ updatedAt }} 更新</time
@@ -57,7 +66,7 @@ const updatedAt = computed(() =>
     <template v-else>
       <div class="crowd-heading">
         <span class="chip">{{ loading ? '読み込み中' : '情報未取得' }}</span
-        ><span class="text-muted">混雑目安（推定）</span>
+        ><span class="text-muted">混雑目安</span>
       </div>
       <p class="unavailable-title">
         {{ loading ? '混雑情報を確認しています' : '混雑情報を取得できません' }}
@@ -106,12 +115,30 @@ const updatedAt = computed(() =>
 .occupancy {
   display: flex;
   gap: 8px;
-  align-items: baseline;
-  font-size: 14px;
+  align-items: center;
+  padding: 4px 12px;
+  margin: 2px 0;
+  width: fit-content;
+  border-radius: 16px;
+}
+/* 背景色は混雑チップ（.chip.relaxed等）と揃え、空き=緑系・普通=黄系・混み=赤系の印象にする。 */
+.occupancy.relaxed {
+  background: var(--mint);
+}
+.occupancy.moderate {
+  background: var(--lemon);
+}
+.occupancy.busy {
+  background: var(--peach);
+}
+.occupancy-emoji {
+  font-size: 32px;
+  line-height: 1;
 }
 .occupancy strong {
-  font-size: 28px;
-  line-height: 1.5;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
 }
 .crowd-update {
   display: flex;
