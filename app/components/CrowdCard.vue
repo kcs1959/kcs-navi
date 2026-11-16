@@ -46,16 +46,14 @@ const updatedAt = computed(() =>
         aria-label="来場状況を詳しく見る"
       />
       <div class="crowd-heading">
-        <span class="chip" :class="current.congestion.level">{{ current.congestion.label }}</span
-        ><span class="text-muted">混雑目安</span>
+        <span class="text-muted">混雑度：{{ current.congestion.estimatedRate }}%</span>
       </div>
       <div class="occupancy" :class="current.congestion.level">
         <span class="occupancy-emoji" aria-hidden="true">{{ emoji }}</span>
-        <strong>{{ current.congestion.estimatedRate }}%</strong>
+        <strong>{{ current.congestion.label }}</strong>
       </div>
       <div class="crowd-update">
-        <time :datetime="current.congestion.calculatedAt">{{ updatedAt }} 更新</time
-        ><span>30秒ごとに更新</span
+        <time :datetime="current.congestion.calculatedAt">{{ updatedAt }} 更新（自動）</time
         ><img v-if="linked" src="/figma/map-icon-chevron-right.svg" width="14" height="14" alt="" />
       </div>
       <span class="sr-only"
@@ -65,8 +63,7 @@ const updatedAt = computed(() =>
     </template>
     <template v-else>
       <div class="crowd-heading">
-        <span class="chip">{{ loading ? '読み込み中' : '情報未取得' }}</span
-        ><span class="text-muted">混雑目安</span>
+        <span class="text-muted">混雑度：{{ loading ? '読み込み中' : '未取得' }}</span>
       </div>
       <p class="unavailable-title">
         {{ loading ? '混雑情報を確認しています' : '混雑情報を取得できません' }}
@@ -103,25 +100,16 @@ const updatedAt = computed(() =>
   font-size: 12px;
   flex-wrap: wrap;
 }
-.chip.relaxed {
-  background: var(--mint);
-}
-.chip.moderate {
-  background: var(--lemon);
-}
-.chip.busy {
-  background: var(--peach);
-}
 .occupancy {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
-  padding: 4px 12px;
+  padding: 10px 18px;
   margin: 2px 0;
   width: fit-content;
   border-radius: 16px;
 }
-/* 背景色は混雑チップ（.chip.relaxed等）と揃え、空き=緑系・普通=黄系・混み=赤系の印象にする。 */
+/* 空き=緑系・普通=黄系・混み=赤系の印象になるよう、既存パレットの mint/lemon/peach を背景色として使う。 */
 .occupancy.relaxed {
   background: var(--mint);
 }
@@ -136,9 +124,9 @@ const updatedAt = computed(() =>
   line-height: 1;
 }
 .occupancy strong {
-  font-size: 32px;
+  font-size: 22px;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.4;
 }
 .crowd-update {
   display: flex;
