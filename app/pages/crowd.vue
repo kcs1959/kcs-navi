@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { crowdChartBuckets } from '../utils/crowdChart'
+
 useHead({ title: '来場者数・混雑状況' })
 const { data, error, status, refresh } = useCrowdStats()
 const selectedTab = ref<'hourly' | 'daily'>('hourly')
@@ -37,18 +39,13 @@ function formatHour(hour: string) {
   }).format(new Date(hour))
 }
 
-// hourly は複数日を含むため、API が JST 形式で返す日付を当日に絞る。未記録の値は補わない。
-const chartItems = computed(() =>
-  selectedTab.value === 'hourly'
-    ? (data.value?.hourly ?? [])
-        .filter((item) => item.hour.startsWith(data.value?.today.date ?? 'no-date'))
-        .map((item) => ({ key: item.hour, label: formatHour(item.hour), count: item.count }))
-    : (data.value?.daily ?? []).map((item) => ({
-        key: item.date,
-        label: formatDay(item.date),
-        count: item.count,
-      })),
-)
+const chartItems = computed(() => {
+  if (!data.value) return []
+  return crowdChartBuckets(data.value, selectedTab.value).map((item) => ({
+    ...item,
+    label: selectedTab.value === 'hourly' ? formatHour(item.key) : formatDay(item.key),
+  }))
+})
 const maximum = computed(() => Math.max(1, ...chartItems.value.map((item) => item.count)))
 const todayLabel = computed(() => {
   const date = data.value?.today.date
@@ -136,7 +133,7 @@ const todayLabel = computed(() => {
       >
         <Transition name="attendance-chart" mode="out-in">
           <div :key="selectedTab">
-            <div v-if="chartItems.length" class="chart-scroll" :aria-label="chartTitle">
+            <div class="chart-scroll" :aria-label="chartTitle">
               <ol
                 class="bar-chart"
                 :style="{ minWidth: `${Math.max(0, chartItems.length * 44)}px` }"
@@ -151,7 +148,9 @@ const todayLabel = computed(() => {
                     <div
                       class="bar"
                       :class="{ latest: index === chartItems.length - 1 }"
-                      :style="{ height: `${(item.count / maximum) * 92}px` }"
+                      :style="{
+                        height: `calc(var(--chart-max-bar-height) * ${item.count / maximum})`,
+                      }"
                     >
                       <span class="bar-value">{{ item.count }}</span>
                     </div>
@@ -160,15 +159,16 @@ const todayLabel = computed(() => {
                 </li>
               </ol>
             </div>
-            <p v-else class="empty-chart">
-              {{ selectedTab === 'hourly' ? '今日の' : '' }}チェックイン記録はまだありません。
-            </p>
           </div>
         </Transition>
       </div>
 
       <p class="chart-caption">
-        {{ selectedTab === 'hourly' ? `${todayLabel}（日本時間）` : '日別集計（日本時間）' }}
+        {{
+          selectedTab === 'hourly'
+            ? `${todayLabel} 時点・直近12時間（日本時間）`
+            : '直近7日間（日本時間）'
+        }}
       </p>
     </section>
 
@@ -253,7 +253,9 @@ const todayLabel = computed(() => {
   cursor: pointer;
 }
 .attendance-panel {
-  min-height: 151px;
+  --chart-plot-height: 180px;
+  --chart-max-bar-height: 150px;
+  min-height: calc(var(--chart-plot-height) + 28px);
 }
 .attendance-chart-enter-active {
   transition:
@@ -274,30 +276,43 @@ const todayLabel = computed(() => {
   transform: translateY(-4px);
 }
 .chart-scroll {
+  position: relative;
   overflow-x: auto;
   padding-top: 4px;
 }
 .bar-chart {
+  position: relative;
   display: flex;
   justify-content: space-between;
   list-style: none;
   padding: 0;
   margin: 0;
-  height: 147px;
+  height: calc(var(--chart-plot-height) + 24px);
+}
+.bar-chart::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--chart-plot-height);
+  box-sizing: border-box;
+  border-left: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+  pointer-events: none;
 }
 .chart-item {
+  position: relative;
   flex: 1;
   min-width: 44px;
   display: grid;
-  grid-template-rows: 123px 24px;
+  grid-template-rows: var(--chart-plot-height) 24px;
   text-align: center;
 }
 .bar-track {
   display: flex;
   align-items: end;
   justify-content: center;
-  padding: 0 8px 1px;
-  border-bottom: 1px solid var(--line);
+  padding: 0 8px 2px;
 }
 .bar {
   position: relative;
@@ -328,14 +343,6 @@ const todayLabel = computed(() => {
 .chart-caption {
   margin: 0;
   font-size: 10px;
-  color: var(--muted);
-}
-.empty-chart {
-  min-height: 147px;
-  display: grid;
-  place-items: center;
-  margin: 0;
-  font-size: 12px;
   color: var(--muted);
 }
 .estimate-note {
