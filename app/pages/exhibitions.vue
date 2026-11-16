@@ -77,6 +77,7 @@ async function retry() {
         v-for="exhibition in filteredExhibitions"
         :key="exhibition.id"
         :exhibition="exhibition"
+        show-likes
         :team="teams.find((team) => team.id === exhibition.teamId)"
         @select="openExhibition(exhibition)"
       />
