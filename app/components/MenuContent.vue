@@ -106,6 +106,16 @@ const links = [
           <span>X ↗</span>
         </a>
         <a
+          href="https://www.instagram.com/kcs1959/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="KCS公式Instagram（新しいタブで開く）"
+          @click="emit('close')"
+        >
+          <img src="/figma/menu-icon-instagram.svg" alt="" width="20" height="20" />
+          <span>Instagram ↗</span>
+        </a>
+        <a
           href="https://www.youtube.com/c/KCSKeioComputerSociety"
           target="_blank"
           rel="noopener noreferrer"
@@ -114,6 +124,16 @@ const links = [
         >
           <img src="/figma/menu-icon-youtube.svg" alt="" width="20" height="20" />
           <span>YouTube ↗</span>
+        </a>
+        <a
+          href="https://github.com/kcs1959"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="KCS公式GitHub（新しいタブで開く）"
+          @click="emit('close')"
+        >
+          <img src="/figma/menu-icon-github.svg" alt="" width="20" height="20" />
+          <span>GitHub ↗</span>
         </a>
       </div>
     </section>
