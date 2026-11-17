@@ -57,8 +57,6 @@ const externalLinks = [
     href: 'https://www.kcs1959.jp/',
     icon: '/figma/kcs_official_light.png',
   },
-  { label: 'KCS公式X', href: 'https://x.com/kcs1959', icon: '/figma/menu-icon-xbrand.svg' },
-  { label: 'KCS Instagram', href: 'https://www.instagram.com/kcs1959/' },
 ]
 </script>
 
