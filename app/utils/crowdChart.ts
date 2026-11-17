@@ -5,7 +5,8 @@ export function crowdChartBuckets(stats: CheckinStatsResponse, period: 'hourly' 
   const hourMs = 60 * 60 * 1000
   const jstOffset = 9 * hourMs
   const step = period === 'hourly' ? hourMs : 24 * hourMs
-  const length = period === 'hourly' ? 12 : 7
+  // 時間別・日別ともに直近7件分のバケットを表示する。
+  const length = 7
   const end = Math.floor((Date.parse(stats.congestion.calculatedAt) + jstOffset) / step) * step
   const counts = new Map(
     period === 'hourly'

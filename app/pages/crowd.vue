@@ -171,7 +171,7 @@ const todayLabel = computed(() => {
       <p class="chart-caption">
         {{
           selectedTab === 'hourly'
-            ? `${todayLabel} 時点・直近12時間（日本時間）`
+            ? `${todayLabel} 時点・直近7時間（日本時間）`
             : '直近7日間（日本時間）'
         }}
       </p>

@@ -13,11 +13,11 @@ function stats() {
 }
 
 describe('fixed JST attendance chart periods', () => {
-  it('keeps 12 hourly labels across midnight and year boundaries without records', () => {
+  it('keeps 7 hourly labels across midnight and year boundaries without records', () => {
     const items = crowdChartBuckets(stats(), 'hourly')
-    expect(items).toHaveLength(12)
-    expect(items[0]).toEqual({ key: '2026-12-31T14:00:00+09:00', count: 0 })
-    expect(items[11]).toEqual({ key: '2027-01-01T01:00:00+09:00', count: 0 })
+    expect(items).toHaveLength(7)
+    expect(items[0]).toEqual({ key: '2026-12-31T19:00:00+09:00', count: 0 })
+    expect(items[6]).toEqual({ key: '2027-01-01T01:00:00+09:00', count: 0 })
     expect(items.every((item) => item.count === 0)).toBe(true)
   })
 
@@ -34,11 +34,11 @@ describe('fixed JST attendance chart periods', () => {
     data.hourly = [
       { hour: '2027-01-01T02:00:00+09:00', count: 100 },
       { hour: '2027-01-01T01:00:00+09:00', count: 5 },
-      { hour: '2026-12-31T13:00:00+09:00', count: 100 },
-      { hour: '2026-12-31T14:00:00+09:00', count: 3 },
+      { hour: '2026-12-31T18:00:00+09:00', count: 100 },
+      { hour: '2026-12-31T19:00:00+09:00', count: 3 },
     ]
     expect(crowdChartBuckets(data, 'hourly').map((item) => item.count)).toEqual([
-      3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,
+      3, 0, 0, 0, 0, 0, 5,
     ])
   })
 
