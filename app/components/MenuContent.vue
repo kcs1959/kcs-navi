@@ -7,25 +7,25 @@ const links = [
   {
     to: '/',
     title: 'ブースマップ',
-    description: 'ブースの配置を見ることができます',
+    description: '展示作品の配置を確認！',
     icon: '/figma/menu-icon-map.svg',
   },
   {
     to: '/crowd',
-    title: '来場者数・混雑状況',
-    description: '混雑の目安をチェックできます',
+    title: 'ブースの混雑状況',
+    description: '来場者数・混雑度合いをチェックできます',
     icon: '/figma/menu-icon-chart-no-axes-column.svg',
   },
   {
     to: '/exhibitions',
     title: '展示紹介',
-    description: '三田祭に展示されている作品をまとめました！',
+    description: '三田祭に展示されている作品をまとめました',
     icon: '/figma/menu-icon-layout-grid.svg',
   },
   {
     to: '/teams',
     title: '班紹介',
-    description: 'KCSの班活動の紹介ページ',
+    description: 'KCSの班活動について',
     icon: '/figma/menu-icon-layout-grid.svg',
   },
 ]
