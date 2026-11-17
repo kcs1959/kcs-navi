@@ -36,36 +36,42 @@ const updatedAt = computed(() =>
       }).format(new Date(current.value.congestion.calculatedAt))
     : '',
 )
+// 混雑度ラベルは日本語をメッセージキーとしている（en.json で英訳を管理）。
+const levelLabels: Record<CheckinStatsResponse['congestion']['level'], string> = {
+  relaxed: 'ゆったり',
+  moderate: 'やや混雑',
+  busy: '混雑',
+}
 function congestionLevelLabel(level: CheckinStatsResponse['congestion']['level']) {
-  return t('crowdCard.levels.' + level)
+  return t(levelLabels[level])
 }
 </script>
 <template>
-  <section class="card crowd-card" :aria-busy="loading" :aria-label="$t('crowdCard.ariaLabel')">
+  <section class="card crowd-card" :aria-busy="loading" :aria-label="$t('混雑状況')">
     <template v-if="!unavailable && current">
       <NuxtLink
         v-if="linked"
         class="crowd-card-link"
         to="/crowd"
-        :aria-label="$t('crowdCard.detailsAriaLabel')"
+        :aria-label="$t('来場状況を詳しく見る')"
       />
       <div class="status" :class="current.congestion.level">
         <span class="status-emoji" aria-hidden="true">{{ emoji }}</span>
         <div class="status-texts">
           <span class="status-label">{{ congestionLevelLabel(current.congestion.level) }}</span>
           <span class="status-rate">{{
-            $t('crowdCard.rate', { rate: current.congestion.estimatedRate })
+            $t('混雑度 {rate}%', { rate: current.congestion.estimatedRate })
           }}</span>
         </div>
       </div>
       <div class="crowd-update">
         <time :datetime="current.congestion.calculatedAt">{{
-          $t('crowdCard.updatedAt', { time: updatedAt })
-        }}（{{ $t('crowdCard.auto') }}）</time
+          $t('{time} 更新', { time: updatedAt })
+        }}（{{ $t('自動') }}）</time
         ><img v-if="linked" src="/figma/map-icon-chevron-right.svg" width="14" height="14" alt="" />
       </div>
       <span class="sr-only">{{
-        $t('crowdCard.summary', {
+        $t('推定滞在人数 {visitors}人、推定混雑率 {rate}パーセント', {
           visitors: current.congestion.estimatedVisitors,
           rate: current.congestion.estimatedRate,
         })
@@ -76,18 +82,18 @@ function congestionLevelLabel(level: CheckinStatsResponse['congestion']['level']
         <span class="status-emoji" aria-hidden="true">{{ loading ? '⏳' : '❔' }}</span>
         <div class="status-texts">
           <span class="status-label">{{
-            $t(loading ? 'crowdCard.loadingChip' : 'crowdCard.unavailableChip')
+            $t(loading ? '読み込み中' : '情報未取得')
           }}</span>
-          <span class="status-rate">{{ $t('crowdCard.rateLabel') }}</span>
+          <span class="status-rate">{{ $t('混雑度') }}</span>
         </div>
       </div>
       <p class="unavailable-title">
-        {{ $t(loading ? 'crowdCard.checking' : 'crowdCard.loadError') }}
+        {{ $t(loading ? '混雑情報を確認しています' : '混雑情報を取得できません') }}
       </p>
       <button v-if="!loading" class="secondary-button" @click="$emit('retry')">
-        {{ $t('crowdCard.retry') }}
+        {{ $t('もう一度読み込む') }}
       </button>
-      <p class="micro text-muted">{{ $t('crowdCard.unavailableNote') }}</p>
+      <p class="micro text-muted">{{ $t('人数は未取得です。マップは利用できます。') }}</p>
     </template>
   </section>
 </template>

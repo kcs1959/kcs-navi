@@ -4,7 +4,7 @@ import { deskKeys, type ExhibitionsResponse, type TeamsResponse } from '~~/share
 const { locale, t } = useI18n()
 
 useHead(() => ({
-  title: t('map.meta.title'),
+  title: t('会場マップ'),
   htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
 }))
 
@@ -50,15 +50,15 @@ const desks = computed(() =>
         ? teamNames.join('・')
         : (works[0]?.title ??
           (status.value === 'pending'
-            ? t('map.states.loading')
+            ? t('読み込み中')
             : error.value
-              ? t('map.states.unavailable')
-              : t('map.states.unregistered'))),
+              ? t('情報未取得')
+              : t('未登録'))),
       count,
       countLabel:
         count === null
-          ? t(status.value === 'pending' ? 'map.states.loading' : 'map.states.notRetrieved')
-          : t('map.workCount', { count }),
+          ? t(status.value === 'pending' ? '読み込み中' : '未取得')
+          : t('{count}作品', { count }),
       titles: works.map((work) => work.title).join('、'),
     }
   }),
@@ -72,8 +72,8 @@ function selectDesk(key: string) {
   <div class="page-content map-page">
     <PageHeading
       eyebrow="EXPLORE KCS"
-      :title="$t('map.heading')"
-      :description="$t('map.description')"
+      :title="$t('KCS ブースマップ')"
+      :description="$t('机をタップすると作品の詳細が表示されます。')"
     />
     <CrowdCard
       :stats="stats"
@@ -83,22 +83,22 @@ function selectDesk(key: string) {
     />
     <section class="card booth-map" aria-labelledby="map-title" :aria-busy="mapLoading">
       <div class="map-heading">
-        <h2 id="map-title">{{ $t('map.mapHeading') }}</h2>
-        <span class="chip lemon">{{ $t('map.tapDesk') }}</span>
+        <h2 id="map-title">{{ $t('展示マップ') }}</h2>
+        <span class="chip lemon">{{ $t('机をタップ') }}</span>
       </div>
       <div class="map-surface">
         <BoothMap :desks="desks" @select="selectDesk" />
         <Transition name="loading-fade">
-          <LoadingIndicator v-if="mapLoading" overlay :label="$t('map.preparingMap')" />
+          <LoadingIndicator v-if="mapLoading" overlay :label="$t('マップを準備しています')" />
         </Transition>
       </div>
     </section>
     <div v-if="error" class="error-card" role="alert">
-      <p>{{ $t('map.loadError') }}</p>
-      <button class="secondary-button" @click="refresh()">{{ $t('map.retry') }}</button>
+      <p>{{ $t('展示情報を読み込めませんでした。') }}</p>
+      <button class="secondary-button" @click="refresh()">{{ $t('もう一度読み込む') }}</button>
     </div>
     <p v-else-if="status !== 'pending' && !data?.exhibitions.length" class="data-notice">
-      {{ $t('map.empty') }}
+      {{ $t('展示情報はまだ登録されていません。') }}
     </p>
   </div>
 </template>

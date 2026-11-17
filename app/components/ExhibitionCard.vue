@@ -21,18 +21,18 @@ defineEmits<{ select: [] }>()
     :class="{ 'has-likes': showLikes }"
     :aria-label="
       showLikes
-        ? $t('exhibitionCard.detailsWithLikesAriaLabel', {
+        ? $t('{title}の詳細を見る（いいね {likes}件）', {
             title: exhibition.title,
             likes: likes.toLocaleString('ja-JP'),
           })
-        : $t('exhibitionCard.detailsAriaLabel', { title: exhibition.title })
+        : $t('{title}の詳細を見る', { title: exhibition.title })
     "
     @click="$emit('select')"
   >
     <span class="work-meta"
-      ><span class="chip">{{ team?.name ?? $t('exhibitionCard.fallbackTeam') }}</span
+      ><span class="chip">{{ team?.name ?? $t('展示作品') }}</span
       ><span>{{
-        $t('exhibitionCard.desk', {
+        $t('展示 {desk}', {
           desk: exhibition.deskKey.replace('desk-', '').toUpperCase(),
         })
       }}</span></span

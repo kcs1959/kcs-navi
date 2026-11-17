@@ -1,157 +1,90 @@
 {
-  "menu": {
-    "meta": {
-      "title": "Menu"
-    },
-    "heading": "Menu",
-    "navigationLabel": "Site menu",
-    "links": {
-      "map": {
-        "title": "Booth map",
-        "description": "View the booth layout"
-      },
-      "crowd": {
-        "title": "Attendance and crowd levels",
-        "description": "Check the estimated crowd level"
-      },
-      "exhibitions": {
-        "title": "Exhibitions",
-        "description": "Explore works created for the Mita Festival"
-      },
-      "teams": {
-        "title": "Teams",
-        "description": "Learn about the teams at KCS"
-      },
-      "mitaOni": {
-        "description": "Oni tag game site ↗",
-        "ariaLabel": "mita-oni tag game site (opens in a new tab)"
-      }
-    },
-    "officialSite": {
-      "title": "KCS official website",
-      "ariaLabel": "KCS official website (opens in a new tab)"
-    },
-    "follow": "Follow KCS",
-    "social": {
-      "xAriaLabel": "Official KCS X account (opens in a new tab)",
-      "youtubeAriaLabel": "Official KCS YouTube channel (opens in a new tab)"
-    },
-    "closeAriaLabel": "Close menu"
-  },
-  "localeSwitcher": {
-    "ariaLabel": "Select display language",
-    "japanese": "Switch to Japanese",
-    "english": "Switch to English"
-  },
-  "exhibitions": {
-    "meta": {
-      "title": "Exhibitions"
-    },
-    "heading": "Exhibitions",
-    "description": "Created by KCS members!",
-    "loadError": "We couldn't load the exhibition information.",
-    "reload": "Reload",
-    "loading": "Loading exhibitions…",
-    "resultCount": "Works: {count}",
-    "empty": "No exhibition information has been added yet.",
-    "teamsLink": "Meet the creators · Teams →",
-    "filterAll": "All",
-    "filterAriaLabel": "Filter by team",
-    "teamEmpty": "No exhibitions for this team yet."
-  },
-  "teams": {
-    "meta": {
-      "title": "Teams"
-    },
-    "heading": "Teams",
-    "description": "Learn about the teams at KCS",
-    "loadError": "We couldn't load the team information.",
-    "reload": "Reload",
-    "workCountUnavailable": "Work count unavailable",
-    "workCount": "Works: {count}",
-    "empty": "No team information has been added yet."
-  },
-  "crowd": {
-    "meta": {
-      "title": "Attendance and crowd levels"
-    },
-    "heading": "Welcome to KCS!",
-    "loadError": "We couldn't load the attendance data.",
-    "reload": "Reload",
-    "loading": "Loading attendance data…",
-    "todayAttendance": "Today's attendance",
-    "totalPeople": "total",
-    "chart": {
-      "hourlyTitle": "Check-ins by hour",
-      "dailyTitle": "Check-ins by day",
-      "tabListLabel": "Attendance aggregation interval",
-      "hourlyTab": "Hourly",
-      "dailyTab": "Daily",
-      "itemLabel": "{label}: {count} people",
-      "todayCaption": "As of {date} · last 7 hours (Japan time)",
-      "dailyCaption": "Last 7 days (Japan time)"
-    }
-  },
-  "crowdCard": {
-    "ariaLabel": "Crowd level",
-    "detailsAriaLabel": "View attendance details",
-    "levels": {
-      "relaxed": "Relaxed",
-      "moderate": "Moderately busy",
-      "busy": "Busy"
-    },
-    "updatedAt": "Updated {time}",
-    "auto": "Auto",
-    "rate": "Congestion {rate}%",
-    "rateLabel": "Congestion",
-    "summary": "Estimated attendance: {visitors} people. Estimated crowd level: {rate} percent.",
-    "loadingChip": "Loading",
-    "unavailableChip": "Unavailable",
-    "checking": "Checking crowd information",
-    "loadError": "We couldn't load the crowd information",
-    "retry": "Try again",
-    "unavailableNote": "Attendance is unavailable. You can still use the map."
-  },
-  "exhibitionCard": {
-    "detailsAriaLabel": "View details for {title}",
-    "detailsWithLikesAriaLabel": "View details for {title} ({likes} likes)",
-    "fallbackTeam": "Exhibition",
-    "desk": "Exhibition {desk}"
-  },
-  "map": {
-    "meta": {
-      "title": "Venue map"
-    },
-    "heading": "KCS booth map",
-    "description": "Tap a desk to view details about its exhibitions.",
-    "mapHeading": "Exhibition map",
-    "tapDesk": "Tap a desk",
-    "entrance": "Entrance ↗",
-    "exit": "Exit ↗",
-    "states": {
-      "loading": "Loading",
-      "unavailable": "Unavailable",
-      "unregistered": "Not registered",
-      "notRetrieved": "Unavailable"
-    },
-    "workCount": "Works: {count}",
-    "deskAria": "{label}, exhibition desk {letter}, {countLabel}",
-    "deskAriaWithTitles": "{label}, exhibition desk {letter}, {countLabel}: View details for {titles}",
-    "loadError": "We couldn't load the exhibition information.",
-    "retry": "Try again",
-    "loadingExhibitions": "Loading exhibition information…",
-    "empty": "No exhibition information has been added yet.",
-    "preparingMap": "Preparing the map"
-  },
-  "teamDetail": {
-    "fallbackTitle": "Team",
-    "backAriaLabel": "Back to the team list",
-    "loadError": "We couldn't load the team information.",
-    "reload": "Reload",
-    "worksHeading": "Works by this team",
-    "worksLoadError": "We couldn't load the works.",
-    "emptyWorks": "No works have been added for this team yet.",
-    "notFound": "This team could not be found.",
-    "teamsLink": "Team list"
-  }
+  "メニュー": "Menu",
+  "サイトメニュー": "Site menu",
+  "ブースマップ": "Booth map",
+  "ブースの配置を見ることができます": "View the booth layout",
+  "来場者数・混雑状況": "Attendance and crowd levels",
+  "混雑の目安をチェックできます": "Check the estimated crowd level",
+  "展示紹介": "Exhibitions",
+  "三田祭に展示されている作品をまとめました！": "Explore works created for the Mita Festival",
+  "班紹介": "Teams",
+  "KCSの班活動の紹介ページ": "Learn about the teams at KCS",
+  "鬼ごっこサイト ↗": "Oni tag game site ↗",
+  "mita-oni 鬼ごっこサイト（新しいタブで開く）": "mita-oni tag game site (opens in a new tab)",
+  "KCS公式サイト": "KCS official website",
+  "KCS公式サイト（新しいタブで開く）": "KCS official website (opens in a new tab)",
+  "KCSをフォロー": "Follow KCS",
+  "KCS公式X（新しいタブで開く）": "Official KCS X account (opens in a new tab)",
+  "KCS公式YouTube（新しいタブで開く）": "Official KCS YouTube channel (opens in a new tab)",
+  "メニューを閉じる": "Close menu",
+  "表示言語を選択": "Select display language",
+  "日本語に切り替える": "Switch to Japanese",
+  "英語に切り替える": "Switch to English",
+  "展示作品": "Exhibitions",
+  "KCSのメンバーが制作しました！": "Created by KCS members!",
+  "展示情報を読み込めませんでした。": "We couldn't load the exhibition information.",
+  "再読み込み": "Reload",
+  "展示作品を読み込んでいます…": "Loading exhibitions…",
+  "{count} 件の作品": "Works: {count}",
+  "展示情報はまだ登録されていません。": "No exhibition information has been added yet.",
+  "つくった人たちを知る · 班紹介 →": "Meet the creators · Teams →",
+  "すべて": "All",
+  "班で絞り込む": "Filter by team",
+  "この班の展示作品はまだありません。": "No exhibitions for this team yet.",
+  "KCSの班活動について": "Learn about the teams at KCS",
+  "班の情報を読み込めませんでした。": "We couldn't load the team information.",
+  "作品数未取得": "Work count unavailable",
+  "{count} 作品": "Works: {count}",
+  "班の情報はまだ登録されていません。": "No team information has been added yet.",
+  "KCS ブースの混雑状況": "Crowd status",
+  "来場者数を取得できませんでした。": "We couldn't load the attendance data.",
+  "来場者数を読み込んでいます…": "Loading attendance data…",
+  "今日の来場者数": "Today's attendance",
+  "人（延べ）": "total",
+  "時間別のチェックイン数": "Check-ins by hour",
+  "日別のチェックイン数": "Check-ins by day",
+  "来場者数の集計単位": "Attendance aggregation interval",
+  "時間別": "Hourly",
+  "日別": "Daily",
+  "{label}：{count}人": "{label}: {count} people",
+  "{date} 時点・直近7時間（日本時間）": "As of {date} · last 7 hours (Japan time)",
+  "直近7日間（日本時間）": "Last 7 days (Japan time)",
+  "混雑状況": "Crowd level",
+  "来場状況を詳しく見る": "View attendance details",
+  "{time} 更新": "Updated {time}",
+  "自動": "Auto",
+  "混雑度 {rate}%": "Congestion {rate}%",
+  "混雑度": "Congestion",
+  "推定滞在人数 {visitors}人、推定混雑率 {rate}パーセント": "Estimated attendance: {visitors} people. Estimated crowd level: {rate} percent.",
+  "読み込み中": "Loading",
+  "情報未取得": "Unavailable",
+  "混雑情報を確認しています": "Checking crowd information",
+  "混雑情報を取得できません": "We couldn't load the crowd information",
+  "もう一度読み込む": "Try again",
+  "人数は未取得です。マップは利用できます。": "Attendance is unavailable. You can still use the map.",
+  "{title}の詳細を見る": "View details for {title}",
+  "{title}の詳細を見る（いいね {likes}件）": "View details for {title} ({likes} likes)",
+  "展示 {desk}": "Exhibition {desk}",
+  "会場マップ": "Venue map",
+  "KCS ブースマップ": "KCS booth map",
+  "机をタップすると作品の詳細が表示されます。": "Tap a desk to view details about its exhibitions.",
+  "展示マップ": "Exhibition map",
+  "机をタップ": "Tap a desk",
+  "入口 ↗": "Entrance ↗",
+  "出口 ↗": "Exit ↗",
+  "未登録": "Not registered",
+  "未取得": "Unavailable",
+  "{count}作品": "Works: {count}",
+  "{label}、展示机{letter}、{countLabel}": "{label}, exhibition desk {letter}, {countLabel}",
+  "{label}、展示机{letter}、{countLabel}：{titles}の詳細を見る": "{label}, exhibition desk {letter}, {countLabel}: View details for {titles}",
+  "マップを準備しています": "Preparing the map",
+  "班一覧に戻る": "Back to the team list",
+  "この班の作品": "Works by this team",
+  "作品を読み込めませんでした。": "We couldn't load the works.",
+  "この班の作品はまだ登録されていません。": "No works have been added for this team yet.",
+  "この班は見つかりませんでした。": "This team could not be found.",
+  "班一覧へ": "Team list",
+  "ゆったり": "Relaxed",
+  "やや混雑": "Moderately busy",
+  "混雑": "Busy"
 }

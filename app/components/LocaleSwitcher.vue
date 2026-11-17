@@ -2,20 +2,20 @@
 const { locale, setLocale } = useI18n()
 
 const languageOptions = [
-  { code: 'ja', label: 'JP', lang: 'ja', ariaKey: 'localeSwitcher.japanese' },
-  { code: 'en', label: 'EN', lang: 'en', ariaKey: 'localeSwitcher.english' },
+  { code: 'ja', label: 'JP', lang: 'ja', ariaLabel: '日本語に切り替える' },
+  { code: 'en', label: 'EN', lang: 'en', ariaLabel: '英語に切り替える' },
 ] as const
 </script>
 
 <template>
-  <div class="locale-switcher" role="group" :aria-label="$t('localeSwitcher.ariaLabel')">
+  <div class="locale-switcher" role="group" :aria-label="$t('表示言語を選択')">
     <button
       v-for="option in languageOptions"
       :key="option.code"
       class="locale-option"
       :class="{ active: locale === option.code }"
       type="button"
-      :aria-label="$t(option.ariaKey)"
+      :aria-label="$t(option.ariaLabel)"
       :aria-pressed="locale === option.code"
       @click="setLocale(option.code)"
     >

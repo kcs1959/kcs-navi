@@ -4,7 +4,7 @@ import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
 const { locale, t } = useI18n()
 
 useHead(() => ({
-  title: t('exhibitions.meta.title'),
+  title: t('展示作品'),
   htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
 }))
 
@@ -38,7 +38,7 @@ const selectedTeamId = computed<number | null>({
   },
 })
 const filterOptions = computed(() => [
-  { id: null, name: t('exhibitions.filterAll') },
+  { id: null, name: t('すべて') },
   ...teams.value,
 ])
 const filteredExhibitions = computed(() =>
@@ -56,21 +56,21 @@ async function retry() {
   <div class="page-content works-page stack">
     <PageHeading
       eyebrow="EXHIBITIONS"
-      :title="$t('exhibitions.heading')"
-      :description="$t('exhibitions.description')"
+      :title="$t('展示作品')"
+      :description="$t('KCSのメンバーが制作しました！')"
     />
 
     <div v-if="worksError || teamsError" class="error-card" role="alert">
-      <p>{{ $t('exhibitions.loadError') }}</p>
+      <p>{{ $t('展示情報を読み込めませんでした。') }}</p>
       <button class="secondary-button" type="button" @click="retry">
-        {{ $t('exhibitions.reload') }}
+        {{ $t('再読み込み') }}
       </button>
     </div>
     <p v-else-if="status === 'pending'" class="text-muted" role="status">
-      {{ $t('exhibitions.loading') }}
+      {{ $t('展示作品を読み込んでいます…') }}
     </p>
     <template v-else>
-      <div v-if="teams.length" class="team-filter" role="group" :aria-label="$t('exhibitions.filterAriaLabel')">
+      <div v-if="teams.length" class="team-filter" role="group" :aria-label="$t('班で絞り込む')">
         <button
           v-for="option in filterOptions"
           :key="option.id ?? 'all'"
@@ -83,7 +83,7 @@ async function retry() {
         </button>
       </div>
       <p class="result-count text-muted" role="status">
-        {{ $t('exhibitions.resultCount', { count: filteredExhibitions.length }) }}
+        {{ $t('{count} 件の作品', { count: filteredExhibitions.length }) }}
       </p>
       <ExhibitionCard
         v-for="exhibition in filteredExhibitions"
@@ -94,12 +94,12 @@ async function retry() {
         @select="openExhibition(exhibition)"
       />
       <div v-if="!exhibitions.length" class="card empty-state">
-        <p>{{ $t('exhibitions.empty') }}</p>
+        <p>{{ $t('展示情報はまだ登録されていません。') }}</p>
       </div>
       <div v-else-if="!filteredExhibitions.length" class="card empty-state">
-        <p>{{ $t('exhibitions.teamEmpty') }}</p>
+        <p>{{ $t('この班の展示作品はまだありません。') }}</p>
       </div>
-      <NuxtLink class="teams-link" to="/teams">{{ $t('exhibitions.teamsLink') }}</NuxtLink>
+      <NuxtLink class="teams-link" to="/teams">{{ $t('つくった人たちを知る · 班紹介 →') }}</NuxtLink>
     </template>
   </div>
 </template>

@@ -136,8 +136,8 @@ function labelPosition(key: DeskKey) {
         </g>
       </g>
       <g class="wayfinding" fill="var(--muted)" text-anchor="middle">
-        <text x="115" y="477">{{ $t('map.entrance') }}</text>
-        <text x="577" y="501">{{ $t('map.exit') }}</text>
+        <text x="115" y="477">{{ $t('入口 ↗') }}</text>
+        <text x="577" y="501">{{ $t('出口 ↗') }}</text>
       </g>
     </svg>
 
@@ -150,13 +150,13 @@ function labelPosition(key: DeskKey) {
       :disabled="!desk.count"
       :aria-label="
         desk.titles
-          ? $t('map.deskAriaWithTitles', {
+          ? $t('{label}、展示机{letter}、{countLabel}：{titles}の詳細を見る', {
               label: desk.label,
               letter: desk.letter,
               countLabel: desk.countLabel,
               titles: desk.titles,
             })
-          : $t('map.deskAria', {
+          : $t('{label}、展示机{letter}、{countLabel}', {
               label: desk.label,
               letter: desk.letter,
               countLabel: desk.countLabel,

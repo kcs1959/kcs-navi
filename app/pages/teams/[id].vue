@@ -23,7 +23,7 @@ const teamWorks = computed(
 const { openExhibition } = useExhibitionDialog()
 
 useHead(() => ({
-  title: team.value?.name ?? t('teamDetail.fallbackTitle'),
+  title: team.value?.name ?? t('班紹介'),
   htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
 }))
 </script>
@@ -31,15 +31,15 @@ useHead(() => ({
 <template>
   <div class="page-content stack team-page">
     <div class="team-heading">
-      <NuxtLink to="/teams" class="back-button" :aria-label="$t('teamDetail.backAriaLabel')">
+      <NuxtLink to="/teams" class="back-button" :aria-label="$t('班一覧に戻る')">
         <img src="/figma/team-icon-arrow-left.svg" alt="" width="22" height="22" />
       </NuxtLink>
-      <PageHeading eyebrow="MEET THE TEAM" :title="team?.name ?? $t('teamDetail.fallbackTitle')" />
+      <PageHeading eyebrow="MEET THE TEAM" :title="team?.name ?? $t('班紹介')" />
     </div>
     <div v-if="error" class="error-card" role="alert">
-      <p>{{ $t('teamDetail.loadError') }}</p>
+      <p>{{ $t('班の情報を読み込めませんでした。') }}</p>
       <button class="secondary-button" type="button" @click="refresh()">
-        {{ $t('teamDetail.reload') }}
+        {{ $t('再読み込み') }}
       </button>
     </div>
     <template v-else-if="team">
@@ -47,13 +47,13 @@ useHead(() => ({
         <p>{{ team.description }}</p>
       </section>
       <h2 class="section-heading">
-        {{ $t('teamDetail.worksHeading') }}
+        {{ $t('この班の作品') }}
         <span v-if="works && !worksError">{{ teamWorks.length }}</span>
       </h2>
       <div v-if="worksError" class="error-card" role="alert">
-        <p>{{ $t('teamDetail.worksLoadError') }}</p>
+        <p>{{ $t('作品を読み込めませんでした。') }}</p>
         <button class="secondary-button" type="button" @click="refreshWorks()">
-          {{ $t('teamDetail.reload') }}
+          {{ $t('再読み込み') }}
         </button>
       </div>
       <ExhibitionCard
@@ -65,12 +65,12 @@ useHead(() => ({
         @select="openExhibition(exhibition)"
       />
       <p v-if="works && !worksError && !teamWorks.length" class="card text-muted">
-        {{ $t('teamDetail.emptyWorks') }}
+        {{ $t('この班の作品はまだ登録されていません。') }}
       </p>
     </template>
     <div v-else-if="data" class="card missing-team">
-      <p>{{ $t('teamDetail.notFound') }}</p>
-      <NuxtLink class="secondary-button" to="/teams">{{ $t('teamDetail.teamsLink') }}</NuxtLink>
+      <p>{{ $t('この班は見つかりませんでした。') }}</p>
+      <NuxtLink class="secondary-button" to="/teams">{{ $t('班一覧へ') }}</NuxtLink>
     </div>
   </div>
 </template>

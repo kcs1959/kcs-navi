@@ -10,14 +10,14 @@ const { locale, t } = useI18n()
 const displayLocale = computed(() => (locale.value === 'en' ? 'en-US' : 'ja-JP'))
 
 useHead(() => ({
-  title: t('crowd.meta.title'),
+  title: t('来場者数・混雑状況'),
   htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
 }))
 
 const { data, error, status, refresh } = useCrowdStats()
 const selectedTab = ref<'hourly' | 'daily'>('hourly')
 const chartTitle = computed(() =>
-  t(selectedTab.value === 'hourly' ? 'crowd.chart.hourlyTitle' : 'crowd.chart.dailyTitle'),
+  t(selectedTab.value === 'hourly' ? '時間別のチェックイン数' : '日別のチェックイン数'),
 )
 
 function handleTabKey(event: KeyboardEvent) {
@@ -76,7 +76,7 @@ function formatNumber(value: number) {
 
 <template>
   <div class="page-content stack crowd-page">
-    <PageHeading eyebrow="LIVE AT KCS" :title="$t('crowd.heading')" />
+    <PageHeading eyebrow="LIVE AT KCS" :title="$t('KCS ブースの混雑状況')" />
     <CrowdCard
       :stats="data"
       :linked="false"
@@ -86,13 +86,13 @@ function formatNumber(value: number) {
     />
 
     <div v-if="error" class="error-card" role="alert">
-      <p>{{ $t('crowd.loadError') }}</p>
+      <p>{{ $t('来場者数を取得できませんでした。') }}</p>
       <button type="button" class="secondary-button" @click="refresh()">
-        {{ $t('crowd.reload') }}
+        {{ $t('再読み込み') }}
       </button>
     </div>
     <p v-else-if="!data && status === 'pending'" class="text-muted" role="status">
-      {{ $t('crowd.loading') }}
+      {{ $t('来場者数を読み込んでいます…') }}
     </p>
     <section
       v-if="data && !error"
@@ -100,18 +100,18 @@ function formatNumber(value: number) {
       aria-labelledby="attendance-heading"
     >
       <div class="attendance-heading">
-        <h2 id="attendance-heading">{{ $t('crowd.todayAttendance') }}</h2>
+        <h2 id="attendance-heading">{{ $t('今日の来場者数') }}</h2>
       </div>
       <p class="attendance-count">
         <strong>{{ formatNumber(data.today.count) }}</strong
-        ><span>{{ $t('crowd.totalPeople') }}</span>
+        ><span>{{ $t('人（延べ）') }}</span>
       </p>
 
       <div
         class="chart-tabs"
         :class="{ 'is-daily': selectedTab === 'daily' }"
         role="tablist"
-        :aria-label="$t('crowd.chart.tabListLabel')"
+        :aria-label="$t('来場者数の集計単位')"
       >
         <button
           id="hourly-tab"
@@ -124,7 +124,7 @@ function formatNumber(value: number) {
           @click="selectedTab = 'hourly'"
           @keydown="handleTabKey"
         >
-          {{ $t('crowd.chart.hourlyTab') }}
+          {{ $t('時間別') }}
         </button>
         <button
           id="daily-tab"
@@ -137,7 +137,7 @@ function formatNumber(value: number) {
           @click="selectedTab = 'daily'"
           @keydown="handleTabKey"
         >
-          {{ $t('crowd.chart.dailyTab') }}
+          {{ $t('日別') }}
         </button>
       </div>
 
@@ -159,7 +159,7 @@ function formatNumber(value: number) {
                   v-for="(item, index) in chartItems"
                   :key="item.key"
                   class="chart-item"
-                  :aria-label="$t('crowd.chart.itemLabel', { label: item.label, count: item.count })"
+                  :aria-label="$t('{label}：{count}人', { label: item.label, count: item.count })"
                 >
                   <div class="bar-track" aria-hidden="true">
                     <div
@@ -183,8 +183,8 @@ function formatNumber(value: number) {
       <p class="chart-caption">
         {{
           selectedTab === 'hourly'
-            ? $t('crowd.chart.todayCaption', { date: todayLabel })
-            : $t('crowd.chart.dailyCaption')
+            ? $t('{date} 時点・直近7時間（日本時間）', { date: todayLabel })
+            : $t('直近7日間（日本時間）')
         }}
       </p>
     </section>

@@ -2,7 +2,7 @@
 const { locale, t } = useI18n()
 
 useHead(() => ({
-  title: t('menu.meta.title'),
+  title: t('メニュー'),
   htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
 }))
 </script>
