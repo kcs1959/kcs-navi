@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // 位置・時間差は固定値で持つ（Math.randomだとSSRとクライアントで値がずれ、
-// hydrationミスマッチの原因になるため）。数値をずらして単調な繰り返しに見えないようにしている。
+// hydrationミスマッチの原因になるため）。
 const shootingStars = [
   { top: 6, left: 18, delay: 0, duration: 7.5, size: 1 },
   { top: 14, left: 68, delay: 2.4, duration: 9, size: 0.8 },
@@ -8,24 +8,34 @@ const shootingStars = [
   { top: 22, left: 85, delay: 7.6, duration: 7.8, size: 0.9 },
 ]
 
-const bubbles = [
-  { left: 8, size: 14, delay: 0, duration: 13, color: 'var(--lavender)' },
-  { left: 24, size: 9, delay: 2.2, duration: 10, color: 'var(--mint)' },
-  { left: 42, size: 18, delay: 4.5, duration: 15, color: 'var(--lemon)' },
-  { left: 58, size: 11, delay: 1.3, duration: 11, color: 'var(--peach)' },
-  { left: 74, size: 15, delay: 6, duration: 14, color: 'var(--lavender)' },
-  { left: 90, size: 10, delay: 3.6, duration: 12, color: 'var(--mint)' },
-]
+// シャボン玉は装飾なのでSSRに含めず、マウント後にランダム生成する。
+interface Bubble {
+  left: number
+  size: number
+  delay: number
+  duration: number
+  color: string
+}
+const bubbleColors = ['var(--lavender)', 'var(--mint)', 'var(--lemon)', 'var(--peach)']
+const bubbles = ref<Bubble[]>([])
+
+onMounted(() => {
+  bubbles.value = Array.from({ length: 12 }, () => ({
+    left: Math.round(Math.random() * 92 + 2),
+    size: Math.round(Math.random() * 32 + 10),
+    delay: Math.round(Math.random() * 180) / 10,
+    duration: Math.round(Math.random() * 100) / 10 + 20,
+    color: bubbleColors[Math.floor(Math.random() * bubbleColors.length)]!,
+  }))
+})
 </script>
 
 <template>
-  <!-- Figmaの装飾は実寸で重ねる。画面の高さが伸びても柄を引き伸ばさず可読性を保つ。 -->
   <div class="festival-background" aria-hidden="true">
     <img class="motif motif-main" src="/figma/map-group.svg" alt="" />
     <img class="motif motif-curves" src="/figma/map-group1.svg" alt="" />
     <img class="motif motif-grid" src="/figma/map-group2.svg" alt="" />
     <img class="motif motif-small" src="/figma/map-group3.svg" alt="" />
-    <!-- 流れ星・シャボン玉は常時表示する軽い装飾。祝祭感を足すための演出で情報は持たない。 -->
     <div class="sparkle-layer">
       <span
         v-for="(star, index) in shootingStars"
@@ -131,7 +141,7 @@ const bubbles = [
   opacity: 0;
   /* 左上の光沢と右下の陰影で、シャボン玉のつやを表現する。 */
   box-shadow:
-    inset 2px 3px 3px rgba(255, 255, 255, 0.7),
+    inset 2px 3px 3px rgba(255, 255, 255, 0.85),
     inset -2px -2px 4px rgba(0, 0, 0, 0.08);
   animation-name: float-up;
   animation-timing-function: ease-in-out;
@@ -143,13 +153,13 @@ const bubbles = [
     transform: translate(0, 0);
   }
   12% {
-    opacity: 0.55;
+    opacity: 0.8;
   }
   50% {
     transform: translate(14px, -50vh);
   }
   88% {
-    opacity: 0.4;
+    opacity: 0.55;
   }
   100% {
     opacity: 0;
