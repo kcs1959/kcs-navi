@@ -21,6 +21,10 @@
       "teams": {
         "title": "Teams",
         "description": "Learn about the teams at KCS"
+      },
+      "mitaOni": {
+        "description": "Oni tag game site ↗",
+        "ariaLabel": "mita-oni tag game site (opens in a new tab)"
       }
     },
     "officialSite": {
@@ -31,7 +35,8 @@
     "social": {
       "xAriaLabel": "Official KCS X account (opens in a new tab)",
       "youtubeAriaLabel": "Official KCS YouTube channel (opens in a new tab)"
-    }
+    },
+    "closeAriaLabel": "Close menu"
   },
   "localeSwitcher": {
     "ariaLabel": "Select display language",
@@ -49,7 +54,10 @@
     "loading": "Loading exhibitions…",
     "resultCount": "Works: {count}",
     "empty": "No exhibition information has been added yet.",
-    "teamsLink": "Meet the creators · Teams →"
+    "teamsLink": "Meet the creators · Teams →",
+    "filterAll": "All",
+    "filterAriaLabel": "Filter by team",
+    "teamEmpty": "No exhibitions for this team yet."
   },
   "teams": {
     "meta": {
@@ -80,16 +88,8 @@
       "hourlyTab": "Hourly",
       "dailyTab": "Daily",
       "itemLabel": "{label}: {count} people",
-      "emptyHourly": "There are no check-ins recorded today yet.",
-      "emptyDaily": "There are no check-ins recorded yet.",
-      "todayCaption": "{date} (Japan time)",
-      "dailyCaption": "Daily totals (Japan time)"
-    },
-    "estimate": {
-      "heading": "About the estimates",
-      "method": "The number of check-ins in the last 20 minutes is used to estimate current attendance.",
-      "formula": "Crowd level = estimated attendance ÷ capacity of 40 × 100%.",
-      "disclaimer": "The actual number of visitors may differ."
+      "todayCaption": "As of {date} · last 7 hours (Japan time)",
+      "dailyCaption": "Last 7 days (Japan time)"
     }
   },
   "crowdCard": {
@@ -100,10 +100,10 @@
       "moderate": "Moderately busy",
       "busy": "Busy"
     },
-    "estimateLabel": "Estimated crowd level",
-    "capacity": "/ {count} people",
     "updatedAt": "Updated {time}",
-    "refreshInterval": "Updated every 30 seconds",
+    "auto": "Auto",
+    "rate": "Congestion {rate}%",
+    "rateLabel": "Congestion",
     "summary": "Estimated attendance: {visitors} people. Estimated crowd level: {rate} percent.",
     "loadingChip": "Loading",
     "unavailableChip": "Unavailable",
@@ -114,6 +114,7 @@
   },
   "exhibitionCard": {
     "detailsAriaLabel": "View details for {title}",
+    "detailsWithLikesAriaLabel": "View details for {title} ({likes} likes)",
     "fallbackTeam": "Exhibition",
     "desk": "Exhibition {desk}"
   },
@@ -125,8 +126,8 @@
     "description": "Tap a desk to view details about its exhibitions.",
     "mapHeading": "Exhibition map",
     "tapDesk": "Tap a desk",
-    "entrance": "Entrance ↓",
-    "exit": "↑ Exit",
+    "entrance": "Entrance ↗",
+    "exit": "Exit ↗",
     "states": {
       "loading": "Loading",
       "unavailable": "Unavailable",
@@ -139,7 +140,8 @@
     "loadError": "We couldn't load the exhibition information.",
     "retry": "Try again",
     "loadingExhibitions": "Loading exhibition information…",
-    "empty": "No exhibition information has been added yet."
+    "empty": "No exhibition information has been added yet.",
+    "preparingMap": "Preparing the map"
   },
   "teamDetail": {
     "fallbackTitle": "Team",

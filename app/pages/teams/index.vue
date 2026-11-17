@@ -79,10 +79,10 @@ function workCountLabel(teamId: number) {
   margin: 0;
   font-size: 12px;
   line-height: 1.7;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
 }
 .work-count {
   font-size: 10px;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
 }
 </style>

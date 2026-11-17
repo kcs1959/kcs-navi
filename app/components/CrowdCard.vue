@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import type { CheckinStatsResponse } from '../../shared/types'
+import type { CheckinStatsResponse, CongestionLevel } from '../../shared/types'
+
+// 混雑度を一目で伝えるための絵文字。3段階の分岐はサーバー側の congestionFor と揃えている。
+const levelEmoji: Record<CongestionLevel, string> = {
+  relaxed: '😄',
+  moderate: '🙂',
+  busy: '😳',
+}
 
 const { locale, t } = useI18n()
 const props = withDefaults(
@@ -17,6 +24,9 @@ defineEmits<{ retry: [] }>()
 const current = computed(() => props.stats)
 // 再取得失敗時は、前回の人数を「いま」の値として表示しない。
 const unavailable = computed(() => props.failed || !current.value)
+const emoji = computed(() =>
+  current.value ? levelEmoji[current.value.congestion.level] : '',
+)
 const updatedAt = computed(() =>
   current.value
     ? new Intl.DateTimeFormat(locale.value === 'en' ? 'en-US' : 'ja-JP', {
@@ -39,22 +49,19 @@ function congestionLevelLabel(level: CheckinStatsResponse['congestion']['level']
         to="/crowd"
         :aria-label="$t('crowdCard.detailsAriaLabel')"
       />
-      <div class="crowd-heading">
-        <span class="chip" :class="current.congestion.level">{{
-          congestionLevelLabel(current.congestion.level)
-        }}</span
-        ><span class="text-muted">{{ $t('crowdCard.estimateLabel') }}</span>
-      </div>
-      <div class="occupancy">
-        <strong>{{ current.congestion.estimatedVisitors }}</strong
-        ><span>{{ $t('crowdCard.capacity', { count: current.congestion.capacity }) }}</span
-        ><b>・ {{ current.congestion.estimatedRate }}%</b>
+      <div class="status" :class="current.congestion.level">
+        <span class="status-emoji" aria-hidden="true">{{ emoji }}</span>
+        <div class="status-texts">
+          <span class="status-label">{{ congestionLevelLabel(current.congestion.level) }}</span>
+          <span class="status-rate">{{
+            $t('crowdCard.rate', { rate: current.congestion.estimatedRate })
+          }}</span>
+        </div>
       </div>
       <div class="crowd-update">
         <time :datetime="current.congestion.calculatedAt">{{
           $t('crowdCard.updatedAt', { time: updatedAt })
-        }}</time
-        ><span>{{ $t('crowdCard.refreshInterval') }}</span
+        }}（{{ $t('crowdCard.auto') }}）</time
         ><img v-if="linked" src="/figma/map-icon-chevron-right.svg" width="14" height="14" alt="" />
       </div>
       <span class="sr-only">{{
@@ -65,11 +72,14 @@ function congestionLevelLabel(level: CheckinStatsResponse['congestion']['level']
       }}</span>
     </template>
     <template v-else>
-      <div class="crowd-heading">
-        <span class="chip">{{
-          $t(loading ? 'crowdCard.loadingChip' : 'crowdCard.unavailableChip')
-        }}</span
-        ><span class="text-muted">{{ $t('crowdCard.estimateLabel') }}</span>
+      <div class="status neutral">
+        <span class="status-emoji" aria-hidden="true">{{ loading ? '⏳' : '❔' }}</span>
+        <div class="status-texts">
+          <span class="status-label">{{
+            $t(loading ? 'crowdCard.loadingChip' : 'crowdCard.unavailableChip')
+          }}</span>
+          <span class="status-rate">{{ $t('crowdCard.rateLabel') }}</span>
+        </div>
       </div>
       <p class="unavailable-title">
         {{ $t(loading ? 'crowdCard.checking' : 'crowdCard.loadError') }}
@@ -99,31 +109,56 @@ function congestionLevelLabel(level: CheckinStatsResponse['congestion']['level']
 .crowd-card:has(a:hover) {
   border-color: var(--orange);
 }
-.crowd-heading {
+/* 絵文字＋ラベル＋割合を1枚のパネルにまとめ、レベルごとの淡いグラデーションと
+   ラベル文字色で「空き=緑系・普通=黄系・混み=赤系」の印象を伝える。 */
+.status {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  flex-wrap: wrap;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 18px;
 }
-.chip.relaxed {
-  background: var(--mint);
+.status.relaxed {
+  background: linear-gradient(135deg, #eafbf1, var(--white));
 }
-.chip.moderate {
-  background: var(--lemon);
+.status.moderate {
+  background: linear-gradient(135deg, #fff7e0, var(--white));
 }
-.chip.busy {
-  background: var(--peach);
+.status.busy {
+  background: linear-gradient(135deg, #ffe9e4, var(--white));
 }
-.occupancy {
+.status.neutral {
+  background: var(--paper);
+}
+.status.relaxed .status-label {
+  color: #2f8f5b;
+}
+.status.moderate .status-label {
+  color: #b9790a;
+}
+.status.busy .status-label {
+  color: #d1483f;
+}
+.status-emoji {
+  font-size: 38px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.status-texts {
   display: flex;
-  gap: 8px;
-  align-items: baseline;
-  font-size: 14px;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
-.occupancy strong {
-  font-size: 28px;
-  line-height: 1.5;
+.status-label {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+.status-rate {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
 }
 .crowd-update {
   display: flex;
@@ -138,5 +173,8 @@ function congestionLevelLabel(level: CheckinStatsResponse['congestion']['level']
 }
 .micro {
   font-size: 10px;
+}
+.crowd-update img {
+  filter: var(--icon-filter);
 }
 </style>

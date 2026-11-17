@@ -27,6 +27,8 @@ export interface TeamsResponse {
   teams: Team[]
 }
 
+export const LIKE_LIMIT = 10
+
 export interface LikeResponse {
   exhibitionId: number
   likes: number
@@ -35,6 +37,11 @@ export interface LikeResponse {
 export interface DailyCount {
   date: string
   count: number
+}
+
+export interface CheckinReceipt {
+  checkedInAt: string
+  visitorNumber: number
 }
 
 export interface HourlyCount {

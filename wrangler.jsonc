@@ -8,12 +8,18 @@
     "directory": ".output/public",
     "binding": "ASSETS"
   },
+  "vars": {
+    // 本番の公開URL。独自ドメインへ変更する場合は、そのURLに更新する。
+    // チェックイン・いいねのOrigin検証にも使用する。ローカルは.dev.varsで上書きする。
+    "NUXT_PUBLIC_SITE_URL": "https://kcs-navi.kcs1959.workers.dev"
+  },
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "kcs-navi",
-      // Replace this placeholder after creating the D1 database yourself.
-      "database_id": "00000000-0000-4000-8000-000000000001",
+      "database_name": "kcs-navi-db",
+      // 同じCloudflareアカウントにある本番D1のDatabase ID。
+      // 接続先を変える場合はdatabase_nameとdatabase_idを更新する。bindingはDBのままにする。
+      "database_id": "7b9dfa1c-4965-4e5f-ba5b-27af007947d6",
       "migrations_dir": "migrations"
     }
   ]

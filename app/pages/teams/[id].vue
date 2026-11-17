@@ -91,7 +91,8 @@ useHead(() => ({
   height: 44px;
   flex: none;
   border-radius: 12px;
-  background: #fff;
+  background: var(--white);
+  color: var(--ink);
 }
 .team-about {
   padding: 20px;
@@ -104,7 +105,7 @@ useHead(() => ({
 }
 .team-about p {
   margin: 0;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -119,5 +120,8 @@ useHead(() => ({
 }
 .missing-team p {
   margin: 0;
+}
+.back-button img {
+  filter: var(--icon-filter);
 }
 </style>
