@@ -51,6 +51,7 @@ watch(
       <OfflineBanner />
       <AppPageTransition />
     </main>
+    <AppFooter />
 
     <Transition name="menu-popup">
       <div v-if="isMenuOpen" class="menu-popup-overlay">
