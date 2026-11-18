@@ -7,7 +7,7 @@ git clone https://github.com/kcs1959/kcs-navi.git
 cd kcs-navi
 
 nvm install # Node.jsのインストール
-nvm use # Node.jsのバージョンを`.nvmrcで書かれているものに切り替える
+nvm use # Node.jsのバージョンを.nvmrcで書かれているものに切り替える
 npm install --global npm@11.13.0 # npmパッケージのインストール
 
 # 入ったか確認
@@ -15,7 +15,11 @@ node --version
 npm --version
 ```
 
-今回、Node.js は `v24.22.1`、npm は `11.13.0` を使用する。
+今回、Node.js は `v22.23.4`、npm は `11.13.0` を使用する。
+Wranglerの最低要件はNode.js 22.0.0だが、現在のNuxtは22.22.3以上が必要なため、22系の対応版に揃える。
+
+既に開いているターミナルでNode.js 20が使われる場合は、`nvm use`で切り替える。
+新しく開くターミナルでもこのバージョンを使う場合は、`nvm alias default 22.23.4`を実行する。
 
 ## 2. 依存関係と環境変数を用意する
 
@@ -39,13 +43,13 @@ cp .dev.vars.example .dev.vars
 DBのマイグレーションを行う。
 
 ```sh
-npx wrangler d1 migrations apply kcs-navi --local
+npm run db:migrate:local
 ```
 
 ローカルDBに、シードデータ（`seeds/test.sql`）を投入する。同じIDを再投入すると内容が更新される。
 
 ```sh
-npx wrangler d1 execute kcs-navi --local --file seeds/test.sql
+npx wrangler d1 execute DB --local --file seeds/test.sql
 ```
 
 ## 4. 開発サーバーを起動する
@@ -89,7 +93,17 @@ npm run dev
 `seeds/` 内のSQLを編集し、編集したファイルを指定して手動で投入する。
 
 ```sh
-npx wrangler d1 execute kcs-navi --local --file seeds/test.sql
+npx wrangler d1 execute DB --local --file seeds/test.sql
+```
+
+混雑表示の確認用ダミー記録を投入する。混雑度は投入時刻を基準に直近20分で計算されるため、確認の直前に投入する。必ず `--local` で実行し、`--remote` では実行しない。まずリセットし、確認したい混雑度の seed を1つだけ投入する。
+
+```sh
+npx wrangler d1 execute DB --local --file seeds/checkins-reset.sql
+# 以下から確認したい混雑度を1つだけ実行する
+npx wrangler d1 execute DB --local --file seeds/checkins-relaxed.sql
+npx wrangler d1 execute DB --local --file seeds/checkins-moderate.sql
+npx wrangler d1 execute DB --local --file seeds/checkins-busy.sql
 ```
 
 ## 4. ユニットテストを行う

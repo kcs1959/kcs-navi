@@ -11,6 +11,19 @@
   --ink: #4b2d22;
   --muted: #7d5b49;
   --line: #ead6c5;
+  --focus: #9c5b30;
+  --navigation-shadow: #4b2d2214;
+  --dialog-shadow: #4b2d2229;
+  --dialog-backdrop: #4b2d2245;
+  --selected-work-border: #b4a0da;
+  --error: #a43d27;
+  --like-accent: #b94b25;
+  --on-like-accent: #fff;
+  --like-shadow: #b94b2526;
+  --on-primary: var(--ink);
+  --on-primary-hover: var(--ink);
+  --icon-filter: none;
+  color-scheme: light;
   font-family: 'Noto Sans JP', sans-serif;
   color: var(--ink);
   background: var(--paper);
@@ -18,13 +31,36 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
+:root[data-theme='dark'] {
+  --paper: #211c19;
+  --glass: #2b2420;
+  --white: #342b26;
+  --orange: #eea16c;
+  --strong: #875033;
+  --peach: #63422f;
+  --lemon: #625332;
+  --mint: #344e3b;
+  --lavender: #4c405e;
+  --ink: #fff0e2;
+  --muted: #cfb6a5;
+  --line: #655044;
+  --focus: #ffbd88;
+  --navigation-shadow: #00000045;
+  --error: #ffad99;
+  --like-accent: var(--orange);
+  --on-like-accent: var(--paper);
+  --like-shadow: #00000045;
+  --on-primary-hover: #211c19;
+  --icon-filter: brightness(0) invert(1);
+  color-scheme: dark;
+}
 * {
   box-sizing: border-box;
 }
 body {
   margin: 0;
 }
-body:has(dialog[open]) {
+body.exhibition-open {
   overflow: hidden;
 }
 button,
@@ -59,7 +95,7 @@ img {
   vertical-align: middle;
 }
 :focus-visible {
-  outline: 3px solid #9c5b30;
+  outline: 3px solid var(--focus);
   outline-offset: 4px;
 }
 .site-shell {
@@ -75,37 +111,6 @@ img {
 .festival-background {
   z-index: -1;
 }
-.site-header {
-  position: relative;
-  height: 76px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 16px 14px 24px;
-  background: var(--glass);
-  z-index: 5;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-.brand-copy {
-  display: flex;
-  flex-direction: column;
-}
-.brand-copy strong {
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.5;
-}
-.brand-copy small {
-  font-size: 10px;
-  line-height: 1.5;
-  color: var(--muted);
-}
 .icon-button {
   border: 0;
   width: 44px;
@@ -113,13 +118,28 @@ img {
   display: grid;
   place-items: center;
   border-radius: 12px;
-  background: white;
+  background: var(--white);
 }
 .page-content {
   padding: 16px 24px 36px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+.menu-enter-active {
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms ease-out;
+}
+.menu-leave-active {
+  transition: opacity 100ms ease-in;
+}
+.menu-enter-from {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.menu-leave-to {
+  opacity: 0;
 }
 .page-heading {
   display: flex;
@@ -145,7 +165,7 @@ img {
   line-height: 1.5;
 }
 .card {
-  background: white;
+  background: var(--white);
   border: 1px solid var(--line);
   border-radius: 20px;
 }
@@ -185,12 +205,15 @@ img {
 }
 .primary-button {
   background: var(--strong);
+  color: var(--on-primary);
 }
 .primary-button:hover {
   background: var(--orange);
+  color: var(--on-primary-hover);
 }
 .secondary-button {
   background: var(--paper);
+  color: var(--ink);
   border: 1px solid var(--line);
 }
 .primary-button:disabled {
@@ -200,7 +223,7 @@ img {
   padding: 20px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: white;
+  background: var(--white);
   font-size: 13px;
 }
 .error-card p {
@@ -224,7 +247,7 @@ img {
   padding: 8px;
   border-radius: 32px;
   background: var(--glass);
-  box-shadow: 0 6px 20px #4b2d2214;
+  box-shadow: 0 6px 20px var(--navigation-shadow);
 }
 .bottom-navigation a {
   flex: 1;
@@ -256,7 +279,7 @@ img {
   z-index: 100;
   top: 6px;
   left: 12px;
-  background: white;
+  background: var(--white);
   padding: 12px;
   transform: translateY(-150%);
 }
@@ -266,9 +289,6 @@ img {
 @media (min-width: 600px) {
   body {
     padding: 20px;
-  }
-  .site-header {
-    border-radius: 30px 30px 0 0;
   }
   .bottom-navigation {
     bottom: 36px;
@@ -281,9 +301,6 @@ img {
   }
   .page-heading h1 {
     font-size: 24px;
-  }
-  .site-header {
-    padding-left: 16px;
   }
   .chip {
     padding-left: 8px;

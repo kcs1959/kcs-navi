@@ -57,7 +57,7 @@
 
 入口QRのURLは `NUXT_PUBLIC_SITE_URL` + `/checkin`。受付ページの読み込み時にJavaScriptが空のフォームを1回自動POSTする。利用者が操作する登録・確認ボタンは設けない。
 
-`POST /api/checkins` は本文を受け取らず、保存成功後に **303、Location: /welcome?checkedInAt=<サーバー時刻>** を返す。時刻は受付時刻の表示用途に限り、識別子や入場証明として扱わない。受け付けたPOSTは毎回1件増やす。利用者ID・識別Cookie・QRトークン・再入場判定・二重登録抑制は設けない。日時はクライアント値を受け付けず、D1の時刻を保存する。WelcomeのGETや再読込では追加登録しない。
+`POST /api/checkins` は本文を受け取らず、保存成功後に **303、Location: /welcome?checkedInAt=<サーバー時刻>&visitorNumber=<日本時間での当日の受付人数>** を返す。時刻と人数は表示用途に限り、識別子や入場証明として扱わない。受け付けたPOSTは毎回1件増やす。利用者ID・識別Cookie・QRトークン・再入場判定・二重登録抑制は設けない。日時はクライアント値を受け付けず、D1の時刻を保存する。WelcomeのGETや再読込では追加登録しない。
 
 JavaScript無効時や通信失敗時は受付ページで状態を伝える。HTMLフォームのエラーは `/checkin?error=busy|forbidden|unavailable` へ303で戻し、自動POSTを停止して再試行リンクを表示する。JSONクライアントには元のエラーステータスを返す。識別情報を持たせないため、Welcomeの直アクセスだけではチェックインの成否を証明しない。
 

@@ -1,7 +1,22 @@
 <script setup lang="ts">
+const { $serwist } = useNuxtApp()
+void $serwist?.register({ immediate: true })
+// beforeinstallprompt を取り逃がさないよう、メニューを開く前からアプリ初期化時に購読する
+if (import.meta.client) useInstallPrompt()
 const route = useRoute()
 const config = useRuntimeConfig()
+const { locale, t } = useI18n()
 const { selectedExhibition, siblings, closeExhibition, openExhibition } = useExhibitionDialog()
+const isMenuOpen = ref(false)
+
+function closeMenu() {
+  isMenuOpen.value = false
+}
+
+function toggleMenu() {
+  isMenuOpen.value = !isMenuOpen.value
+}
+
 const {
   data: teamResponse,
   error: teamError,
@@ -14,45 +29,45 @@ const showNavigation = computed(() => !['/', '/menu', '/checkin', '/welcome'].in
 
 // URLの組み立てを環境変数に集約し、ローカルURLが公開環境のcanonicalに残るのを防ぐ。
 useHead(() => ({
-  htmlAttrs: { lang: 'ja' },
-  titleTemplate: (title) => (title ? `${title} | KCS Navi` : 'KCS Navi | 三田祭2026'),
+  htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
+  bodyAttrs: { class: selectedExhibition.value || isMenuOpen.value ? 'exhibition-open' : '' },
+  titleTemplate: (title) => (title ? `${title} | KCS Navi` : t('app.defaultTitle')),
   link: [{ rel: 'canonical', href: new URL(route.path, config.public.siteUrl).href }],
 }))
-watch(() => route.path, closeExhibition)
+watch(
+  () => route.path,
+  () => {
+    closeMenu()
+    closeExhibition()
+  },
+)
 </script>
 
 <template>
   <div>
     <FestivalBackground />
-    <a class="skip-link" href="#main-content">本文へスキップ</a>
-    <header class="site-header">
-      <NuxtLink class="brand" to="/" aria-label="KCS Navi 会場マップへ">
-        <KcsLogo />
-        <span class="brand-copy"><strong>KCS Navi</strong><small>三田祭 2026</small></span>
-      </NuxtLink>
-      <div class="header-actions">
-        <LocaleSwitcher v-if="route.path !== '/checkin'" />
-        <!--TODO: ハンバーガーメニューを改良。別ページ`/menu`ではなく、アニメーションでポップアップを表示させる-->
-        <NuxtLink
-          class="icon-button"
-          :to="route.path === '/menu' ? '/' : '/menu'"
-          :aria-label="route.path === '/menu' ? 'メニューを閉じる' : 'メニューを開く'"
-          :aria-expanded="route.path === '/menu'"
-        >
-          <img
-            v-if="route.path === '/menu'"
-            src="/figma/menu-icon-x.svg"
-            alt=""
-            width="22"
-            height="22"
-          />
-          <img v-else src="/figma/map-icon-menu.svg" alt="" width="24" height="24" />
-        </NuxtLink>
-      </div>
-    </header>
+    <a class="skip-link" href="#main-content">{{ t('app.skipLink') }}</a>
+    <AppHeader :is-menu-open="isMenuOpen" @toggle-menu="toggleMenu" />
     <main id="main-content" :class="{ 'with-navigation': showNavigation }">
-      <NuxtPage />
+      <OfflineBanner />
+      <AppPageTransition />
     </main>
+    <AppFooter />
+
+    <Transition name="menu-popup">
+      <div v-if="isMenuOpen" class="menu-popup-overlay">
+        <div
+          id="menu-popup"
+          class="menu-popup-container"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="menu-title"
+        >
+          <MenuContent @close="closeMenu" />
+        </div>
+      </div>
+    </Transition>
+
     <ExhibitionModal
       v-if="selectedExhibition"
       :exhibition="selectedExhibition"
@@ -66,11 +81,57 @@ watch(() => route.path, closeExhibition)
   </div>
 </template>
 
-<style scoped>
-.header-actions {
+<style>
+.menu-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
   display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: none;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.menu-popup-container {
+  width: 100%;
+  max-width: 540px;
+  max-height: calc(100dvh - 40px);
+  background: var(--paper, #fff);
+  border-radius: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.menu-popup-enter-active,
+.menu-popup-leave-active {
+  transition: opacity 0.25s ease;
+}
+.menu-popup-enter-active .menu-popup-container,
+.menu-popup-leave-active .menu-popup-container {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.menu-popup-enter-from,
+.menu-popup-leave-to {
+  opacity: 0;
+}
+.menu-popup-enter-from .menu-popup-container,
+.menu-popup-leave-to .menu-popup-container {
+  transform: translateY(-20px) scale(0.96);
+}
+
+@media (max-width: 599px) {
+  .menu-popup-overlay {
+    padding: 12px;
+  }
+
+  .menu-popup-container {
+    max-height: calc(100dvh - 24px);
+  }
 }
 </style>

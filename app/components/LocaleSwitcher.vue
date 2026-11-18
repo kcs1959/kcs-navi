@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { locale, setLocale } = useI18n()
+const { locale, setLocale, t } = useI18n()
 
 const languageOptions = [
   { code: 'ja', label: 'JP', lang: 'ja', ariaKey: 'localeSwitcher.japanese' },
@@ -8,14 +8,14 @@ const languageOptions = [
 </script>
 
 <template>
-  <div class="locale-switcher" role="group" :aria-label="$t('localeSwitcher.ariaLabel')">
+  <div class="locale-switcher" role="group" :aria-label="t('localeSwitcher.ariaLabel')">
     <button
       v-for="option in languageOptions"
       :key="option.code"
       class="locale-option"
       :class="{ active: locale === option.code }"
       type="button"
-      :aria-label="$t(option.ariaKey)"
+      :aria-label="t(option.ariaKey)"
       :aria-pressed="locale === option.code"
       @click="setLocale(option.code)"
     >
@@ -32,9 +32,9 @@ const languageOptions = [
   align-items: center;
   gap: 2px;
   padding: 1px;
-  border: 1px solid var(--kcs-line, #ead6c5);
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: var(--kcs-paper, #fff6ea);
+  background: var(--white);
 }
 .locale-option {
   width: 40px;
@@ -43,19 +43,19 @@ const languageOptions = [
   border: 0;
   border-radius: 9px;
   background: transparent;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
   font: inherit;
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
 }
 .locale-option.active {
-  background: var(--kcs-peach, #ffd8bc);
-  color: var(--kcs-ink, #4b2d22);
+  background: var(--peach);
+  color: var(--ink);
   font-weight: 700;
 }
 .locale-option:focus-visible {
-  outline: 2px solid var(--kcs-orange, #ee8b4a);
+  outline: 2px solid var(--orange);
   outline-offset: 1px;
 }
 </style>

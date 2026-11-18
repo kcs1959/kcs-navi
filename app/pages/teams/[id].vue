@@ -31,15 +31,15 @@ useHead(() => ({
 <template>
   <div class="page-content stack team-page">
     <div class="team-heading">
-      <NuxtLink to="/teams" class="back-button" :aria-label="$t('teamDetail.backAriaLabel')">
+      <NuxtLink to="/teams" class="back-button" :aria-label="t('teamDetail.backAriaLabel')">
         <img src="/figma/team-icon-arrow-left.svg" alt="" width="22" height="22" />
       </NuxtLink>
-      <PageHeading eyebrow="MEET THE TEAM" :title="team?.name ?? $t('teamDetail.fallbackTitle')" />
+      <PageHeading eyebrow="MEET THE TEAM" :title="team?.name ?? t('teamDetail.fallbackTitle')" />
     </div>
     <div v-if="error" class="error-card" role="alert">
-      <p>{{ $t('teamDetail.loadError') }}</p>
+      <p>{{ t('teamDetail.loadError') }}</p>
       <button class="secondary-button" type="button" @click="refresh()">
-        {{ $t('teamDetail.reload') }}
+        {{ t('teamDetail.reload') }}
       </button>
     </div>
     <template v-else-if="team">
@@ -47,13 +47,13 @@ useHead(() => ({
         <p>{{ team.description }}</p>
       </section>
       <h2 class="section-heading">
-        {{ $t('teamDetail.worksHeading') }}
+        {{ t('teamDetail.worksHeading') }}
         <span v-if="works && !worksError">{{ teamWorks.length }}</span>
       </h2>
       <div v-if="worksError" class="error-card" role="alert">
-        <p>{{ $t('teamDetail.worksLoadError') }}</p>
+        <p>{{ t('teamDetail.worksLoadError') }}</p>
         <button class="secondary-button" type="button" @click="refreshWorks()">
-          {{ $t('teamDetail.reload') }}
+          {{ t('teamDetail.reload') }}
         </button>
       </div>
       <ExhibitionCard
@@ -65,12 +65,12 @@ useHead(() => ({
         @select="openExhibition(exhibition)"
       />
       <p v-if="works && !worksError && !teamWorks.length" class="card text-muted">
-        {{ $t('teamDetail.emptyWorks') }}
+        {{ t('teamDetail.emptyWorks') }}
       </p>
     </template>
     <div v-else-if="data" class="card missing-team">
-      <p>{{ $t('teamDetail.notFound') }}</p>
-      <NuxtLink class="secondary-button" to="/teams">{{ $t('teamDetail.teamsLink') }}</NuxtLink>
+      <p>{{ t('teamDetail.notFound') }}</p>
+      <NuxtLink class="secondary-button" to="/teams">{{ t('teamDetail.teamsLink') }}</NuxtLink>
     </div>
   </div>
 </template>
@@ -91,7 +91,8 @@ useHead(() => ({
   height: 44px;
   flex: none;
   border-radius: 12px;
-  background: #fff;
+  background: var(--white);
+  color: var(--ink);
 }
 .team-about {
   padding: 20px;
@@ -104,7 +105,7 @@ useHead(() => ({
 }
 .team-about p {
   margin: 0;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -119,5 +120,8 @@ useHead(() => ({
 }
 .missing-team p {
   margin: 0;
+}
+.back-button img {
+  filter: var(--icon-filter);
 }
 </style>

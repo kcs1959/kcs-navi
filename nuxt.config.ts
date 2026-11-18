@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 export default defineNuxtConfig({
   compatibilityDate: '2026-07-01',
   devtools: { enabled: false },
-  modules: ['@nuxt/eslint', '@nuxtjs/i18n'],
+  modules: ['@nuxt/eslint', '@serwist/nuxt', '@nuxtjs/i18n'],
   i18n: {
     strategy: 'no_prefix',
     defaultLocale: 'ja',
@@ -13,6 +13,14 @@ export default defineNuxtConfig({
       { code: 'en', name: 'English', language: 'en-US', file: 'en.json' },
     ],
     vueI18n: 'i18n.config.ts',
+  },
+  serwist: {
+    globPatterns: ['**/*.{js,css,html,svg}'],
+  },
+  vite: {
+    build: {
+      target: ['chrome111', 'edge111', 'firefox115', 'safari16.4', 'ios16.4'],
+    },
   },
   css: [
     '@fontsource/noto-sans-jp/400.css',
@@ -35,6 +43,11 @@ export default defineNuxtConfig({
           content: 'KCSの展示を、もっと楽しむ。ブースマップと班紹介、混雑状況をチェック。',
         },
         { name: 'theme-color', content: '#f4f1e9' },
+        { name: 'apple-mobile-web-app-title', content: 'KCS Navi' },
+      ],
+      link: [
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+        { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' },
       ],
     },
   },

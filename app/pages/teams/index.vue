@@ -26,13 +26,13 @@ function workCountLabel(teamId: number) {
   <div class="page-content stack teams-page">
     <PageHeading
       eyebrow="KCS TEAMS"
-      :title="$t('teams.heading')"
-      :description="$t('teams.description')"
+      :title="t('teams.heading')"
+      :description="t('teams.description')"
     />
     <div v-if="error" class="error-card" role="alert">
-      <p>{{ $t('teams.loadError') }}</p>
+      <p>{{ t('teams.loadError') }}</p>
       <button type="button" class="secondary-button" @click="refresh()">
-        {{ $t('teams.reload') }}
+        {{ t('teams.reload') }}
       </button>
     </div>
     <NuxtLink
@@ -49,7 +49,7 @@ function workCountLabel(teamId: number) {
       <p>{{ team.description }}</p>
     </NuxtLink>
     <p v-if="data && !error && !data.teams.length" class="card text-muted">
-      {{ $t('teams.empty') }}
+      {{ t('teams.empty') }}
     </p>
   </div>
 </template>
@@ -79,10 +79,10 @@ function workCountLabel(teamId: number) {
   margin: 0;
   font-size: 12px;
   line-height: 1.7;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
 }
 .work-count {
   font-size: 10px;
-  color: var(--kcs-muted, #7d5b49);
+  color: var(--muted);
 }
 </style>
