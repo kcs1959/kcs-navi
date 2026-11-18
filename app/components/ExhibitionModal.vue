@@ -113,10 +113,6 @@ function dismissBackdrop(event: MouseEvent) {
         >
       </div>
       <p class="description">{{ exhibition.description }}</p>
-      <p class="detail-location">
-        所属班 {{ team?.name ?? '情報未取得' }} ／ 展示場所
-        {{ exhibition.deskKey.replace('desk-', '').toUpperCase() }}
-      </p>
       <div v-if="teamError" class="inline-error" role="alert">
         <p>班の情報を取得できませんでした。</p>
         <button class="secondary-button" @click="emit('retryTeams')">班の情報を再読み込み</button>
@@ -159,7 +155,7 @@ function dismissBackdrop(event: MouseEvent) {
             submitting
               ? '送信中…'
               : atLimit
-                ? '10回の応援、ありがとうございます！'
+                ? '応援ありがとう！'
                 : '1作品につき10回までタップできます'
           }}
           <span class="sr-only">あなたのいいね {{ myLikes }} / {{ LIKE_LIMIT }} 回。</span>
@@ -233,10 +229,6 @@ function dismissBackdrop(event: MouseEvent) {
   font-size: 13px;
   line-height: 1.8;
   white-space: pre-line;
-}
-.detail-location {
-  font-size: 11px;
-  color: var(--muted);
 }
 .creator-comment {
   background: var(--paper);

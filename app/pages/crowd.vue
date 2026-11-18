@@ -75,13 +75,6 @@ const todayLabel = computed(() => {
       @retry="refresh()"
     />
 
-    <div v-if="error" class="error-card" role="alert">
-      <p>来場者数を取得できませんでした。</p>
-      <button type="button" class="secondary-button" @click="refresh()">再読み込み</button>
-    </div>
-    <p v-else-if="!data && status === 'pending'" class="text-muted" role="status">
-      来場者数を読み込んでいます…
-    </p>
     <section
       v-if="data && !error"
       class="card attendance-card"

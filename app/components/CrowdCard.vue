@@ -23,9 +23,7 @@ defineEmits<{ retry: [] }>()
 const current = computed(() => props.stats)
 // 再取得失敗時は、前回の人数を「いま」の値として表示しない。
 const unavailable = computed(() => props.failed || !current.value)
-const emoji = computed(() =>
-  current.value ? levelEmoji[current.value.congestion.level] : '',
-)
+const emoji = computed(() => (current.value ? levelEmoji[current.value.congestion.level] : ''))
 const updatedAt = computed(() =>
   current.value
     ? new Intl.DateTimeFormat('ja-JP', {
@@ -75,7 +73,6 @@ const updatedAt = computed(() =>
       <button v-if="!loading" class="secondary-button" @click="$emit('retry')">
         もう一度読み込む
       </button>
-      <p class="micro text-muted">人数は未取得です。マップは利用できます。</p>
     </template>
   </section>
 </template>
@@ -158,9 +155,6 @@ const updatedAt = computed(() =>
 .unavailable-title {
   font-size: 13px;
   margin: 8px 0;
-}
-.micro {
-  font-size: 10px;
 }
 .crowd-update img {
   filter: var(--icon-filter);

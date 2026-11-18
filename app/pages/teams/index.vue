@@ -26,7 +26,7 @@ const countWorks = (teamId: number) =>
       class="card team-card"
     >
       <div class="team-card-top">
-        <span class="chip">{{ team.name }}</span>
+        <h2>{{ team.name }}</h2>
         <span class="work-count"
           >{{
             countWorks(team.id) === null ? '作品数未取得' : `${countWorks(team.id)} 作品`
@@ -34,7 +34,6 @@ const countWorks = (teamId: number) =>
           →</span
         >
       </div>
-      <h2>{{ team.name }}</h2>
       <p>{{ team.description }}</p>
     </NuxtLink>
     <p v-if="data && !error && !data.teams.length" class="card text-muted">
@@ -60,6 +59,8 @@ const countWorks = (teamId: number) =>
   gap: 8px;
 }
 .team-card h2 {
+  min-width: 0;
+  overflow-wrap: anywhere;
   margin: 0;
   font-size: 18px;
   line-height: 1.5;
@@ -71,6 +72,8 @@ const countWorks = (teamId: number) =>
   color: var(--muted);
 }
 .work-count {
+  flex-shrink: 0;
+  white-space: nowrap;
   font-size: 10px;
   color: var(--muted);
 }

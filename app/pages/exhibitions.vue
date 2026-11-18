@@ -15,7 +15,8 @@ const {
   error: teamsError,
   refresh: refreshTeams,
 } = await useFetch<TeamsResponse>('/api/teams', { key: 'teams' })
-const teams = computed(() => teamData.value?.teams ?? [])
+// 班情報の取得に失敗したときは古い班データを使わず、絞り込みを解除して全作品を表示する。
+const teams = computed(() => (teamsError.value ? [] : (teamData.value?.teams ?? [])))
 const exhibitions = computed(() => works.value?.exhibitions ?? [])
 
 // 絞り込み状態はURLのクエリ (?team=班ID) に持たせ、再読み込みやリンク共有でも保持する。
@@ -38,10 +39,6 @@ const filteredExhibitions = computed(() =>
     ? exhibitions.value
     : exhibitions.value.filter((work) => work.teamId === selectedTeamId.value),
 )
-
-async function retry() {
-  await Promise.all([refreshWorks(), refreshTeams()])
-}
 </script>
 
 <template>
@@ -52,15 +49,21 @@ async function retry() {
       description="KCSのメンバーが制作しました！"
     />
 
-    <div v-if="worksError || teamsError" class="error-card" role="alert">
+    <div v-if="worksError" class="error-card" role="alert">
       <p>展示情報を読み込めませんでした。</p>
-      <button class="secondary-button" type="button" @click="retry">再読み込み</button>
+      <button class="secondary-button" type="button" @click="refreshWorks()">再読み込み</button>
     </div>
     <p v-else-if="status === 'pending'" class="text-muted" role="status">
       展示作品を読み込んでいます…
     </p>
     <template v-else>
-      <div v-if="teams.length" class="team-filter" role="group" aria-label="班で絞り込む">
+      <div v-if="teamsError" class="error-card" role="alert">
+        <p>班情報を読み込めませんでした。すべての作品を表示しています。</p>
+        <button class="secondary-button" type="button" @click="refreshTeams()">
+          班情報を再読み込み
+        </button>
+      </div>
+      <div v-else-if="teams.length" class="team-filter" role="group" aria-label="班で絞り込む">
         <button
           v-for="option in filterOptions"
           :key="option.id ?? 'all'"
@@ -87,7 +90,7 @@ async function retry() {
       <div v-else-if="!filteredExhibitions.length" class="card empty-state">
         <p>この班の展示作品はまだありません。</p>
       </div>
-      <NuxtLink class="teams-link" to="/teams">つくった人たちを知る · 班紹介 →</NuxtLink>
+      <NuxtLink class="teams-link" to="/teams">つくった人たちを知る →</NuxtLink>
     </template>
   </div>
 </template>
