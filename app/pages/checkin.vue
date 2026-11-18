@@ -1,14 +1,19 @@
 <script setup lang="ts">
-useHead({ title: 'チェックイン', meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
+const { t } = useI18n()
+
+useHead(() => ({
+  title: t('checkin.meta.title'),
+  meta: [{ name: 'robots', content: 'noindex, nofollow' }],
+}))
 const route = useRoute()
 const registrationForm = ref<HTMLFormElement | null>(null)
 const hasError = computed(() => typeof route.query.error === 'string')
 const errorMessage = computed(() =>
   route.query.error === 'busy'
-    ? 'ただいま受付が混み合っています。少し時間をおいて、もう一度お試しください。'
+    ? t('checkin.errors.busy')
     : route.query.error === 'forbidden'
-      ? '受付ページを確認できませんでした。入口のQRコードからもう一度開いてください。'
-      : 'チェックインを完了できませんでした。通信環境を確認して、もう一度お試しください。',
+      ? t('checkin.errors.forbidden')
+      : t('checkin.errors.default'),
 )
 
 onMounted(() => {
@@ -23,19 +28,21 @@ onMounted(() => {
   <div class="page-content checkin-page">
     <section class="card checkin-card" aria-labelledby="checkin-heading">
       <template v-if="hasError">
-        <h1 id="checkin-heading">受付を完了できませんでした</h1>
+        <h1 id="checkin-heading">{{ t('checkin.errorHeading') }}</h1>
         <p role="alert">{{ errorMessage }}</p>
-        <a href="/checkin" class="primary-button">受付を再試行</a>
-        <NuxtLink to="/" class="secondary-button">会場マップへ</NuxtLink>
+        <a href="/checkin" class="primary-button">{{ t('checkin.retry') }}</a>
+        <NuxtLink to="/" class="secondary-button">{{ t('checkin.mapLink') }}</NuxtLink>
       </template>
       <template v-else>
         <span class="checkin-spinner" aria-hidden="true" />
-        <h1 id="checkin-heading">チェックインしています</h1>
-        <p role="status">受付が終わるまで、このままお待ちください。</p>
+        <h1 id="checkin-heading">{{ t('checkin.progressHeading') }}</h1>
+        <p role="status">{{ t('checkin.progressStatus') }}</p>
         <form ref="registrationForm" method="post" action="/api/checkins" />
         <!-- noscript内をプレーンテキストにし、JS有効時のブラウザ解析とVueの水和を一致させる。 -->
         <noscript
-          >自動チェックインにはJavaScriptが必要です。ブラウザのJavaScriptを有効にして、入口のQRコードをもう一度読み取ってください。</noscript
+          >自動チェックインにはJavaScriptが必要です。ブラウザのJavaScriptを有効にして、入口のQRコードをもう一度読み取ってください。
+          / JavaScript is required for automatic check-in. Enable JavaScript in your browser, then
+          scan the entrance QR code again.</noscript
         >
       </template>
     </section>

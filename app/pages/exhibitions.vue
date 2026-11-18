@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
 
-useHead({ title: '展示作品' })
+const { locale, t } = useI18n()
+
+useHead(() => ({ title: t('exhibitions.meta.title') }))
 
 const { openExhibition } = useExhibitionDialog()
 const {
@@ -32,12 +34,19 @@ const selectedTeamId = computed<number | null>({
     })
   },
 })
-const filterOptions = computed(() => [{ id: null, name: 'すべて' }, ...teams.value])
+const filterOptions = computed(() => [
+  { id: null, name: t('exhibitions.allTeams') },
+  ...teams.value,
+])
 const filteredExhibitions = computed(() =>
   selectedTeamId.value === null
     ? exhibitions.value
     : exhibitions.value.filter((work) => work.teamId === selectedTeamId.value),
 )
+
+function formatNumber(value: number) {
+  return value.toLocaleString(locale.value === 'en' ? 'en-US' : 'ja-JP')
+}
 
 async function retry() {
   await Promise.all([refreshWorks(), refreshTeams()])
@@ -48,19 +57,26 @@ async function retry() {
   <div class="page-content works-page stack">
     <PageHeading
       eyebrow="EXHIBITIONS"
-      title="展示作品"
-      description="KCSのメンバーが制作しました！"
+      :title="t('exhibitions.heading')"
+      :description="t('exhibitions.description')"
     />
 
     <div v-if="worksError || teamsError" class="error-card" role="alert">
-      <p>展示情報を読み込めませんでした。</p>
-      <button class="secondary-button" type="button" @click="retry">再読み込み</button>
+      <p>{{ t('exhibitions.loadError') }}</p>
+      <button class="secondary-button" type="button" @click="retry">
+        {{ t('exhibitions.reload') }}
+      </button>
     </div>
     <p v-else-if="status === 'pending'" class="text-muted" role="status">
-      展示作品を読み込んでいます…
+      {{ t('exhibitions.loading') }}
     </p>
     <template v-else>
-      <div v-if="teams.length" class="team-filter" role="group" aria-label="班で絞り込む">
+      <div
+        v-if="teams.length"
+        class="team-filter"
+        role="group"
+        :aria-label="t('exhibitions.filterLabel')"
+      >
         <button
           v-for="option in filterOptions"
           :key="option.id ?? 'all'"
@@ -72,7 +88,9 @@ async function retry() {
           {{ option.name }}
         </button>
       </div>
-      <p class="result-count text-muted" role="status">{{ filteredExhibitions.length }} 件の作品</p>
+      <p class="result-count text-muted" role="status">
+        {{ t('exhibitions.resultCount', { count: formatNumber(filteredExhibitions.length) }) }}
+      </p>
       <ExhibitionCard
         v-for="exhibition in filteredExhibitions"
         :key="exhibition.id"
@@ -82,12 +100,12 @@ async function retry() {
         @select="openExhibition(exhibition)"
       />
       <div v-if="!exhibitions.length" class="card empty-state">
-        <p>展示情報はまだ登録されていません。</p>
+        <p>{{ t('exhibitions.empty') }}</p>
       </div>
       <div v-else-if="!filteredExhibitions.length" class="card empty-state">
-        <p>この班の展示作品はまだありません。</p>
+        <p>{{ t('exhibitions.emptyForTeam') }}</p>
       </div>
-      <NuxtLink class="teams-link" to="/teams">つくった人たちを知る · 班紹介 →</NuxtLink>
+      <NuxtLink class="teams-link" to="/teams">{{ t('exhibitions.teamsLink') }}</NuxtLink>
     </template>
   </div>
 </template>

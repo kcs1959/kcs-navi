@@ -2,6 +2,7 @@
 import type { ExhibitionsResponse, TeamsResponse } from '~~/shared/types'
 
 const route = useRoute()
+const { locale, t } = useI18n()
 const { data, error, refresh } = await useFetch<TeamsResponse>('/api/teams', { key: 'teams' })
 const {
   data: works,
@@ -21,31 +22,39 @@ const teamWorks = computed(
 )
 const { openExhibition } = useExhibitionDialog()
 
-useHead(() => ({ title: team.value?.name ?? '班紹介' }))
+useHead(() => ({
+  title: team.value?.name ?? t('teamDetail.fallbackTitle'),
+  htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
+}))
 </script>
 
 <template>
   <div class="page-content stack team-page">
     <div class="team-heading">
-      <NuxtLink to="/teams" class="back-button" aria-label="班一覧に戻る">
+      <NuxtLink to="/teams" class="back-button" :aria-label="t('teamDetail.backAriaLabel')">
         <img src="/figma/team-icon-arrow-left.svg" alt="" width="22" height="22" />
       </NuxtLink>
-      <PageHeading eyebrow="MEET THE TEAM" :title="team?.name ?? '班紹介'" />
+      <PageHeading eyebrow="MEET THE TEAM" :title="team?.name ?? t('teamDetail.fallbackTitle')" />
     </div>
     <div v-if="error" class="error-card" role="alert">
-      <p>班の情報を読み込めませんでした。</p>
-      <button class="secondary-button" type="button" @click="refresh()">再読み込み</button>
+      <p>{{ t('teamDetail.loadError') }}</p>
+      <button class="secondary-button" type="button" @click="refresh()">
+        {{ t('teamDetail.reload') }}
+      </button>
     </div>
     <template v-else-if="team">
       <section class="card team-about">
         <p>{{ team.description }}</p>
       </section>
       <h2 class="section-heading">
-        この班の作品 <span v-if="works && !worksError">{{ teamWorks.length }}</span>
+        {{ t('teamDetail.worksHeading') }}
+        <span v-if="works && !worksError">{{ teamWorks.length }}</span>
       </h2>
       <div v-if="worksError" class="error-card" role="alert">
-        <p>作品を読み込めませんでした。</p>
-        <button class="secondary-button" type="button" @click="refreshWorks()">再読み込み</button>
+        <p>{{ t('teamDetail.worksLoadError') }}</p>
+        <button class="secondary-button" type="button" @click="refreshWorks()">
+          {{ t('teamDetail.reload') }}
+        </button>
       </div>
       <ExhibitionCard
         v-for="exhibition in teamWorks"
@@ -56,12 +65,12 @@ useHead(() => ({ title: team.value?.name ?? '班紹介' }))
         @select="openExhibition(exhibition)"
       />
       <p v-if="works && !worksError && !teamWorks.length" class="card text-muted">
-        この班の作品はまだ登録されていません。
+        {{ t('teamDetail.emptyWorks') }}
       </p>
     </template>
     <div v-else-if="data" class="card missing-team">
-      <p>この班は見つかりませんでした。</p>
-      <NuxtLink class="secondary-button" to="/teams">班一覧へ</NuxtLink>
+      <p>{{ t('teamDetail.notFound') }}</p>
+      <NuxtLink class="secondary-button" to="/teams">{{ t('teamDetail.teamsLink') }}</NuxtLink>
     </div>
   </div>
 </template>

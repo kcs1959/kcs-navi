@@ -34,6 +34,7 @@
   "devDependencies": {
     "@nuxt/eslint": "1.17.0",
     "@nuxt/test-utils": "4.3.4",
+    "@nuxtjs/i18n": "10.6.0",
     "@serwist/nuxt": "^9.5.13",
     "@serwist/vite": "9.5.13",
     "@types/node": "26.6.6",

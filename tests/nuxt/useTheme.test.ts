@@ -24,6 +24,7 @@ describe('theme toggle', () => {
     const button = await mountSuspended(ThemeToggle)
 
     expect(button.attributes('aria-pressed')).toBe('true')
+    expect(button.attributes('aria-label')).toBe('ダークモード')
     await button.trigger('click')
     expect(document.documentElement.dataset.theme).toBe('light')
     expect(save).toHaveBeenCalledWith('kcs-navi-theme', 'light')

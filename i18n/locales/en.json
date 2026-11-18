@@ -1,0 +1,246 @@
+{
+  "app": {
+    "defaultTitle": "KCS Navi | Mita Festival 2026",
+    "skipLink": "Skip to main content"
+  },
+  "header": {
+    "subtitle": "Mita Festival 2026",
+    "brandAriaLabel": "Go to the KCS Navi venue map",
+    "navigationLabel": "Main navigation",
+    "homeAriaLabel": "Home (venue map)",
+    "officialSite": "KCS official website",
+    "externalLinkAriaLabel": "{label} (opens in a new tab)",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "menu": {
+    "meta": {
+      "title": "Menu"
+    },
+    "heading": "Menu",
+    "closeAriaLabel": "Close menu",
+    "navigationLabel": "Site menu",
+    "links": {
+      "map": {
+        "title": "Booth map",
+        "description": "Check where the exhibits are located!"
+      },
+      "crowd": {
+        "title": "Booth crowd levels",
+        "description": "Check attendance and crowd levels"
+      },
+      "exhibitions": {
+        "title": "Exhibitions",
+        "description": "Explore works created for the Mita Festival"
+      },
+      "teams": {
+        "title": "Teams",
+        "description": "Learn about the teams at KCS"
+      }
+    },
+    "game": {
+      "title": "mita-oni",
+      "description": "Tag game site",
+      "ariaLabel": "mita-oni tag game site (opens in a new tab)"
+    },
+    "officialSite": {
+      "title": "KCS official website",
+      "ariaLabel": "KCS official website (opens in a new tab)"
+    },
+    "follow": "Follow KCS",
+    "social": {
+      "xAriaLabel": "Official KCS X account (opens in a new tab)",
+      "instagramAriaLabel": "Official KCS Instagram account (opens in a new tab)",
+      "youtubeAriaLabel": "Official KCS YouTube channel (opens in a new tab)",
+      "githubAriaLabel": "Official KCS GitHub account (opens in a new tab)"
+    }
+  },
+  "localeSwitcher": {
+    "ariaLabel": "Select display language",
+    "japanese": "Switch to Japanese",
+    "english": "Switch to English"
+  },
+  "checkin": {
+    "meta": {
+      "title": "Check in"
+    },
+    "errorHeading": "We couldn't complete your check-in",
+    "errors": {
+      "busy": "Check-in is currently busy. Please wait a moment and try again.",
+      "forbidden": "We couldn't verify the check-in page. Please open it again using the QR code at the entrance.",
+      "default": "We couldn't complete your check-in. Check your connection and try again."
+    },
+    "retry": "Try check-in again",
+    "mapLink": "Go to the venue map",
+    "progressHeading": "Checking you in",
+    "progressStatus": "Please wait while we complete your check-in."
+  },
+  "welcome": {
+    "meta": {
+      "title": "Welcome"
+    },
+    "checkedInHeading": "You're checked in!",
+    "defaultHeading": "Welcome to KCS!",
+    "visitorPrefix": "You are visitor",
+    "visitorUnit": "",
+    "visitorSuffix": "today!",
+    "message": "Thank you for visiting the KCS booth at the Mita Festival!",
+    "receiptTime": "Check-in time: {time}",
+    "mapLink": "Go to the venue map",
+    "note": "Open the exhibition map to see details about each work."
+  },
+  "offlineBanner": {
+    "message": "You're offline. The information shown is from the last successful update."
+  },
+  "themeToggle": {
+    "ariaLabel": "Dark mode"
+  },
+  "exhibitions": {
+    "meta": {
+      "title": "Exhibitions"
+    },
+    "heading": "Exhibitions",
+    "description": "Created by KCS members!",
+    "loadError": "We couldn't load the exhibition information.",
+    "reload": "Reload",
+    "loading": "Loading exhibitions…",
+    "resultCount": "Works: {count}",
+    "filterLabel": "Filter by team",
+    "allTeams": "All",
+    "empty": "No exhibition information has been added yet.",
+    "emptyForTeam": "There are no exhibition works for this team yet.",
+    "teamsLink": "Meet the creators · Teams →"
+  },
+  "teams": {
+    "meta": {
+      "title": "Teams"
+    },
+    "heading": "Teams",
+    "description": "Learn about the teams at KCS",
+    "loadError": "We couldn't load the team information.",
+    "reload": "Reload",
+    "workCountUnavailable": "Work count unavailable",
+    "workCount": "Works: {count}",
+    "empty": "No team information has been added yet."
+  },
+  "crowd": {
+    "meta": {
+      "title": "Attendance and crowd levels"
+    },
+    "heading": "KCS booth crowd levels",
+    "loadError": "We couldn't load the attendance data.",
+    "reload": "Reload",
+    "loading": "Loading attendance data…",
+    "todayAttendance": "Today's attendance",
+    "totalPeople": "total",
+    "chart": {
+      "hourlyTitle": "Check-ins by hour",
+      "dailyTitle": "Check-ins by day",
+      "tabListLabel": "Attendance aggregation interval",
+      "hourlyTab": "Hourly",
+      "dailyTab": "Daily",
+      "itemLabel": "{label}: {count} people",
+      "emptyHourly": "There are no check-ins recorded today yet.",
+      "emptyDaily": "There are no check-ins recorded yet.",
+      "todayCaption": "As of {date} · Last 7 hours (Japan time)",
+      "dailyCaption": "Last 7 days (Japan time)"
+    },
+    "estimate": {
+      "heading": "About the estimates",
+      "method": "The number of check-ins in the last 20 minutes is used to estimate current attendance.",
+      "formula": "Crowd level = estimated attendance ÷ capacity of 40 × 100%.",
+      "disclaimer": "The actual number of visitors may differ."
+    }
+  },
+  "crowdCard": {
+    "ariaLabel": "Crowd level",
+    "detailsAriaLabel": "View attendance details",
+    "levels": {
+      "relaxed": "Relaxed",
+      "moderate": "Moderately busy",
+      "busy": "Busy"
+    },
+    "rate": "Crowd level {rate}%",
+    "rateLabel": "Crowd level",
+    "estimateLabel": "Estimated crowd level",
+    "capacity": "/ {count} people",
+    "updatedAt": "Updated {time} (automatic)",
+    "refreshInterval": "Updated every 30 seconds",
+    "summary": "Estimated attendance: {visitors} people. Estimated crowd level: {rate} percent.",
+    "loadingChip": "Loading",
+    "unavailableChip": "Unavailable",
+    "checking": "Checking crowd information",
+    "loadError": "We couldn't load the crowd information",
+    "retry": "Try again",
+    "unavailableNote": "Attendance is unavailable. You can still use the map."
+  },
+  "exhibitionCard": {
+    "detailsAriaLabel": "View details for {title}",
+    "detailsWithLikesAriaLabel": "View details for {title} ({count} likes)",
+    "fallbackTeam": "Exhibition",
+    "desk": "Exhibition {desk}",
+    "likesLabel": "Likes"
+  },
+  "exhibitionModal": {
+    "closeAriaLabel": "Close exhibition details",
+    "worksAtDeskAriaLabel": "Works at this desk",
+    "fallbackTeam": "Team information",
+    "unavailable": "Unavailable",
+    "location": "Team: {team} / Location: {desk}",
+    "teamLoadError": "We couldn't load the team information.",
+    "retryTeam": "Reload team information",
+    "creatorHeading": "From the creator",
+    "noCreatorComment": "No comment has been added.",
+    "like": {
+      "areaAriaLabel": "Support this work",
+      "thankYou": "Thank you!",
+      "prompt": "Show your support with a like!",
+      "limitAriaLabel": "You supported this work {limit} times",
+      "buttonAriaLabel": "Like this work ({count} / {limit})",
+      "everyoneLikes": "Everyone's likes",
+      "sending": "Sending…",
+      "complete": "Thank you for all {limit} likes!",
+      "instruction": "You can tap up to {limit} times per work",
+      "personalSummary": "Your likes: {count} / {limit}.",
+      "offline": "Likes can't be sent while offline.",
+      "storageUnavailable": "This browser can't save your count. It will reset when the page reloads.",
+      "sendError": "We couldn't send your like. Please try again."
+    }
+  },
+  "map": {
+    "meta": {
+      "title": "Venue map"
+    },
+    "heading": "KCS booth map",
+    "description": "Tap a desk to view details about its exhibitions.",
+    "mapHeading": "Exhibition map",
+    "tapDesk": "Tap a desk",
+    "entrance": "Entrance ↗",
+    "exit": "Exit ↗",
+    "preparing": "Preparing the map",
+    "states": {
+      "loading": "Loading",
+      "unavailable": "Unavailable",
+      "unregistered": "Not registered",
+      "notRetrieved": "Unavailable"
+    },
+    "workCount": "Works: {count}",
+    "deskAria": "{label}, exhibition desk {letter}, {countLabel}",
+    "deskAriaWithTitles": "{label}, exhibition desk {letter}, {countLabel}: View details for {titles}",
+    "loadError": "We couldn't load the exhibition information.",
+    "retry": "Try again",
+    "loadingExhibitions": "Loading exhibition information…",
+    "empty": "No exhibition information has been added yet."
+  },
+  "teamDetail": {
+    "fallbackTitle": "Team",
+    "backAriaLabel": "Back to the team list",
+    "loadError": "We couldn't load the team information.",
+    "reload": "Reload",
+    "worksHeading": "Works by this team",
+    "worksLoadError": "We couldn't load the works.",
+    "emptyWorks": "No works have been added for this team yet.",
+    "notFound": "This team could not be found.",
+    "teamsLink": "Team list"
+  }
+}

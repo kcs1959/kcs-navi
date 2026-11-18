@@ -1,10 +1,11 @@
 <script setup lang="ts">
 const online = useOnline()
+const { t } = useI18n()
 </script>
 
 <template>
   <p v-if="!online" class="offline-banner" role="status">
-    オフラインです。表示中の情報は最後に取得したときのものです。
+    {{ t('offlineBanner.message') }}
   </p>
 </template>
 

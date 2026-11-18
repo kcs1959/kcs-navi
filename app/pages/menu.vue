@@ -1,5 +1,7 @@
 <script setup lang="ts">
-useHead({ title: 'メニュー' })
+const { t } = useI18n()
+
+useHead(() => ({ title: t('menu.meta.title') }))
 </script>
 
 <template>

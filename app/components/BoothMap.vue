@@ -13,6 +13,7 @@ defineProps<{
   }[]
 }>()
 defineEmits<{ select: [key: DeskKey] }>()
+const { t } = useI18n()
 
 const symbolId = useId()
 // リリース時の固定配置。机の移動はこの座標だけで調整する。
@@ -39,6 +40,19 @@ function labelPosition(key: DeskKey) {
     left: `${((330 + (x + 66 - y - 34) * 0.75) / 720) * 100}%`,
     top: `${((210 + (x + 66 + y + 34) * 0.4 - 68 - (key === 'desk-c' ? 0 : 110)) / 590) * 100}%`,
   }
+}
+function deskAriaLabel(desk: {
+  label: string
+  letter: string
+  countLabel: string
+  titles: string
+}) {
+  return t(desk.titles ? 'map.deskAriaWithTitles' : 'map.deskAria', {
+    label: desk.label,
+    letter: desk.letter,
+    countLabel: desk.countLabel,
+    titles: desk.titles,
+  })
 }
 </script>
 
@@ -136,8 +150,8 @@ function labelPosition(key: DeskKey) {
         </g>
       </g>
       <g class="wayfinding" fill="var(--muted)" text-anchor="middle">
-        <text x="115" y="477">入口 ↗</text>
-        <text x="577" y="501">出口 ↗</text>
+        <text x="115" y="477">{{ t('map.entrance') }}</text>
+        <text x="577" y="501">{{ t('map.exit') }}</text>
       </g>
     </svg>
 
@@ -148,7 +162,7 @@ function labelPosition(key: DeskKey) {
       class="desk"
       :style="labelPosition(desk.key)"
       :disabled="!desk.count"
-      :aria-label="`${desk.label}、展示机${desk.letter}、${desk.countLabel}${desk.titles ? `：${desk.titles}の詳細を見る` : ''}`"
+      :aria-label="deskAriaLabel(desk)"
       @click="$emit('select', desk.key)"
     >
       <span class="desk-label">{{ desk.label }}</span>

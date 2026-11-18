@@ -1,5 +1,8 @@
 <script setup lang="ts">
-useHead({ title: 'ようこそ' })
+const { locale, t } = useI18n()
+const displayLocale = computed(() => (locale.value === 'en' ? 'en-US' : 'ja-JP'))
+
+useHead(() => ({ title: t('welcome.meta.title') }))
 const route = useRoute()
 const checkedInAt = computed(() => {
   const value = typeof route.query.checkedInAt === 'string' ? route.query.checkedInAt : ''
@@ -14,7 +17,7 @@ const visitorNumber = computed(() => {
 })
 const receiptTime = computed(() =>
   checkedInAt.value
-    ? new Intl.DateTimeFormat('ja-JP', {
+    ? new Intl.DateTimeFormat(displayLocale.value, {
         timeZone: 'Asia/Tokyo',
         year: 'numeric',
         month: '2-digit',
@@ -25,6 +28,9 @@ const receiptTime = computed(() =>
       }).format(checkedInAt.value)
     : '',
 )
+const formattedVisitorNumber = computed(() =>
+  visitorNumber.value === null ? '' : visitorNumber.value.toLocaleString(displayLocale.value),
+)
 </script>
 
 <template>
@@ -33,18 +39,22 @@ const receiptTime = computed(() =>
       <div class="success-badge">
         <img src="/figma/welcome-icon-check.svg" alt="" width="48" height="48" />
       </div>
-      <h1 id="welcome-title">{{ checkedInAt ? 'チェックインしました！' : 'KCSへようこそ！' }}</h1>
+      <h1 id="welcome-title">
+        {{ t(checkedInAt ? 'welcome.checkedInHeading' : 'welcome.defaultHeading') }}
+      </h1>
       <p v-if="visitorNumber" class="welcome-message visitor-message">
-        <span>あなたは本日</span>
+        <span>{{ t('welcome.visitorPrefix') }}</span>
         <strong class="visitor-number"
-          >{{ visitorNumber.toLocaleString('ja-JP') }}<span>人目</span></strong
+          >{{ formattedVisitorNumber }}<span>{{ t('welcome.visitorUnit') }}</span></strong
         >
-        <span>の来場者です！</span>
+        <span>{{ t('welcome.visitorSuffix') }}</span>
       </p>
-      <p class="welcome-message">三田祭KCSブースへのご来場、ありがとうございます！<br /></p>
-      <span v-if="receiptTime" class="chip receipt-time">受付日時 {{ receiptTime }}</span>
-      <NuxtLink to="/" class="primary-button map-button">会場マップへ</NuxtLink>
-      <p class="welcome-note">展示マップから、各作品の詳細を見られます。</p>
+      <p class="welcome-message">{{ t('welcome.message') }}<br /></p>
+      <span v-if="receiptTime" class="chip receipt-time">{{
+        t('welcome.receiptTime', { time: receiptTime })
+      }}</span>
+      <NuxtLink to="/" class="primary-button map-button">{{ t('welcome.mapLink') }}</NuxtLink>
+      <p class="welcome-note">{{ t('welcome.note') }}</p>
     </section>
   </div>
 </template>

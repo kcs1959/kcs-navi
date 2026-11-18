@@ -8,6 +8,7 @@ const props = defineProps<{
   siblings: Exhibition[]
 }>()
 const emit = defineEmits<{ close: []; select: [exhibition: Exhibition]; retryTeams: [] }>()
+const { t } = useI18n()
 const dialog = ref<HTMLDialogElement>()
 const { counts, totals, pending, storageAvailable, syncCount, sendLike } = useLocalLikes()
 const online = ref(true)
@@ -63,8 +64,7 @@ async function like() {
     // A completed request belongs to its original work, including after closing the dialog.
     updateLikes(requestedId, result.likes)
   } catch {
-    if (version === viewVersion)
-      likeError.value = 'いいねを送信できませんでした。もう一度試してください。'
+    if (version === viewVersion) likeError.value = 'exhibitionModal.like.sendError'
   }
 }
 function dismissBackdrop(event: MouseEvent) {
@@ -89,14 +89,18 @@ function dismissBackdrop(event: MouseEvent) {
         </div>
         <button
           class="icon-button close-detail"
-          aria-label="作品詳細を閉じる"
+          :aria-label="t('exhibitionModal.closeAriaLabel')"
           autofocus
           @click="emit('close')"
         >
           <img src="/figma/detail-icon-x.svg" width="22" height="22" alt="" />
         </button>
       </div>
-      <div v-if="siblings.length > 1" class="work-switcher" aria-label="この机の作品">
+      <div
+        v-if="siblings.length > 1"
+        class="work-switcher"
+        :aria-label="t('exhibitionModal.worksAtDeskAriaLabel')"
+      >
         <button
           v-for="(item, index) in siblings"
           :key="item.id"
@@ -109,25 +113,33 @@ function dismissBackdrop(event: MouseEvent) {
       </div>
       <div class="detail-tags">
         <NuxtLink class="chip" :to="`/teams/${team?.id ?? exhibition.teamId}`"
-          >{{ team?.name ?? '班紹介' }} ↗</NuxtLink
+          >{{ team?.name ?? t('exhibitionModal.fallbackTeam') }} ↗</NuxtLink
         >
       </div>
       <p class="description">{{ exhibition.description }}</p>
       <p class="detail-location">
-        所属班 {{ team?.name ?? '情報未取得' }} ／ 展示場所
-        {{ exhibition.deskKey.replace('desk-', '').toUpperCase() }}
+        {{
+          t('exhibitionModal.location', {
+            team: team?.name ?? t('exhibitionModal.unavailable'),
+            desk: exhibition.deskKey.replace('desk-', '').toUpperCase(),
+          })
+        }}
       </p>
       <div v-if="teamError" class="inline-error" role="alert">
-        <p>班の情報を取得できませんでした。</p>
-        <button class="secondary-button" @click="emit('retryTeams')">班の情報を再読み込み</button>
+        <p>{{ t('exhibitionModal.teamLoadError') }}</p>
+        <button class="secondary-button" @click="emit('retryTeams')">
+          {{ t('exhibitionModal.retryTeam') }}
+        </button>
       </div>
       <section class="creator-comment">
-        <h3>制作者より</h3>
+        <h3>{{ t('exhibitionModal.creatorHeading') }}</h3>
         <p v-if="exhibition.creatorComment.trim()">{{ exhibition.creatorComment }}</p>
-        <p v-else>コメントはありません。</p>
+        <p v-else>{{ t('exhibitionModal.noCreatorComment') }}</p>
       </section>
-      <section class="like-area" aria-label="作品を応援">
-        <p class="like-message">{{ myLikes > 0 ? 'ありがとう！' : 'いいね！で応援しよう' }}</p>
+      <section class="like-area" :aria-label="t('exhibitionModal.like.areaAriaLabel')">
+        <p class="like-message">
+          {{ t(myLikes > 0 ? 'exhibitionModal.like.thankYou' : 'exhibitionModal.like.prompt') }}
+        </p>
         <button
           class="like-button"
           :class="{ 'is-complete': atLimit, 'is-offline': !online }"
@@ -135,8 +147,11 @@ function dismissBackdrop(event: MouseEvent) {
           :aria-busy="submitting"
           :aria-label="
             atLimit
-              ? 'この作品を10回応援しました'
-              : `この作品にいいね（${myLikes} / ${LIKE_LIMIT}回）`
+              ? t('exhibitionModal.like.limitAriaLabel', { limit: LIKE_LIMIT })
+              : t('exhibitionModal.like.buttonAriaLabel', {
+                  count: myLikes,
+                  limit: LIKE_LIMIT,
+                })
           "
           @click="like"
         >
@@ -152,24 +167,31 @@ function dismissBackdrop(event: MouseEvent) {
         </button>
         <p class="like-total">
           <strong>{{ likes.toLocaleString('ja-JP') }}</strong
-          ><span>みんなのいいね</span>
+          ><span>{{ t('exhibitionModal.like.everyoneLikes') }}</span>
         </p>
         <p class="like-feedback" aria-live="polite">
           {{
             submitting
-              ? '送信中…'
+              ? t('exhibitionModal.like.sending')
               : atLimit
-                ? '10回の応援、ありがとうございます！'
-                : '1作品につき10回までタップできます'
+                ? t('exhibitionModal.like.complete', { limit: LIKE_LIMIT })
+                : t('exhibitionModal.like.instruction', { limit: LIKE_LIMIT })
           }}
-          <span class="sr-only">あなたのいいね {{ myLikes }} / {{ LIKE_LIMIT }} 回。</span>
+          <span class="sr-only">{{
+            t('exhibitionModal.like.personalSummary', {
+              count: myLikes,
+              limit: LIKE_LIMIT,
+            })
+          }}</span>
         </p>
       </section>
-      <p v-if="!online" class="like-feedback" role="status">オフラインのため送信できません。</p>
-      <p v-if="!storageAvailable" class="like-feedback" role="status">
-        このブラウザでは回数を保存できません。再読み込みすると回数がリセットされます。
+      <p v-if="!online" class="like-feedback" role="status">
+        {{ t('exhibitionModal.like.offline') }}
       </p>
-      <p v-if="likeError" class="inline-error" role="alert">{{ likeError }}</p>
+      <p v-if="!storageAvailable" class="like-feedback" role="status">
+        {{ t('exhibitionModal.like.storageUnavailable') }}
+      </p>
+      <p v-if="likeError" class="inline-error" role="alert">{{ t(likeError) }}</p>
     </div>
   </dialog>
 </template>
@@ -326,6 +348,14 @@ function dismissBackdrop(event: MouseEvent) {
 .like-feedback {
   color: var(--muted);
   font-size: 10px;
+}
+.detail-location,
+.creator-comment p,
+.like-message,
+.like-total span,
+.like-feedback,
+.inline-error {
+  overflow-wrap: anywhere;
 }
 .sr-only {
   position: absolute;

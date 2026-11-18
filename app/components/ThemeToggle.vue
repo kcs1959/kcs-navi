@@ -1,12 +1,13 @@
 <script setup lang="ts">
 const { theme, ready, toggleTheme } = useTheme()
+const { t } = useI18n()
 </script>
 
 <template>
   <button
     type="button"
     class="icon-button theme-toggle"
-    aria-label="ダークモード"
+    :aria-label="t('themeToggle.ariaLabel')"
     :aria-pressed="theme === 'dark'"
     :disabled="!ready"
     @click="toggleTheme"

@@ -9,6 +9,16 @@ afterEach(() => {
 })
 
 describe('AppHeader', () => {
+  it('hides language switching during automatic check-in and shows it on check-in errors', async () => {
+    const submitting = await mountSuspended(AppHeader, { route: '/checkin' })
+    expect(submitting.find('.locale-switcher').exists()).toBe(false)
+    submitting.unmount()
+
+    const failed = await mountSuspended(AppHeader, { route: '/checkin?error=busy' })
+    expect(failed.find('.locale-switcher').exists()).toBe(true)
+    failed.unmount()
+  })
+
   it('slides in only after leaving the viewport and stays until its original position returns', async () => {
     let top = 20
     let width = 480

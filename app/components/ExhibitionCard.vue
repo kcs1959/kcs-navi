@@ -9,9 +9,21 @@ const props = withDefaults(
   }>(),
   { team: undefined, showDescription: true, showLikes: false },
 )
+const { locale, t } = useI18n()
 const { totals } = useLocalLikes()
 const likes = computed(() =>
   Math.max(props.exhibition.likes, totals.value[props.exhibition.id] ?? 0),
+)
+const formattedLikes = computed(() =>
+  likes.value.toLocaleString(locale.value === 'en' ? 'en-US' : 'ja-JP'),
+)
+const detailsAriaLabel = computed(() =>
+  props.showLikes
+    ? t('exhibitionCard.detailsWithLikesAriaLabel', {
+        title: props.exhibition.title,
+        count: formattedLikes.value,
+      })
+    : t('exhibitionCard.detailsAriaLabel', { title: props.exhibition.title }),
 )
 defineEmits<{ select: [] }>()
 </script>
@@ -19,18 +31,22 @@ defineEmits<{ select: [] }>()
   <button
     class="card exhibition-card"
     :class="{ 'has-likes': showLikes }"
-    :aria-label="`${exhibition.title}の詳細を見る${showLikes ? `（いいね ${likes.toLocaleString('ja-JP')}件）` : ''}`"
+    :aria-label="detailsAriaLabel"
     @click="$emit('select')"
   >
     <span class="work-meta"
-      ><span class="chip">{{ team?.name ?? '展示作品' }}</span
-      ><span>展示 {{ exhibition.deskKey.replace('desk-', '').toUpperCase() }}</span></span
+      ><span class="chip">{{ team?.name ?? t('exhibitionCard.fallbackTeam') }}</span
+      ><span>{{
+        t('exhibitionCard.desk', {
+          desk: exhibition.deskKey.replace('desk-', '').toUpperCase(),
+        })
+      }}</span></span
     >
     <strong class="work-title">{{ exhibition.title }}</strong>
     <span v-if="showDescription" class="work-description">{{ exhibition.description }}</span>
     <span v-if="showLikes" class="work-likes" aria-hidden="true">
-      <strong>{{ likes.toLocaleString('ja-JP') }}</strong>
-      <span>いいね</span>
+      <strong>{{ formattedLikes }}</strong>
+      <span>{{ t('exhibitionCard.likesLabel') }}</span>
     </span>
   </button>
 </template>

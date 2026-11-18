@@ -8,6 +8,8 @@ const levelEmoji: Record<CongestionLevel, string> = {
   busy: '😳',
 }
 
+const { locale, t } = useI18n()
+const displayLocale = computed(() => (locale.value === 'en' ? 'en-US' : 'ja-JP'))
 const props = withDefaults(
   defineProps<{
     stats?: CheckinStatsResponse | null
@@ -28,54 +30,70 @@ const emoji = computed(() =>
 )
 const updatedAt = computed(() =>
   current.value
-    ? new Intl.DateTimeFormat('ja-JP', {
+    ? new Intl.DateTimeFormat(displayLocale.value, {
         timeZone: 'Asia/Tokyo',
         hour: '2-digit',
         minute: '2-digit',
       }).format(new Date(current.value.congestion.calculatedAt))
     : '',
 )
+function formatNumber(value: number) {
+  return value.toLocaleString(displayLocale.value)
+}
+function congestionLevelLabel(level: CongestionLevel) {
+  return t(`crowdCard.levels.${level}`)
+}
 </script>
 <template>
-  <section class="card crowd-card" :aria-busy="loading" aria-label="混雑状況">
+  <section class="card crowd-card" :aria-busy="loading" :aria-label="t('crowdCard.ariaLabel')">
     <template v-if="!unavailable && current">
       <NuxtLink
         v-if="linked"
         class="crowd-card-link"
         to="/crowd"
-        aria-label="来場状況を詳しく見る"
+        :aria-label="t('crowdCard.detailsAriaLabel')"
       />
       <div class="status" :class="current.congestion.level">
         <span class="status-emoji" aria-hidden="true">{{ emoji }}</span>
         <div class="status-texts">
-          <span class="status-label">{{ current.congestion.label }}</span>
-          <span class="status-rate">混雑度 {{ current.congestion.estimatedRate }}%</span>
+          <span class="status-label">{{ congestionLevelLabel(current.congestion.level) }}</span>
+          <span class="status-rate">{{
+            t('crowdCard.rate', {
+              rate: formatNumber(current.congestion.estimatedRate),
+            })
+          }}</span>
         </div>
       </div>
       <div class="crowd-update">
-        <time :datetime="current.congestion.calculatedAt">{{ updatedAt }} 更新（自動）</time
+        <time :datetime="current.congestion.calculatedAt">{{
+          t('crowdCard.updatedAt', { time: updatedAt })
+        }}</time
         ><img v-if="linked" src="/figma/map-icon-chevron-right.svg" width="14" height="14" alt="" />
       </div>
-      <span class="sr-only"
-        >推定滞在人数 {{ current.congestion.estimatedVisitors }}人、推定混雑率
-        {{ current.congestion.estimatedRate }}パーセント</span
-      >
+      <span class="sr-only">{{
+        t('crowdCard.summary', {
+          visitors: formatNumber(current.congestion.estimatedVisitors),
+          rate: formatNumber(current.congestion.estimatedRate),
+        })
+      }}</span>
     </template>
     <template v-else>
       <div class="status neutral">
         <span class="status-emoji" aria-hidden="true">{{ loading ? '⏳' : '❔' }}</span>
         <div class="status-texts">
-          <span class="status-label">{{ loading ? '読み込み中' : '未取得' }}</span>
-          <span class="status-rate">混雑度</span>
+          <span class="status-label">{{
+            t(loading ? 'crowdCard.loadingChip' : 'crowdCard.unavailableChip')
+          }}</span>
+          <span class="status-rate">{{ t('crowdCard.rateLabel') }}</span>
         </div>
       </div>
       <p class="unavailable-title">
-        {{ loading ? '混雑情報を確認しています' : '混雑情報を取得できません' }}
+        {{ t(loading ? 'crowdCard.checking' : 'crowdCard.loadError') }}
       </p>
       <button v-if="!loading" class="secondary-button" @click="$emit('retry')">
-        もう一度読み込む
+        {{ t('crowdCard.retry') }}
       </button>
-      <p class="micro text-muted">人数は未取得です。マップは利用できます。</p>
+      <p class="micro text-muted">{{ t('crowdCard.unavailableNote') }}</p>
     </template>
   </section>
 </template>

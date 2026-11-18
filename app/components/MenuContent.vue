@@ -1,31 +1,32 @@
 <script setup lang="ts">
 withDefaults(defineProps<{ showClose?: boolean }>(), { showClose: true })
 const emit = defineEmits<{ close: [] }>()
+const { t } = useI18n()
 // const { promptEvent, installed, iosSafari, mobileChrome } = useInstallPrompt()
 
 const links = [
   {
     to: '/',
-    title: 'ブースマップ',
-    description: '展示作品の配置を確認！',
+    titleKey: 'menu.links.map.title',
+    descriptionKey: 'menu.links.map.description',
     icon: '/figma/menu-icon-map.svg',
   },
   {
     to: '/crowd',
-    title: 'ブースの混雑状況',
-    description: '来場者数・混雑度合いをチェックできます',
+    titleKey: 'menu.links.crowd.title',
+    descriptionKey: 'menu.links.crowd.description',
     icon: '/figma/menu-icon-chart-no-axes-column.svg',
   },
   {
     to: '/exhibitions',
-    title: '展示紹介',
-    description: '三田祭に展示されている作品をまとめました',
+    titleKey: 'menu.links.exhibitions.title',
+    descriptionKey: 'menu.links.exhibitions.description',
     icon: '/figma/menu-icon-layout-grid.svg',
   },
   {
     to: '/teams',
-    title: '班紹介',
-    description: 'KCSの班活動について',
+    titleKey: 'menu.links.teams.title',
+    descriptionKey: 'menu.links.teams.description',
     icon: '/figma/menu-icon-layout-grid.svg',
   },
 ]
@@ -36,20 +37,20 @@ const links = [
     <header class="menu-heading">
       <div class="page-heading">
         <p class="eyebrow">MENU</p>
-        <h1 id="menu-title">メニュー</h1>
+        <h1 id="menu-title">{{ t('menu.heading') }}</h1>
       </div>
       <button
         v-if="showClose"
         type="button"
         class="icon-button menu-close"
-        aria-label="メニューを閉じる"
+        :aria-label="t('menu.closeAriaLabel')"
         @click="emit('close')"
       >
         <img src="/figma/menu-icon-x.svg" alt="" width="22" height="22" />
       </button>
     </header>
 
-    <nav class="card menu-links" aria-label="サイトメニュー">
+    <nav class="card menu-links" :aria-label="t('menu.navigationLabel')">
       <NuxtLink
         v-for="link in links"
         :key="link.to"
@@ -59,8 +60,8 @@ const links = [
       >
         <img :src="link.icon" alt="" width="24" height="24" />
         <span class="menu-link-text"
-          ><strong>{{ link.title }}</strong
-          ><span>{{ link.description }}</span></span
+          ><strong>{{ t(link.titleKey) }}</strong
+          ><span>{{ t(link.descriptionKey) }}</span></span
         >
         <img src="/figma/menu-icon-chevron-right.svg" alt="" width="16" height="16" />
       </NuxtLink>
@@ -69,11 +70,14 @@ const links = [
         target="_blank"
         rel="noopener noreferrer"
         class="menu-link"
-        aria-label="mita-oni 鬼ごっこサイト（新しいタブで開く）"
+        :aria-label="t('menu.game.ariaLabel')"
         @click="emit('close')"
       >
         <img src="/figma/menu-icon-gamepad2.svg" alt="" width="24" height="24" />
-        <span class="menu-link-text"><strong>mita-oni</strong><span>鬼ごっこサイト ↗</span></span>
+        <span class="menu-link-text"
+          ><strong>{{ t('menu.game.title') }}</strong
+          ><span>{{ t('menu.game.description') }} ↗</span></span
+        >
         <img src="/figma/menu-icon-chevron-right.svg" alt="" width="16" height="16" />
       </a>
       <a
@@ -81,11 +85,14 @@ const links = [
         target="_blank"
         rel="noopener noreferrer"
         class="menu-link"
-        aria-label="KCS公式サイト（新しいタブで開く）"
+        :aria-label="t('menu.officialSite.ariaLabel')"
         @click="emit('close')"
       >
         <img src="/figma/menu-icon-external-link.svg" alt="" width="24" height="24" />
-        <span class="menu-link-text"><strong>KCS公式サイト</strong><span>kcs1959.jp ↗</span></span>
+        <span class="menu-link-text"
+          ><strong>{{ t('menu.officialSite.title') }}</strong
+          ><span>kcs1959.jp ↗</span></span
+        >
         <img src="/figma/menu-icon-chevron-right.svg" alt="" width="16" height="16" />
       </a>
     </nav>
@@ -93,13 +100,13 @@ const links = [
     <!--InstallGuide v-if="!installed && (promptEvent || iosSafari || mobileChrome)" /-->
 
     <section class="card social-card" aria-labelledby="follow-heading">
-      <h2 id="follow-heading">KCSをフォロー</h2>
+      <h2 id="follow-heading">{{ t('menu.follow') }}</h2>
       <div class="social-links">
         <a
           href="https://x.com/kcs1959"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="KCS公式X（新しいタブで開く）"
+          :aria-label="t('menu.social.xAriaLabel')"
           @click="emit('close')"
         >
           <img src="/figma/menu-icon-xbrand.svg" alt="" width="20" height="20" />
@@ -109,7 +116,7 @@ const links = [
           href="https://www.instagram.com/kcs1959/"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="KCS公式Instagram（新しいタブで開く）"
+          :aria-label="t('menu.social.instagramAriaLabel')"
           @click="emit('close')"
         >
           <img src="/figma/menu-icon-instagram.svg" alt="" width="20" height="20" />
@@ -119,7 +126,7 @@ const links = [
           href="https://www.youtube.com/c/KCSKeioComputerSociety"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="KCS公式YouTube（新しいタブで開く）"
+          :aria-label="t('menu.social.youtubeAriaLabel')"
           @click="emit('close')"
         >
           <img src="/figma/menu-icon-youtube.svg" alt="" width="20" height="20" />
@@ -129,7 +136,7 @@ const links = [
           href="https://github.com/kcs1959"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="KCS公式GitHub（新しいタブで開く）"
+          :aria-label="t('menu.social.githubAriaLabel')"
           @click="emit('close')"
         >
           <img src="/figma/menu-icon-github.svg" alt="" width="20" height="20" />

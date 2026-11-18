@@ -5,6 +5,7 @@ void $serwist?.register({ immediate: true })
 if (import.meta.client) useInstallPrompt()
 const route = useRoute()
 const config = useRuntimeConfig()
+const { locale, t } = useI18n()
 const { selectedExhibition, siblings, closeExhibition, openExhibition } = useExhibitionDialog()
 const isMenuOpen = ref(false)
 
@@ -28,9 +29,9 @@ const showNavigation = computed(() => !['/', '/menu', '/checkin', '/welcome'].in
 
 // URLの組み立てを環境変数に集約し、ローカルURLが公開環境のcanonicalに残るのを防ぐ。
 useHead(() => ({
-  htmlAttrs: { lang: 'ja' },
+  htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'ja' },
   bodyAttrs: { class: selectedExhibition.value || isMenuOpen.value ? 'exhibition-open' : '' },
-  titleTemplate: (title) => (title ? `${title} | KCS Navi` : 'KCS Navi | 三田祭2026'),
+  titleTemplate: (title) => (title ? `${title} | KCS Navi` : t('app.defaultTitle')),
   link: [{ rel: 'canonical', href: new URL(route.path, config.public.siteUrl).href }],
 }))
 watch(
@@ -45,7 +46,7 @@ watch(
 <template>
   <div>
     <FestivalBackground />
-    <a class="skip-link" href="#main-content">本文へスキップ</a>
+    <a class="skip-link" href="#main-content">{{ t('app.skipLink') }}</a>
     <AppHeader :is-menu-open="isMenuOpen" @toggle-menu="toggleMenu" />
     <main id="main-content" :class="{ 'with-navigation': showNavigation }">
       <OfflineBanner />

@@ -1,0 +1,246 @@
+{
+  "app": {
+    "defaultTitle": "KCS Navi | 三田祭2026",
+    "skipLink": "本文へスキップ"
+  },
+  "header": {
+    "subtitle": "三田祭 2026",
+    "brandAriaLabel": "KCS Navi 会場マップへ",
+    "navigationLabel": "共通ナビゲーション",
+    "homeAriaLabel": "Home（会場マップ）",
+    "officialSite": "KCS公式サイト",
+    "externalLinkAriaLabel": "{label}（新しいタブで開く）",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる"
+  },
+  "menu": {
+    "meta": {
+      "title": "メニュー"
+    },
+    "heading": "メニュー",
+    "closeAriaLabel": "メニューを閉じる",
+    "navigationLabel": "サイトメニュー",
+    "links": {
+      "map": {
+        "title": "ブースマップ",
+        "description": "展示作品の配置を確認！"
+      },
+      "crowd": {
+        "title": "ブースの混雑状況",
+        "description": "来場者数・混雑度合いをチェックできます"
+      },
+      "exhibitions": {
+        "title": "展示紹介",
+        "description": "三田祭に展示されている作品をまとめました"
+      },
+      "teams": {
+        "title": "班紹介",
+        "description": "KCSの班活動について"
+      }
+    },
+    "game": {
+      "title": "mita-oni",
+      "description": "鬼ごっこサイト",
+      "ariaLabel": "mita-oni 鬼ごっこサイト（新しいタブで開く）"
+    },
+    "officialSite": {
+      "title": "KCS公式サイト",
+      "ariaLabel": "KCS公式サイト（新しいタブで開く）"
+    },
+    "follow": "KCSをフォロー",
+    "social": {
+      "xAriaLabel": "KCS公式X（新しいタブで開く）",
+      "instagramAriaLabel": "KCS公式Instagram（新しいタブで開く）",
+      "youtubeAriaLabel": "KCS公式YouTube（新しいタブで開く）",
+      "githubAriaLabel": "KCS公式GitHub（新しいタブで開く）"
+    }
+  },
+  "localeSwitcher": {
+    "ariaLabel": "表示言語を選択",
+    "japanese": "日本語に切り替える",
+    "english": "英語に切り替える"
+  },
+  "checkin": {
+    "meta": {
+      "title": "チェックイン"
+    },
+    "errorHeading": "受付を完了できませんでした",
+    "errors": {
+      "busy": "ただいま受付が混み合っています。少し時間をおいて、もう一度お試しください。",
+      "forbidden": "受付ページを確認できませんでした。入口のQRコードからもう一度開いてください。",
+      "default": "チェックインを完了できませんでした。通信環境を確認して、もう一度お試しください。"
+    },
+    "retry": "受付を再試行",
+    "mapLink": "会場マップへ",
+    "progressHeading": "チェックインしています",
+    "progressStatus": "受付が終わるまで、このままお待ちください。"
+  },
+  "welcome": {
+    "meta": {
+      "title": "ようこそ"
+    },
+    "checkedInHeading": "チェックインしました！",
+    "defaultHeading": "KCSへようこそ！",
+    "visitorPrefix": "あなたは本日",
+    "visitorUnit": "人目",
+    "visitorSuffix": "の来場者です！",
+    "message": "三田祭KCSブースへのご来場、ありがとうございます！",
+    "receiptTime": "受付日時 {time}",
+    "mapLink": "会場マップへ",
+    "note": "展示マップから、各作品の詳細を見られます。"
+  },
+  "offlineBanner": {
+    "message": "オフラインです。表示中の情報は最後に取得したときのものです。"
+  },
+  "themeToggle": {
+    "ariaLabel": "ダークモード"
+  },
+  "exhibitions": {
+    "meta": {
+      "title": "展示作品"
+    },
+    "heading": "展示作品",
+    "description": "KCSのメンバーが制作しました！",
+    "loadError": "展示情報を読み込めませんでした。",
+    "reload": "再読み込み",
+    "loading": "展示作品を読み込んでいます…",
+    "resultCount": "{count} 件の作品",
+    "filterLabel": "班で絞り込む",
+    "allTeams": "すべて",
+    "empty": "展示情報はまだ登録されていません。",
+    "emptyForTeam": "この班の展示作品はまだありません。",
+    "teamsLink": "つくった人たちを知る · 班紹介 →"
+  },
+  "teams": {
+    "meta": {
+      "title": "班紹介"
+    },
+    "heading": "班紹介",
+    "description": "KCSの班活動について",
+    "loadError": "班の情報を読み込めませんでした。",
+    "reload": "再読み込み",
+    "workCountUnavailable": "作品数未取得",
+    "workCount": "{count} 作品",
+    "empty": "班の情報はまだ登録されていません。"
+  },
+  "crowd": {
+    "meta": {
+      "title": "来場者数・混雑状況"
+    },
+    "heading": "KCS ブースの混雑状況",
+    "loadError": "来場者数を取得できませんでした。",
+    "reload": "再読み込み",
+    "loading": "来場者数を読み込んでいます…",
+    "todayAttendance": "今日の来場者数",
+    "totalPeople": "人（延べ）",
+    "chart": {
+      "hourlyTitle": "時間別のチェックイン数",
+      "dailyTitle": "日別のチェックイン数",
+      "tabListLabel": "来場者数の集計単位",
+      "hourlyTab": "時間別",
+      "dailyTab": "日別",
+      "itemLabel": "{label}：{count}人",
+      "emptyHourly": "今日のチェックイン記録はまだありません。",
+      "emptyDaily": "チェックイン記録はまだありません。",
+      "todayCaption": "{date} 時点・直近7時間（日本時間）",
+      "dailyCaption": "直近7日間（日本時間）"
+    },
+    "estimate": {
+      "heading": "推定値について",
+      "method": "直近20分のチェックイン数を滞在人数として推定。",
+      "formula": "混雑率 = 推定人数 ÷ 定員40人 × 100%。",
+      "disclaimer": "実際の人数とは異なる場合があります。"
+    }
+  },
+  "crowdCard": {
+    "ariaLabel": "混雑状況",
+    "detailsAriaLabel": "来場状況を詳しく見る",
+    "levels": {
+      "relaxed": "ゆったり",
+      "moderate": "やや混雑",
+      "busy": "混雑"
+    },
+    "rate": "混雑度 {rate}%",
+    "rateLabel": "混雑度",
+    "estimateLabel": "混雑目安（推定）",
+    "capacity": "/ {count} 人",
+    "updatedAt": "{time} 更新（自動）",
+    "refreshInterval": "30秒ごとに更新",
+    "summary": "推定滞在人数 {visitors}人、推定混雑率 {rate}パーセント",
+    "loadingChip": "読み込み中",
+    "unavailableChip": "情報未取得",
+    "checking": "混雑情報を確認しています",
+    "loadError": "混雑情報を取得できません",
+    "retry": "もう一度読み込む",
+    "unavailableNote": "人数は未取得です。マップは利用できます。"
+  },
+  "exhibitionCard": {
+    "detailsAriaLabel": "{title}の詳細を見る",
+    "detailsWithLikesAriaLabel": "{title}の詳細を見る（いいね {count}件）",
+    "fallbackTeam": "展示作品",
+    "desk": "展示 {desk}",
+    "likesLabel": "いいね"
+  },
+  "exhibitionModal": {
+    "closeAriaLabel": "作品詳細を閉じる",
+    "worksAtDeskAriaLabel": "この机の作品",
+    "fallbackTeam": "班紹介",
+    "unavailable": "情報未取得",
+    "location": "所属班 {team} ／ 展示場所 {desk}",
+    "teamLoadError": "班の情報を取得できませんでした。",
+    "retryTeam": "班の情報を再読み込み",
+    "creatorHeading": "制作者より",
+    "noCreatorComment": "コメントはありません。",
+    "like": {
+      "areaAriaLabel": "作品を応援",
+      "thankYou": "ありがとう！",
+      "prompt": "いいね！で応援しよう",
+      "limitAriaLabel": "この作品を{limit}回応援しました",
+      "buttonAriaLabel": "この作品にいいね（{count} / {limit}回）",
+      "everyoneLikes": "みんなのいいね",
+      "sending": "送信中…",
+      "complete": "{limit}回の応援、ありがとうございました！",
+      "instruction": "1作品につき{limit}回までタップできます",
+      "personalSummary": "あなたのいいね {count} / {limit} 回。",
+      "offline": "オフラインのため送信できません。",
+      "storageUnavailable": "このブラウザでは回数を保存できません。再読み込みすると回数がリセットされます。",
+      "sendError": "いいねを送信できませんでした。もう一度試してください。"
+    }
+  },
+  "map": {
+    "meta": {
+      "title": "会場マップ"
+    },
+    "heading": "KCS ブースマップ",
+    "description": "机をタップすると作品の詳細が表示されます。",
+    "mapHeading": "展示マップ",
+    "tapDesk": "机をタップ",
+    "entrance": "入口 ↗",
+    "exit": "出口 ↗",
+    "preparing": "マップを準備しています",
+    "states": {
+      "loading": "読み込み中",
+      "unavailable": "情報未取得",
+      "unregistered": "未登録",
+      "notRetrieved": "未取得"
+    },
+    "workCount": "{count}作品",
+    "deskAria": "{label}、展示机{letter}、{countLabel}",
+    "deskAriaWithTitles": "{label}、展示机{letter}、{countLabel}：{titles}の詳細を見る",
+    "loadError": "展示情報を読み込めませんでした。",
+    "retry": "もう一度読み込む",
+    "loadingExhibitions": "展示情報を読み込んでいます…",
+    "empty": "展示情報はまだ登録されていません。"
+  },
+  "teamDetail": {
+    "fallbackTitle": "班紹介",
+    "backAriaLabel": "班一覧に戻る",
+    "loadError": "班の情報を読み込めませんでした。",
+    "reload": "再読み込み",
+    "worksHeading": "この班の作品",
+    "worksLoadError": "作品を読み込めませんでした。",
+    "emptyWorks": "この班の作品はまだ登録されていません。",
+    "notFound": "この班は見つかりませんでした。",
+    "teamsLink": "班一覧へ"
+  }
+}

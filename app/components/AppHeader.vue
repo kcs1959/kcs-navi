@@ -2,12 +2,19 @@
 const props = withDefaults(
   defineProps<{ title?: string; subtitle?: string; isMenuOpen?: boolean }>(),
   {
-    title: 'KCS Navi',
-    subtitle: '三田祭 2026',
     isMenuOpen: false,
   },
 )
 const emit = defineEmits<{ 'toggle-menu': [] }>()
+const route = useRoute()
+const { t } = useI18n()
+const displayTitle = computed(() => props.title ?? 'KCS Navi')
+const displaySubtitle = computed(() => props.subtitle ?? t('header.subtitle'))
+// 通常のチェックイン中は即座にPOSTするため操作を挟ませず、送信しないエラー画面では切替可能にする。
+// 成功時は遷移先のWelcome画面で切り替えられる。
+const showLocaleSwitcher = computed(
+  () => route.path !== '/checkin' || typeof route.query.error === 'string',
+)
 
 const headerSlot = ref<HTMLElement>()
 const header = ref<HTMLElement>()
@@ -53,7 +60,7 @@ onBeforeUnmount(() => {
 
 const externalLinks = [
   {
-    label: 'KCS公式サイト',
+    labelKey: 'header.officialSite',
     href: 'https://www.kcs1959.jp/',
     icon: '/figma/kcs_official_light.png',
   },
@@ -67,19 +74,19 @@ const externalLinks = [
     :style="isFloating ? { height: `${headerHeight}px` } : undefined"
   >
     <header ref="header" class="site-header" :class="{ 'is-floating': isFloating }">
-      <NuxtLink class="brand" to="/" aria-label="KCS Navi 会場マップへ">
+      <NuxtLink class="brand" to="/" :aria-label="t('header.brandAriaLabel')">
         <KcsLogo />
         <span class="brand-copy">
-          <strong>{{ title }}</strong>
-          <small v-if="subtitle">{{ subtitle }}</small>
+          <strong>{{ displayTitle }}</strong>
+          <small v-if="displaySubtitle">{{ displaySubtitle }}</small>
         </span>
       </NuxtLink>
-      <nav class="header-navigation" aria-label="共通ナビゲーション">
+      <nav class="header-navigation" :aria-label="t('header.navigationLabel')">
         <NuxtLink
           class="header-link"
           to="/"
-          aria-label="Home（会場マップ）"
-          title="Home（会場マップ）"
+          :aria-label="t('header.homeAriaLabel')"
+          :title="t('header.homeAriaLabel')"
         >
           <svg
             viewBox="0 0 24 24"
@@ -98,8 +105,8 @@ const externalLinks = [
           :href="link.href"
           target="_blank"
           rel="noopener noreferrer"
-          :aria-label="`${link.label}（新しいタブで開く）`"
-          :title="`${link.label}（新しいタブで開く）`"
+          :aria-label="t('header.externalLinkAriaLabel', { label: t(link.labelKey) })"
+          :title="t('header.externalLinkAriaLabel', { label: t(link.labelKey) })"
         >
           <img v-if="link.icon" :src="link.icon" alt="" width="22" height="22" />
           <svg
@@ -115,14 +122,15 @@ const externalLinks = [
             <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
           </svg>
         </a>
+        <LocaleSwitcher v-if="showLocaleSwitcher" class="header-locale-switcher" />
         <ThemeToggle />
         <button
           type="button"
           class="header-link menu-toggle-btn"
           :aria-expanded="props.isMenuOpen"
           aria-controls="menu-popup"
-          :aria-label="props.isMenuOpen ? 'メニューを閉じる' : 'メニューを開く'"
-          :title="props.isMenuOpen ? 'メニューを閉じる' : 'メニューを開く'"
+          :aria-label="props.isMenuOpen ? t('header.closeMenu') : t('header.openMenu')"
+          :title="props.isMenuOpen ? t('header.closeMenu') : t('header.openMenu')"
           @click="emit('toggle-menu')"
         >
           <img
@@ -198,6 +206,9 @@ const externalLinks = [
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+}
+.header-locale-switcher {
+  flex-shrink: 0;
 }
 .header-link,
 .menu-toggle-btn {
