@@ -26,7 +26,7 @@ const countWorks = (teamId: number) =>
       class="card team-card"
     >
       <div class="team-card-top">
-        <span class="chip">{{ team.name }}</span>
+        <h2>{{ team.name }}</h2>
         <span class="work-count"
           >{{
             countWorks(team.id) === null ? '作品数未取得' : `${countWorks(team.id)} 作品`
@@ -34,7 +34,6 @@ const countWorks = (teamId: number) =>
           →</span
         >
       </div>
-      <h2>{{ team.name }}</h2>
       <p>{{ team.description }}</p>
     </NuxtLink>
     <p v-if="data && !error && !data.teams.length" class="card text-muted">

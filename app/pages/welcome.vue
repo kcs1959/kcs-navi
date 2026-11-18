@@ -44,7 +44,6 @@ const receiptTime = computed(() =>
       <p class="welcome-message">三田祭KCSブースへのご来場、ありがとうございます！<br /></p>
       <span v-if="receiptTime" class="chip receipt-time">受付日時 {{ receiptTime }}</span>
       <NuxtLink to="/" class="primary-button map-button">会場マップへ</NuxtLink>
-      <p class="welcome-note">展示マップから、各作品の詳細を見られます。</p>
     </section>
   </div>
 </template>
@@ -102,13 +101,6 @@ const receiptTime = computed(() =>
 }
 .map-button {
   width: 100%;
-}
-.welcome-note {
-  margin: 0;
-  align-self: stretch;
-  font-size: 10px;
-  color: var(--muted);
-  line-height: 1.5;
 }
 .success-badge img {
   filter: var(--icon-filter);
