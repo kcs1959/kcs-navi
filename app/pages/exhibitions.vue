@@ -15,7 +15,8 @@ const {
   error: teamsError,
   refresh: refreshTeams,
 } = await useFetch<TeamsResponse>('/api/teams', { key: 'teams' })
-const teams = computed(() => teamData.value?.teams ?? [])
+// 班情報の取得に失敗したときは古い班データを使わず、絞り込みを解除して全作品を表示する。
+const teams = computed(() => (teamsError.value ? [] : (teamData.value?.teams ?? [])))
 const exhibitions = computed(() => works.value?.exhibitions ?? [])
 
 // 絞り込み状態はURLのクエリ (?team=班ID) に持たせ、再読み込みやリンク共有でも保持する。
@@ -37,9 +38,6 @@ const filteredExhibitions = computed(() =>
   selectedTeamId.value === null
     ? exhibitions.value
     : exhibitions.value.filter((work) => work.teamId === selectedTeamId.value),
-)
-const visibleExhibitions = computed(() =>
-  teamsError.value ? exhibitions.value : filteredExhibitions.value,
 )
 </script>
 
@@ -77,19 +75,19 @@ const visibleExhibitions = computed(() =>
           {{ option.name }}
         </button>
       </div>
-      <p class="result-count text-muted" role="status">{{ visibleExhibitions.length }} 件の作品</p>
+      <p class="result-count text-muted" role="status">{{ filteredExhibitions.length }} 件の作品</p>
       <ExhibitionCard
-        v-for="exhibition in visibleExhibitions"
+        v-for="exhibition in filteredExhibitions"
         :key="exhibition.id"
         :exhibition="exhibition"
         show-likes
-        :team="teamsError ? undefined : teams.find((team) => team.id === exhibition.teamId)"
+        :team="teams.find((team) => team.id === exhibition.teamId)"
         @select="openExhibition(exhibition)"
       />
       <div v-if="!exhibitions.length" class="card empty-state">
         <p>展示情報はまだ登録されていません。</p>
       </div>
-      <div v-else-if="!visibleExhibitions.length" class="card empty-state">
+      <div v-else-if="!filteredExhibitions.length" class="card empty-state">
         <p>この班の展示作品はまだありません。</p>
       </div>
       <NuxtLink class="teams-link" to="/teams">つくった人たちを知る →</NuxtLink>
