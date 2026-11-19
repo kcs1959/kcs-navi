@@ -47,13 +47,13 @@ export const boothMapLocations = [
 // スマホ幅（地図 約280〜350×500px、カード124×66px）向け。x の ±200 は左右端に寄せる指定で、
 // 上3段×2列（y≈12/86/160）・下2段（y≈340/414）に並べ、カード同士が重ならないようにする。
 export const boothMapCalloutOffsets: Partial<Record<string, { x: number; y: number }>> = {
-  'desk-b': { x: -200, y: -300 },
-  'desk-c': { x: 200, y: -300 },
-  'desk-a': { x: -200, y: -170 },
-  'desk-d': { x: 200, y: -206 },
-  'board-wall': { x: -200, y: -87 },
-  'desk-e': { x: 200, y: -144 },
+  'desk-b': { x: -200, y: -250 },
+  'desk-c': { x: 200, y: -250 },
+  'desk-a': { x: -200, y: -130 },
+  'desk-d': { x: 200, y: -166 },
+  'board-wall': { x: -200, y: -57 },
+  'desk-e': { x: 200, y: -104 },
   'desk-f': { x: -200, y: 54 },
-  smartphone: { x: 200, y: 19 },
+  'smartphone': { x: 200, y: 19 },
   'board-stand': { x: -56, y: 111 },
 }

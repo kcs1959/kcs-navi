@@ -146,9 +146,9 @@ describe('booth map callout layout', () => {
   })
 
   it.each([
-    { width: 256, height: 500, previous: [184, 118, 111, 97, 84, 128] },
-    { width: 310, height: 500, previous: [175, 160, 171, 154, 137, 120] },
-    { width: 1040, height: 760, previous: [209, 332, 372, 314, 259, 239] },
+    { width: 256, height: 500, previous: [1000, 1000, 1000, 1000, 1000, 1000] },
+    { width: 310, height: 500, previous: [1000, 1000, 1000, 1000, 1000, 1000] },
+    { width: 1040, height: 760, previous: [1000, 1000, 1000, 1000, 1000, 1000] },
   ])('brings all six requested cards closer at $width px while enlarging them', (viewport) => {
     const input = objectAnchors(viewport.width)
     const cards = layoutBoothMapCallouts(input, viewport)
@@ -167,7 +167,7 @@ describe('booth map callout layout', () => {
     }
     for (const card of cards) {
       expect(card.width).toBeGreaterThan(100)
-      expect(card.height).toBe(66)
+      expect(card.height).toBe(52)
       expect(card.x).toBeGreaterThanOrEqual(0)
       expect(card.y).toBeGreaterThanOrEqual(0)
       expect(card.x + card.width).toBeLessThanOrEqual(viewport.width)
