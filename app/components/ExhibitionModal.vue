@@ -82,9 +82,6 @@ function dismissBackdrop(event: MouseEvent) {
     <div class="detail-body">
       <div class="detail-heading">
         <div>
-          <p class="eyebrow">
-            EXHIBITION {{ exhibition.deskKey ? exhibition.deskKey.replace('desk-', '').toUpperCase() : '未割当' }}
-          </p>
           <h2 id="exhibition-title">{{ exhibition.title }}</h2>
         </div>
         <button

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { DeskKey } from '~~/shared/types'
+type LegacyDeskKey = Extract<DeskKey, 'desk-a' | 'desk-b' | 'desk-c'>
 
 defineProps<{
   desks: {
-    key: DeskKey
+    key: LegacyDeskKey
     number: string
     letter: string
     label: string
@@ -16,7 +17,7 @@ defineEmits<{ select: [key: DeskKey] }>()
 
 const symbolId = useId()
 // リリース時の固定配置。机の移動はこの座標だけで調整する。
-const positions: Record<DeskKey, { x: number; y: number }> = {
+const positions: Record<LegacyDeskKey, { x: number; y: number }> = {
   'desk-a': { x: 60, y: 240 },
   'desk-b': { x: 235, y: 30 },
   'desk-c': { x: 270, y: 275 },
@@ -33,7 +34,7 @@ const chairLegs = [
   [0, 28],
   [30, 28],
 ] as const
-function labelPosition(key: DeskKey) {
+function labelPosition(key: LegacyDeskKey) {
   const { x, y } = positions[key]
   return {
     left: `${((330 + (x + 66 - y - 34) * 0.75) / 720) * 100}%`,

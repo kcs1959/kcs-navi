@@ -2,7 +2,7 @@
 
 [requirements.md](requirements.md) の**第3節「開発スコープ」を優先**する。Cloudflare D1（SQLite）を使用し、4テーブルで構成する。旧案のPostgreSQL、`desks`、制作者名の独立項目、利用者ID・識別Cookieは採用しない。
 
-スキーマの実装上の定義は [0001_create_exhibitions.sql](../migrations/0001_create_exhibitions.sql)。本書およびSQLファイルの作成のみを行い、マイグレーション・シードの実行は開発者が行う。
+スキーマの実装上の定義は [migrations](../migrations/) の連番SQL。9枠への拡張は [0004_expand_exhibition_desk_keys.sql](../migrations/0004_expand_exhibition_desk_keys.sql) に定義する。本書およびSQLファイルの作成のみを行い、マイグレーション・シードの実行は開発者が行う。
 
 ## テーブル・関連
 
@@ -15,11 +15,25 @@
 
 `teams.id → exhibitions.team_id` は1対多、`exhibitions.id → likes.exhibition_id` は1対多。チェックインは作品・班に紐づけない。`INTEGER PRIMARY KEY` はSQLiteの自動採番を使用する。
 
-机の座標・識別子はアプリケーションの固定設定で管理し、`desk_key` は `desk-a`、`desk-b`、`desk-c` のいずれか。表示名はD1に登録した班名・作品名から組み立てる。1つの机に複数作品を表示できるよう、`desk_key` に一意制約は設けない。制作者名を載せるときは、登録者が `creator_comment` の本文に含める。
+地図上の座標・識別子はアプリケーションの固定設定で管理し、`desk_key` は `desk-a`〜`desk-i` の9キー、または未割当の `NULL`。フロントエンドの固定ID（desk_id）は既存のDB列 `desk_key`、API項目 `deskKey` と同じ値を使う。表示名はD1に登録した班名・作品名から組み立てる。1つの場所に複数作品を表示できるよう、`desk_key` に一意制約は設けない。
+
+| `desk_key` | 地図上の対応箇所 |
+| ---------- | ---------------- |
+| `desk-a` | 長い壁沿いの机1（左端） |
+| `desk-b` | 長い壁沿いの机2 |
+| `desk-c` | 長い壁沿いの机3 |
+| `desk-d` | 長い壁沿いの机4 |
+| `desk-e` | 長い壁沿いの机5（右端） |
+| `desk-f` | 左壁の白いパネルの左隣の机 |
+| `desk-g` | 左壁のホワイトボード |
+| `desk-h` | 自立式ホワイトボード |
+| `desk-i` | 人が持つスマートフォン |
+
+0004は既存の作品割当を変更せず、作品・いいねのIDといいね日時を保持する。D1では外部キーを無効化できず、外部キー検査の延期だけでも `ON DELETE CASCADE` は止まらないため、作品といいねの両テーブルをコピーし、旧いいねテーブルを先に破棄してから差し替える。[D1の外部キー仕様](https://developers.cloudflare.com/d1/sql-api/foreign-keys/)、[CASCADEと検査延期](https://developers.cloudflare.com/d1/sql-api/sql-statements/#pragma-defer_foreign_keys--onoff) を参照。
 
 ## 制約・インデックス
 
-主キー以外の全カラムを `NOT NULL` とする。
+主キー以外のカラムは原則 `NOT NULL` とし、`exhibitions.desk_key` は未割当時に `NULL` を許可する。
 
 | 対象                          | 制約                                                                       |
 | ----------------------------- | -------------------------------------------------------------------------- |
@@ -27,7 +41,7 @@
 | `teams.name`                  | 1〜100文字                                                                 |
 | `teams.description`           | 1〜5,000文字                                                               |
 | `exhibitions.team_id`         | 外部キー、班削除は `ON DELETE RESTRICT`                                    |
-| `exhibitions.desk_key`        | 固定3キーの `CHECK`                                                        |
+| `exhibitions.desk_key`        | 固定9キーの `CHECK`、未割当時は `NULL`                                     |
 | `exhibitions.title`           | 1〜200文字                                                                 |
 | `exhibitions.description`     | 1〜10,000文字                                                              |
 | `exhibitions.creator_comment` | 0〜5,000文字                                                               |

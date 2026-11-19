@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import * as THREE from 'three'
 import type { DeskKey } from '~~/shared/types'
+import { boothMapLocations } from '~~/shared/boothMap'
+import { layoutBoothMapCallouts, type BoothMapCalloutAnchor } from '~/utils/boothMapCalloutLayout'
 import {
   createBoothDesk,
   createBoothVisitor,
@@ -8,8 +10,7 @@ import {
   type BoothModelMaterials,
 } from '~/utils/boothMapModels'
 
-// 展示説明は次の段階で接続する。既存マップと同じデータ・選択イベントを受け継ぐ。
-defineProps<{
+const props = defineProps<{
   desks: {
     key: DeskKey
     number: string
@@ -18,13 +19,64 @@ defineProps<{
     count: number | null
     countLabel: string
     titles: string
+    title?: string
+    description?: string
   }[]
 }>()
 const emit = defineEmits<{ select: [key: DeskKey]; ready: [] }>()
 
 const viewport = useTemplateRef('viewport')
+const mapRoot = useTemplateRef('mapRoot')
 const webglFailed = ref(false)
 const { theme } = useTheme()
+const mapSize = ref({ width: 0, height: 0 })
+const projectedAnchors = shallowRef<BoothMapCalloutAnchor[]>([])
+const calloutsVisible = ref(false)
+const reducedMotion = ref(false)
+const calloutInsets = computed(() => {
+  const labels = layoutBoothMapCallouts(
+    boothMapLocations.map(({ deskId, side }) => ({ id: deskId, side, x: 0, y: 0 })),
+    mapSize.value,
+  )
+  if (!labels.length) return { top: 16, bottom: 16 }
+  return {
+    top:
+      Math.max(
+        ...labels.filter((label) => label.side === 'top').map((label) => label.y + label.height),
+      ) + 18,
+    bottom:
+      mapSize.value.height -
+      Math.min(...labels.filter((label) => label.side === 'bottom').map((label) => label.y)) +
+      18,
+  }
+})
+const calloutItems = computed(() =>
+  boothMapLocations.map((location) => {
+    const desk = props.desks.find((item) => item.key === location.deskId)
+    const count = desk?.count ?? null
+    return {
+      id: location.deskId,
+      title: desk?.title || location.label,
+      description:
+        desk?.description ||
+        (count === 0
+          ? '展示情報はまだ登録されていません'
+          : count === null
+            ? desk?.countLabel === '未取得'
+              ? '展示情報を取得できませんでした'
+              : '展示情報を読み込み中'
+            : '作品の詳細を見る'),
+      actionLabel: `${location.label}：${desk?.titles || location.label}${count ? 'の詳細を見る' : ''}`,
+      disabled: !count,
+      countLabel: count && count > 1 ? `${count}作品` : undefined,
+    }
+  }),
+)
+
+function selectCallout(id: string) {
+  const desk = props.desks.find((item) => item.key === id)
+  if (desk?.count) emit('select', desk.key)
+}
 
 // 写真の、横長の床と奥・左の2面の壁。寸法・カメラはここで調整する。
 const roomSize = { width: 12, depth: 7.5, height: 3.2, thickness: 0.16 }
@@ -41,7 +93,7 @@ const deskPlacements = [
   { id: 'panel-side-desk', x: -4.95, z: 2.3, rotation: Math.PI / 2 },
 ]
 const visitorPlacement = { x: roomSize.width / 2 - 2, z: roomSize.depth / 2 - 3 }
-const boardPlacement = { x: 1.2, z: 2, rotation: Math.PI * 1.7 / 3 }
+const boardPlacement = { x: 1.2, z: 2, rotation: (Math.PI * 1.7) / 3 }
 
 let renderer: THREE.WebGLRenderer | undefined
 let scene: THREE.Scene | undefined
@@ -49,9 +101,10 @@ let resizeObserver: ResizeObserver | undefined
 let motionPreference: MediaQueryList | undefined
 let finishIntro: (() => void) | undefined
 let stopThemeWatch: (() => void) | undefined
+let resizeScene: (() => void) | undefined
+let projectFallback: (() => void) | undefined
 
-function disposeScene() {
-  resizeObserver?.disconnect()
+function disposeGraphics() {
   motionPreference?.removeEventListener('change', onMotionChange)
   stopThemeWatch?.()
   renderer?.setAnimationLoop(null)
@@ -76,21 +129,59 @@ function disposeScene() {
   renderer?.domElement.remove()
 }
 
+function disposeScene() {
+  resizeObserver?.disconnect()
+  disposeGraphics()
+}
+
 function onContextLost(event: Event) {
   event.preventDefault()
   renderer?.setAnimationLoop(null)
   webglFailed.value = true
+  calloutsVisible.value = true
+  void nextTick(() => projectFallback?.())
 }
 
 function onMotionChange(event: MediaQueryListEvent) {
-  if (event.matches) finishIntro?.()
+  reducedMotion.value = event.matches
+  if (event.matches && !webglFailed.value) finishIntro?.()
 }
 
 onMounted(async () => {
   // Nuxtの.clientコンポーネントはマウント後の更新でテンプレートを描画する。
   await nextTick()
   const host = viewport.value
-  if (!host) return
+  const root = mapRoot.value
+  if (!host || !root) return
+
+  const fallbackPoints: { id: DeskKey; side: 'top' | 'bottom'; point: THREE.Vector3 }[] = []
+  projectFallback = () => {
+    const svg = root.querySelector('.room-fallback svg')
+    if (!svg) return
+    const rect = svg.getBoundingClientRect()
+    const parent = root.getBoundingClientRect()
+    const scale = Math.min(rect.width / 720, rect.height / 500)
+    const offsetX = rect.left - parent.left + (rect.width - 720 * scale) / 2
+    const offsetY = rect.top - parent.top + (rect.height - 500 * scale) / 2
+    projectedAnchors.value = fallbackPoints.map(({ id, side, point }) => ({
+      id,
+      side,
+      x: offsetX + (360 + (point.x * 382) / 12 - (point.z * 202) / 7.5) * scale,
+      y:
+        offsetY +
+        (301 + (point.x * 164) / 12 + (point.z * 126) / 7.5 - (point.y * 136) / 3.2) * scale,
+    }))
+  }
+  // WebGLが使えなくても、全体図の吹き出しはリサイズに追従させる。
+  function syncSize() {
+    const { width, height } = root!.getBoundingClientRect()
+    mapSize.value = { width, height }
+    if (webglFailed.value) projectFallback?.()
+    else resizeScene?.()
+  }
+  syncSize()
+  resizeObserver = new ResizeObserver(syncSize)
+  resizeObserver.observe(root)
 
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
@@ -194,6 +285,37 @@ onMounted(async () => {
     furnishings.push(visitor)
     room.add(...furnishings)
 
+    const calloutAnchors = boothMapLocations.map((location) => {
+      let object: THREE.Object3D
+      const point = new THREE.Vector3()
+      if (location.objectId === 'whiteboard') {
+        object = board.getObjectByName('board-surface')!
+      } else if (location.objectId === 'smartphone') {
+        object = visitor.getObjectByName('phone-body')!
+      } else {
+        object = room.getObjectByName(location.objectId)!
+        if (location.objectId.includes('desk')) point.y = 0.88
+      }
+      return { id: location.deskId, side: location.side, object, point }
+    })
+    // 代替SVGでも、同じ物体の同じ点から線を伸ばす。
+    room.updateMatrixWorld(true)
+    calloutAnchors.forEach(({ id, side, object, point }) => {
+      fallbackPoints.push({ id, side, point: object.localToWorld(point.clone()) })
+    })
+    function projectCallouts() {
+      room.updateMatrixWorld(true)
+      projectedAnchors.value = calloutAnchors.map(({ id, side, object, point }) => {
+        const projected = object.localToWorld(point.clone()).project(camera)
+        return {
+          id,
+          side,
+          x: ((projected.x + 1) / 2) * mapSize.value.width,
+          y: ((1 - projected.y) / 2) * mapSize.value.height,
+        }
+      })
+    }
+
     const shadowMaterial = material('--ink')
     shadowMaterial.transparent = true
     shadowMaterial.opacity = 0.08
@@ -233,17 +355,27 @@ onMounted(async () => {
     function resize() {
       const { width: hostWidth, height: hostHeight } = host!.getBoundingClientRect()
       if (!hostWidth || !hostHeight) return
+      const { top: topInset, bottom: bottomInset } = calloutInsets.value
+      const availableHeight = Math.max(80, hostHeight - topInset - bottomInset)
+      const unitsPerPixel =
+        Math.max(
+          projectedSize.x / Math.max(80, hostWidth - 28),
+          projectedSize.y / availableHeight,
+        ) * 1.08
+      const halfHeight = (unitsPerPixel * hostHeight) / 2
       const aspect = hostWidth / hostHeight
-      const halfHeight = Math.max(projectedSize.y / 2, projectedSize.x / (2 * aspect)) * 1.13
+      const centerY = projectedCenter.y + ((topInset - bottomInset) / 2) * unitsPerPixel
       camera.left = projectedCenter.x - halfHeight * aspect
       camera.right = projectedCenter.x + halfHeight * aspect
-      camera.top = projectedCenter.y + halfHeight
-      camera.bottom = projectedCenter.y - halfHeight
+      camera.top = centerY + halfHeight
+      camera.bottom = centerY - halfHeight
       camera.updateProjectionMatrix()
       view.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
       view.setSize(hostWidth, hostHeight)
       view.render(world, camera)
+      if (calloutsVisible.value) projectCallouts()
     }
+    resizeScene = resize
 
     finishIntro = () => {
       room.rotation.y = 0
@@ -256,13 +388,14 @@ onMounted(async () => {
       shadowMaterial.opacity = 0.08
       view.setAnimationLoop(null)
       view.render(world, camera)
+      projectCallouts()
+      calloutsVisible.value = true
     }
     motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
+    reducedMotion.value = motionPreference.matches
     motionPreference.addEventListener('change', onMotionChange)
     applyPalette()
     resize()
-    resizeObserver = new ResizeObserver(resize)
-    resizeObserver.observe(host)
     stopThemeWatch = watch(theme, applyPalette, { flush: 'post' })
 
     if (motionPreference.matches) {
@@ -308,8 +441,35 @@ onMounted(async () => {
     }
     emit('ready')
   } catch {
-    disposeScene()
+    disposeGraphics()
     webglFailed.value = true
+    // WebGL初期化前に失敗した場合の、最終配置のアンカー。
+    if (!fallbackPoints.length) {
+      boothMapLocations.forEach((location) => {
+        const desk = deskPlacements.find((placement) => placement.id === location.objectId)
+        let point: THREE.Vector3
+        if (desk) point = new THREE.Vector3(desk.x, 0.88, desk.z)
+        else if (location.objectId === 'wall-whiteboard')
+          point = new THREE.Vector3(-5.81, 1.9, -0.55)
+        else if (location.objectId === 'whiteboard')
+          point = new THREE.Vector3(
+            boardPlacement.x + Math.sin(boardPlacement.rotation) * 0.059,
+            1.705,
+            boardPlacement.z + Math.cos(boardPlacement.rotation) * 0.059,
+          )
+        else
+          point = new THREE.Vector3(
+            visitorPlacement.x + Math.sin(-Math.PI / 7) * 0.445,
+            1.1,
+            visitorPlacement.z + Math.cos(-Math.PI / 7) * 0.445,
+          )
+        fallbackPoints.push({ id: location.deskId, side: location.side, point })
+      })
+    }
+    reducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    await nextTick()
+    projectFallback()
+    calloutsVisible.value = true
     emit('ready')
   }
 })
@@ -318,7 +478,7 @@ onBeforeUnmount(disposeScene)
 </script>
 
 <template>
-  <div class="room-map-3d">
+  <div ref="mapRoot" class="room-map-3d">
     <div
       v-show="!webglFailed"
       ref="viewport"
@@ -331,6 +491,16 @@ onBeforeUnmount(disposeScene)
       :desks="deskPlacements"
       :visitor="visitorPlacement"
       :board="boardPlacement"
+      :style="{ paddingTop: `${calloutInsets.top}px`, paddingBottom: `${calloutInsets.bottom}px` }"
+    />
+    <BoothMapCallouts
+      :items="calloutItems"
+      :anchors="projectedAnchors"
+      :width="mapSize.width"
+      :height="mapSize.height"
+      :visible="calloutsVisible"
+      :reduced-motion="reducedMotion"
+      @select="selectCallout"
     />
   </div>
 </template>

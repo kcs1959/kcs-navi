@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { deskKeys, type ExhibitionsResponse, type TeamsResponse } from '~~/shared/types'
+import { boothMapLocations } from '~~/shared/boothMap'
 
 useHead({ title: '会場マップ' })
 const { data, error, status, refresh } = await useFetch<ExhibitionsResponse>('/api/exhibitions', {
@@ -44,6 +45,9 @@ const desks = computed(() =>
       countLabel:
         count === null ? (status.value === 'pending' ? '読み込み中' : '未取得') : `${count}作品`,
       titles: works.map((work) => work.title).join('、'),
+      title:
+        works[0]?.title ?? boothMapLocations.find((location) => location.deskId === key)?.label,
+      description: works[0]?.description ?? '',
     }
   }),
 )
@@ -57,7 +61,7 @@ function selectDesk(key: string) {
     <PageHeading
       eyebrow="EXPLORE KCS"
       title="KCS ブースマップ"
-      description="机をタップすると作品の詳細が表示されます。"
+      description="吹き出しをタップすると作品の詳細が表示されます。"
     />
     <CrowdCard
       :stats="stats"
@@ -65,7 +69,7 @@ function selectDesk(key: string) {
       :loading="statsStatus === 'pending'"
       @retry="refreshStats()"
     />
-    <section class="card booth-map" aria-labelledby="map-title" :aria-busy="mapLoading">
+    <section class="card booth-map" aria-label="展示マップ" :aria-busy="mapLoading">
       <div class="map-heading">
         <span class="chip lemon">三田キャンパス 院校舎 345A教室</span>
       </div>
@@ -113,7 +117,7 @@ function selectDesk(key: string) {
 .map-surface {
   position: relative;
   border-radius: 20px;
-  height: clamp(380px, 60vw, 640px);
+  height: clamp(500px, 65vw, 760px);
 }
 .map-footer {
   display: flex;

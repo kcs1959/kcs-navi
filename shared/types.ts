@@ -1,5 +1,15 @@
-// The map is fixed in code; these keys connect its buttons to D1 exhibition rows.
-export const deskKeys = ['desk-a', 'desk-b', 'desk-c'] as const
+// 教室の机は固定する。
+export const deskKeys = [
+  'desk-a',
+  'desk-b',
+  'desk-c',
+  'desk-d',
+  'desk-e',
+  'desk-f',
+  'board-wall',
+  'board-stand',
+  'smartphone',
+] as const
 export type DeskKey = (typeof deskKeys)[number]
 
 export interface Team {
