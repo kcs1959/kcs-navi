@@ -41,7 +41,7 @@ const deskPlacements = [
   { id: 'panel-side-desk', x: -4.95, z: 2.3, rotation: Math.PI / 2 },
 ]
 const visitorPlacement = { x: roomSize.width / 2 - 2, z: roomSize.depth / 2 - 3 }
-const boardPlacement = { x: -0.9, z: 1.35, rotation: Math.PI / 2 }
+const boardPlacement = { x: 1.2, z: 2, rotation: Math.PI * 1.7 / 3 }
 
 let renderer: THREE.WebGLRenderer | undefined
 let scene: THREE.Scene | undefined

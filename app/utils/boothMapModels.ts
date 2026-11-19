@@ -179,14 +179,14 @@ export function createBoothVisitor(materials: BoothModelMaterials): THREE.Group 
   return visitor
 }
 
-/** 表が+zを向く自立式ホワイトボード。脚を含む高さ2.0。 */
+/** 表が+zを向く縦長の自立式ホワイトボード。脚を含む高さ2.63。 */
 export function createBoothWhiteboard(materials: BoothModelMaterials): THREE.Group {
   const whiteboard = new THREE.Group()
   whiteboard.name = 'whiteboard'
-  addBox(whiteboard, 'base', materials.frame, [0.8, 0.065, 0.65], [0, 0.0325, 0])
+  addBox(whiteboard, 'base', materials.frame, [1.22, 0.065, 0.24], [0, 0.0325, 0])
   addBox(whiteboard, 'central-post', materials.frame, [0.085, 0.9, 0.085], [0, 0.515, 0])
-  addBox(whiteboard, 'board-frame', materials.frame, [1.85, 1.22, 0.095], [0, 1.39, 0])
-  addBox(whiteboard, 'board-surface', materials.board, [1.74, 1.11, 0.025], [0, 1.39, 0.059])
-  addBox(whiteboard, 'pen-tray', materials.frame, [1.72, 0.04, 0.16], [0, 0.785, 0.1])
+  addBox(whiteboard, 'board-frame', materials.frame, [1.22, 1.85, 0.095], [0, 1.705, 0])
+  addBox(whiteboard, 'board-surface', materials.board, [1.11, 1.74, 0.025], [0, 1.705, 0.059])
+  addBox(whiteboard, 'pen-tray', materials.frame, [1.09, 0.04, 0.16], [0, 0.785, 0.1])
   return whiteboard
 }
