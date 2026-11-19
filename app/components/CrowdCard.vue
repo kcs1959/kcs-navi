@@ -94,7 +94,7 @@ const updatedAt = computed(() =>
 .crowd-card:has(a:hover) {
   border-color: var(--orange);
 }
-/* 絵文字＋ラベル＋割合を1枚のパネルにまとめ、レベルごとの淡いグラデーションと
+/* 絵文字＋ラベル＋割合を1枚のパネルにまとめ、レベルごとのグラデーションと
    ラベル文字色で「空き=緑系・普通=黄系・混み=赤系」の印象を伝える。 */
 .status {
   display: flex;
@@ -102,27 +102,34 @@ const updatedAt = computed(() =>
   gap: 14px;
   padding: 14px 18px;
   border-radius: 18px;
+  background: linear-gradient(135deg, var(--status-tint), var(--white));
 }
 .status.relaxed {
-  background: linear-gradient(135deg, #eafbf1, var(--white));
+  --status-tint: #eafbf1;
+  --status-label-color: #2f8f5b;
 }
 .status.moderate {
-  background: linear-gradient(135deg, #fff7e0, var(--white));
+  --status-tint: #fff7e0;
+  --status-label-color: #b9790a;
 }
 .status.busy {
-  background: linear-gradient(135deg, #ffe9e4, var(--white));
+  --status-tint: #ffe9e4;
+  --status-label-color: #d1483f;
 }
 .status.neutral {
   background: var(--paper);
 }
-.status.relaxed .status-label {
-  color: #2f8f5b;
+html[data-theme='dark'] .status.relaxed {
+  --status-tint: #20392d;
+  --status-label-color: #8ee0b1;
 }
-.status.moderate .status-label {
-  color: #b9790a;
+html[data-theme='dark'] .status.moderate {
+  --status-tint: #44351d;
+  --status-label-color: #ffd783;
 }
-.status.busy .status-label {
-  color: #d1483f;
+html[data-theme='dark'] .status.busy {
+  --status-tint: #482c29;
+  --status-label-color: #ffaaa0;
 }
 .status-emoji {
   font-size: 38px;
@@ -136,6 +143,7 @@ const updatedAt = computed(() =>
   min-width: 0;
 }
 .status-label {
+  color: var(--status-label-color, inherit);
   font-size: 19px;
   font-weight: 800;
   line-height: 1.3;
