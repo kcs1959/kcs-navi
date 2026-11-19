@@ -80,7 +80,7 @@ export function layoutBoothMapCallouts(
     ...bottomRows.map((row) => row.length),
   )
   const cardWidth = Math.min(desiredWidth, (availableWidth - gap * (widestRow - 1)) / widestRow)
-  const cardHeight = Math.min(66, (height - margin * 2 - gap * (totalRows - 1)) / totalRows)
+  const cardHeight = Math.min(52, (height - margin * 2 - gap * (totalRows - 1)) / totalRows)
   const bottomStart = height - margin - bottomRows.length * (cardHeight + gap) + gap
   const result: BoothMapCalloutLayout[] = []
 

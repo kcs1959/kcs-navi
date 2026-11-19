@@ -123,9 +123,9 @@ const callouts = computed(() => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 3px;
-  min-height: 44px;
-  padding: 10px 12px;
+  gap: 2px;
+  min-height: 40px;
+  padding: 6px 12px;
   border: 1px solid var(--line);
   border-radius: 13px;
   background: var(--glass);
