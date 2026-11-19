@@ -229,9 +229,20 @@ const externalLinks = [
   }
 }
 @media (max-width: 599px) {
+  .site-header {
+    flex-wrap: nowrap;
+  }
   .header-navigation {
-    width: 100%;
+    width: auto;
+    flex-wrap: nowrap;
     justify-content: flex-end;
+    gap: 2px;
+  }
+  .brand-copy strong {
+    font-size: 16px;
+  }
+  .brand-copy small {
+    font-size: 9px;
   }
 }
 @media (max-width: 359px) {
