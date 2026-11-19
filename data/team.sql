@@ -1,5 +1,3 @@
--- KCS公式サイトの班紹介をもとにした班データ。
--- 本番データベースへの投入は行わない。
 INSERT INTO teams (id, key, name, description) VALUES
   (1, 'ai', 'AI班', 'TensorFlowやPyTorchを用いた深層学習の開発や、機械学習の理論を学んでいます。部内AIコンペ、共同開発、上級生による新入生教育などを行っています。'),
   (2, 'web', 'Web班', 'HTML/CSS/JavaScriptのフロントエンド開発、PHP/Pythonのバックエンド開発を通して、Web技術やチーム開発フローを学びます。'),
