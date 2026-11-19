@@ -30,7 +30,7 @@ useHead(() => ({ title: team.value?.name ?? '班紹介' }))
       <NuxtLink to="/teams" class="back-button" aria-label="班一覧に戻る">
         <img src="/figma/team-icon-arrow-left.svg" alt="" width="22" height="22" />
       </NuxtLink>
-      <PageHeading eyebrow="MEET THE TEAM" :title="team?.name ?? '班紹介'" />
+      <PageHeading :title="team?.name ?? '班紹介'" />
     </div>
     <div v-if="error" class="error-card" role="alert">
       <p>班の情報を読み込めませんでした。</p>

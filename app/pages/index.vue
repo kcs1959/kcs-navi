@@ -59,7 +59,6 @@ function selectDesk(key: string) {
 <template>
   <div class="page-content map-page">
     <PageHeading
-      eyebrow="EXPLORE KCS"
       title="KCS ブースマップ"
       description="吹き出しをタップすると作品の詳細が表示されます。"
     />
