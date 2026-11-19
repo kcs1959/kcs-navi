@@ -27,6 +27,7 @@ defineEmits<{ select: [] }>()
       ><span v-if="exhibition.deskKey">展示 {{ exhibition.deskKey.replace('desk-', '').toUpperCase() }}</span></span
     >
     <strong class="work-title">{{ exhibition.title }}</strong>
+    <span v-if="exhibition.creator" class="work-creator">By: {{ exhibition.creator }}</span>
     <span v-if="showDescription" class="work-description">{{ exhibition.description }}</span>
     <span v-if="showLikes" class="work-likes" aria-hidden="true">
       <strong>{{ likes.toLocaleString('ja-JP') }}</strong>
@@ -80,6 +81,12 @@ defineEmits<{ select: [] }>()
 }
 .work-title {
   font-size: 18px;
+}
+.work-creator {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+  opacity: 0.8;
 }
 .work-description {
   color: var(--muted);
