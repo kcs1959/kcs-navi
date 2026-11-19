@@ -3,6 +3,7 @@ import {
   layoutBoothMapCallouts,
   type BoothMapCalloutAnchor,
 } from '../../app/utils/boothMapCalloutLayout'
+import { boothMapCalloutOffsets, boothMapLocations } from '../../shared/boothMap'
 
 function anchors(): BoothMapCalloutAnchor[] {
   return Array.from({ length: 9 }, (_, index) => ({
@@ -188,5 +189,80 @@ describe('booth map callout layout', () => {
     const cards = layoutBoothMapCallouts(input, { width: 310, height: 500 })
     expect(cards).toHaveLength(3)
     expect(cards.every((card) => card.side === 'top' && card.y + card.height < 180)).toBe(true)
+  })
+})
+
+describe('booth map callout offsets on phones', () => {
+  // 実機相当のブラウザで計測したアンカー座標（地図の高さは500px）。
+  const measured = {
+    280: {
+      'desk-a': [110, 258],
+      'desk-b': [139, 269],
+      'desk-c': [168, 280],
+      'board-wall': [71, 250],
+      'desk-d': [197, 290],
+      'desk-e': [226, 301],
+      'desk-f': [53, 285],
+      'board-stand': [135, 301],
+      smartphone: [176, 316],
+    },
+    310: {
+      'desk-a': [121, 256],
+      'desk-b': [154, 268],
+      'desk-c': [186, 280],
+      'board-wall': [78, 247],
+      'desk-d': [219, 292],
+      'desk-e': [252, 304],
+      'desk-f': [58, 286],
+      'board-stand': [149, 303],
+      smartphone: [195, 321],
+    },
+    350: {
+      'desk-a': [136, 252],
+      'desk-b': [173, 265],
+      'desk-c': [211, 279],
+      'board-wall': [87, 242],
+      'desk-d': [248, 293],
+      'desk-e': [286, 306],
+      'desk-f': [64, 287],
+      'board-stand': [169, 306],
+      smartphone: [221, 326],
+    },
+  } as const
+
+  it.each(Object.keys(measured).map(Number))('keeps all nine cards apart at %i px', (width) => {
+    const input = boothMapLocations.map((location) => {
+      const [x, y] = measured[width as keyof typeof measured][location.deskId]
+      return {
+        id: location.deskId,
+        side: location.side,
+        inset: location.inset,
+        x,
+        y,
+        offset: boothMapCalloutOffsets[location.deskId],
+      }
+    })
+    const cards = layoutBoothMapCallouts(input, { width, height: 500 })
+    expect(cards).toHaveLength(9)
+    cards.forEach((card, index) => {
+      expect(card.x).toBeGreaterThanOrEqual(0)
+      expect(card.x + card.width).toBeLessThanOrEqual(width)
+      for (const other of cards.slice(index + 1)) {
+        const overlaps =
+          card.x < other.x + other.width &&
+          card.x + card.width > other.x &&
+          card.y < other.y + other.height &&
+          card.y + card.height > other.y
+        expect(overlaps, `${card.id} overlaps ${other.id}`).toBe(false)
+      }
+      for (const anchor of input.filter((item) => item.id !== card.id)) {
+        const covers =
+          anchor.x >= card.x &&
+          anchor.x <= card.x + card.width &&
+          anchor.y >= card.y &&
+          anchor.y <= card.y + card.height
+        expect(covers, `${card.id} covers ${anchor.id}`).toBe(false)
+      }
+    })
   })
 })

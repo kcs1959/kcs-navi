@@ -74,6 +74,11 @@ const calloutItems = computed(() =>
   }),
 )
 
+// 手動オフセットはスマホ幅向けの値のため、それより広い画面では自動配置にする。
+function calloutOffset(id: string) {
+  return mapSize.value.width < 480 ? boothMapCalloutOffsets[id] : undefined
+}
+
 function selectCallout(id: string) {
   const desk = props.desks.find((item) => item.key === id)
   if (desk?.count) emit('select', desk.key)
@@ -173,7 +178,7 @@ onMounted(async () => {
       id,
       side,
       inset,
-      offset: boothMapCalloutOffsets[id],
+      offset: calloutOffset(id),
       x: offsetX + (360 + (point.x * 382) / 12 - (point.z * 202) / 7.5) * scale,
       y:
         offsetY +
@@ -329,7 +334,7 @@ onMounted(async () => {
           id,
           side,
           inset,
-          offset: boothMapCalloutOffsets[id],
+          offset: calloutOffset(id),
           x: ((projected.x + 1) / 2) * mapSize.value.width,
           y: ((1 - projected.y) / 2) * mapSize.value.height,
         }

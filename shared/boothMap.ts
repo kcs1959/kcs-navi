@@ -43,15 +43,17 @@ export const boothMapLocations = [
   inset: boolean
 }[]
 
-// 吹き出しカードのアンカーからの相対位置 (px)。空なら自動配置。
+// 吹き出しカードのアンカーからの相対位置 (px)。空なら自動配置。地図幅480px未満でのみ適用する。
+// スマホ幅（地図 約280〜350×500px、カード124×66px）向け。x の ±200 は左右端に寄せる指定で、
+// 上3段×2列（y≈12/86/160）・下2段（y≈340/414）に並べ、カード同士が重ならないようにする。
 export const boothMapCalloutOffsets: Partial<Record<string, { x: number; y: number }>> = {
-  'desk-a': {x: -20, y: -300},
-  'desk-b': {x: 0, y: -220},
-  'desk-c': {x: 0, y: -175},
-  'desk-d': {x: 0, y: -120},
-  'desk-e': {x: 0, y: -80},
-  'desk-f': { x: 40, y: 40 },
-  'board-wall': { x: -200, y: -150 },
-  'board-stand': { x: -275, y: 100},
-  'smartphone': { x: -200, y: 100},
+  'desk-b': { x: -200, y: -300 },
+  'desk-c': { x: 200, y: -300 },
+  'desk-a': { x: -200, y: -170 },
+  'desk-d': { x: 200, y: -206 },
+  'board-wall': { x: -200, y: -87 },
+  'desk-e': { x: 200, y: -144 },
+  'desk-f': { x: -200, y: 54 },
+  smartphone: { x: 200, y: 19 },
+  'board-stand': { x: -56, y: 111 },
 }
