@@ -81,7 +81,7 @@ function selectCallout(id: string) {
 // 写真の、横長の床と奥・左の2面の壁。寸法・カメラはここで調整する。
 const roomSize = { width: 12, depth: 7.5, height: 3.2, thickness: 0.16 }
 const intro = { duration: 1000, rotation: -Math.PI * 0.7, scale: 0.68 }
-const drop = { duration: 720, height: 3.6 }
+const drop = { duration: 280, height: 1.8 }
 const deskPlacements = [
   ...[-4.6, -2.3, 0, 2.3, 4.6].map((x, index) => ({
     id: `wall-desk-${index + 1}`,
