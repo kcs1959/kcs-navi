@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import * as THREE from 'three'
+import kcsLogo from '~/assets/kcs.png'
 import type { DeskKey } from '~~/shared/types'
 import { boothMapLocations, boothMapCalloutOffsets } from '~~/shared/boothMap'
 import { layoutBoothMapCallouts, type BoothMapCalloutAnchor } from '~/utils/boothMapCalloutLayout'
@@ -229,7 +230,13 @@ onMounted(async () => {
     const wallMaterial = material('--peach')
     const trimMaterial = material('--strong')
     const boardFrameMaterial = material('--muted')
-    const boardMaterial = material('--glass')
+    const boardTexture = new THREE.TextureLoader().load(kcsLogo)
+    boardTexture.colorSpace = THREE.SRGBColorSpace
+    const boardMaterial = new THREE.MeshStandardMaterial({
+      map: boardTexture,
+      color: '#ffffff',
+      roughness: 0.8,
+    })
     const deskOutlineMaterial = new THREE.LineBasicMaterial({ linewidth: 1 })
     themedMaterials.push({ material: deskOutlineMaterial, token: '--muted' })
     const furnitureMaterials: BoothModelMaterials = {
