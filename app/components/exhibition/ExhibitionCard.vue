@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Exhibition, Team } from '../../shared/types'
+import type { Exhibition, Team } from '../../../shared/types'
 const props = withDefaults(
   defineProps<{
     exhibition: Exhibition

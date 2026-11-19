@@ -167,9 +167,9 @@ describe('D1 likes repository', () => {
       'desk-d',
       'desk-e',
       'desk-f',
-      'desk-g',
-      'desk-h',
-      'desk-i',
+      'board-wall',
+      'board-stand',
+      'smartphone',
     ].entries()) {
       await db
         .prepare(
@@ -182,9 +182,9 @@ describe('D1 likes repository', () => {
       'desk-d',
       'desk-e',
       'desk-f',
-      'desk-g',
-      'desk-h',
-      'desk-i',
+      'board-wall',
+      'board-stand',
+      'smartphone',
     ])
     expect(await repository.addLike(1)).toBe(2)
     const newWork = await repository.listExhibitions()

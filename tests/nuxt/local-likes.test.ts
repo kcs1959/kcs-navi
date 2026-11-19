@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import { clearNuxtState, useNuxtApp } from '#app'
-import ExhibitionModal from '~/components/ExhibitionModal.vue'
+import ExhibitionModal from '~/components/exhibition/ExhibitionModal.vue'
 import { likeStorageKey } from '~/composables/useLocalLikes'
 import type { Exhibition, LikeResponse } from '../../shared/types'
 

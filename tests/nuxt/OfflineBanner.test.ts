@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
-import OfflineBanner from '~/components/OfflineBanner.vue'
-import ExhibitionModal from '~/components/ExhibitionModal.vue'
+import OfflineBanner from '~/components/common/OfflineBanner.vue'
+import ExhibitionModal from '~/components/exhibition/ExhibitionModal.vue'
 import type { Exhibition } from '../../shared/types'
 
 const wrappers: Array<{ unmount(): void }> = []

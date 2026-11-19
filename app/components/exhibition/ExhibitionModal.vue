@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { LIKE_LIMIT, type Exhibition, type Team } from '../../shared/types'
-import { likeStorageKey } from '../composables/useLocalLikes'
+import { LIKE_LIMIT, type Exhibition, type Team } from '../../../shared/types'
+import { likeStorageKey } from '../../composables/useLocalLikes'
 const props = defineProps<{
   exhibition: Exhibition
   team?: Team

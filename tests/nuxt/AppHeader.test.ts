@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { nextTick } from 'vue'
-import AppHeader from '~/components/AppHeader.vue'
+import AppHeader from '~/components/layout/AppHeader.vue'
 
 afterEach(() => {
   vi.restoreAllMocks()
