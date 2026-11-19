@@ -83,7 +83,7 @@ function dismissBackdrop(event: MouseEvent) {
       <div class="detail-heading">
         <div>
           <p class="eyebrow">
-            EXHIBITION {{ exhibition.deskKey.replace('desk-', '').toUpperCase() }}
+            EXHIBITION {{ exhibition.deskKey ? exhibition.deskKey.replace('desk-', '').toUpperCase() : '未割当' }}
           </p>
           <h2 id="exhibition-title">{{ exhibition.title }}</h2>
         </div>
@@ -112,6 +112,7 @@ function dismissBackdrop(event: MouseEvent) {
           >{{ team?.name ?? '班紹介' }} ↗</NuxtLink
         >
       </div>
+      <p v-if="exhibition.creator" class="creator-name">制作者: {{ exhibition.creator }}</p>
       <p class="description">{{ exhibition.description }}</p>
       <div v-if="teamError" class="inline-error" role="alert">
         <p>班の情報を取得できませんでした。</p>

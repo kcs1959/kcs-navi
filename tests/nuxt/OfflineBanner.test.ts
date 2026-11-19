@@ -16,7 +16,8 @@ const work: Exhibition = {
   deskKey: 'desk-a',
   title: '作品1',
   description: '',
-  creatorComment: '',
+  creator: '',
+          creatorComment: '',
   likes: 0,
 }
 

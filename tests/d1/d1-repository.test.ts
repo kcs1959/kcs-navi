@@ -16,18 +16,18 @@ beforeAll(async () => {
     envFiles: [],
   })
   db = platform.env.DB
-  const sql = await readFile(
-    new URL('../../migrations/0001_create_exhibitions.sql', import.meta.url),
-    'utf8',
-  )
-  await db.batch(
-    sql
-      .replace(/^--.*$/gm, '')
-      .split(';')
-      .map((sql) => sql.trim())
-      .filter(Boolean)
-      .map((sql) => db.prepare(sql)),
-  )
+  const migrationFiles = ['0001_create_exhibitions.sql', '0002_add_creator_to_exhibitions.sql', '0003_make_exhibitions_desk_key_nullable.sql']
+  for (const file of migrationFiles) {
+    const sql = await readFile(new URL(`../../migrations/${file}`, import.meta.url), 'utf8')
+    await db.batch(
+      sql
+        .replace(/^--.*$/gm, '')
+        .split(';')
+        .map((sql) => sql.trim())
+        .filter(Boolean)
+        .map((sql) => db.prepare(sql)),
+    )
+  }
   repository = createD1Repository(db)
 }, 30_000)
 afterAll(async () => {

@@ -12,9 +12,10 @@ export interface Team {
 export interface Exhibition {
   id: number
   teamId: number
-  deskKey: string
+  deskKey: DeskKey | null
   title: string
   description: string
+  creator: string
   creatorComment: string
   likes: number
 }

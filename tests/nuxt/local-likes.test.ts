@@ -23,7 +23,8 @@ const work = (id = 1): Exhibition => ({
   deskKey: 'desk-a',
   title: `作品${id}`,
   description: '',
-  creatorComment: '',
+  creator: '',
+          creatorComment: '',
   likes: 0,
 })
 function resetState() {

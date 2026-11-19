@@ -20,7 +20,7 @@ export function createD1Repository(db: NaviD1Database): NaviRepository {
           .prepare(
             `
         SELECT e.id, e.team_id AS teamId, e.desk_key AS deskKey, e.title,
-               e.description, e.creator_comment AS creatorComment,
+               e.description, e.creator AS creator, e.creator_comment AS creatorComment,
                (SELECT COUNT(*) FROM likes l WHERE l.exhibition_id = e.id) AS likes
         FROM exhibitions e ORDER BY e.id
       `,
