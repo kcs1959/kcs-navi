@@ -22,7 +22,7 @@ const { theme } = useTheme()
 
 // 写真の、横長の床と奥・左の2面の壁。寸法・カメラはここで調整する。
 const roomSize = { width: 12, depth: 7.5, height: 3.2, thickness: 0.16 }
-const intro = { duration: 2000, rotation: -Math.PI * 0.7, scale: 0.68 }
+const intro = { duration: 1000, rotation: -Math.PI * 0.7, scale: 0.68 }
 
 let renderer: THREE.WebGLRenderer | undefined
 let scene: THREE.Scene | undefined
@@ -163,7 +163,6 @@ onMounted(async () => {
       labelContext!.textAlign = 'center'
       labelContext!.textBaseline = 'middle'
       labelContext!.font = '500 72px sans-serif'
-      labelContext!.fillText('PV', 320, 180)
       labelTexture.needsUpdate = true
       view.render(world, camera)
     }
