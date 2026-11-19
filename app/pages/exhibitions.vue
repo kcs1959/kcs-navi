@@ -44,7 +44,6 @@ const filteredExhibitions = computed(() =>
 <template>
   <div class="page-content works-page stack">
     <PageHeading
-      eyebrow="EXHIBITIONS"
       title="展示作品"
       description="KCSのメンバーが制作しました！タップして詳細を確認"
     />

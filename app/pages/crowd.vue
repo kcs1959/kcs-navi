@@ -66,7 +66,7 @@ const todayLabel = computed(() => {
 
 <template>
   <div class="page-content stack crowd-page">
-    <PageHeading eyebrow="LIVE AT KCS" title="KCS ブースの混雑状況" />
+    <PageHeading title="KCS ブースの混雑状況" />
     <CrowdCard
       :stats="data"
       :linked="false"
@@ -169,6 +169,7 @@ const todayLabel = computed(() => {
         }}
       </p>
     </section>
+    <NuxtLink class="teams-link" to="/">ブースマップを見る →</NuxtLink>
   </div>
 </template>
 
@@ -350,5 +351,13 @@ const todayLabel = computed(() => {
   font-size: 12px;
   color: var(--muted);
   line-height: 1.5;
+}
+.teams-link {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
 }
 </style>
