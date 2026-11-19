@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as THREE from 'three'
 import type { DeskKey } from '~~/shared/types'
-import { boothMapLocations } from '~~/shared/boothMap'
+import { boothMapLocations, boothMapCalloutOffsets } from '~~/shared/boothMap'
 import { layoutBoothMapCallouts, type BoothMapCalloutAnchor } from '~/utils/boothMapCalloutLayout'
 import {
   createBoothDesk,
@@ -35,19 +35,19 @@ const calloutsVisible = ref(false)
 const reducedMotion = ref(false)
 const calloutInsets = computed(() => {
   const labels = layoutBoothMapCallouts(
-    boothMapLocations.map(({ deskId, side }) => ({ id: deskId, side, x: 0, y: 0 })),
+    boothMapLocations
+      .filter((location) => !location.inset)
+      .map(({ deskId, side }) => ({ id: deskId, side, x: 0, y: 0 })),
     mapSize.value,
   )
   if (!labels.length) return { top: 16, bottom: 16 }
+  const top = labels.filter((label) => label.side === 'top')
+  const bottom = labels.filter((label) => label.side === 'bottom')
   return {
-    top:
-      Math.max(
-        ...labels.filter((label) => label.side === 'top').map((label) => label.y + label.height),
-      ) + 18,
-    bottom:
-      mapSize.value.height -
-      Math.min(...labels.filter((label) => label.side === 'bottom').map((label) => label.y)) +
-      18,
+    top: top.length ? Math.max(...top.map((label) => label.y + label.height)) + 18 : 16,
+    bottom: bottom.length
+      ? mapSize.value.height - Math.min(...bottom.map((label) => label.y)) + 18
+      : Math.max(...labels.map((label) => label.height)) + 30,
   }
 })
 const calloutItems = computed(() =>
@@ -154,7 +154,12 @@ onMounted(async () => {
   const root = mapRoot.value
   if (!host || !root) return
 
-  const fallbackPoints: { id: DeskKey; side: 'top' | 'bottom'; point: THREE.Vector3 }[] = []
+  const fallbackPoints: {
+    id: DeskKey
+    side: 'top' | 'bottom'
+    inset: boolean
+    point: THREE.Vector3
+  }[] = []
   projectFallback = () => {
     const svg = root.querySelector('.room-fallback svg')
     if (!svg) return
@@ -163,9 +168,11 @@ onMounted(async () => {
     const scale = Math.min(rect.width / 720, rect.height / 500)
     const offsetX = rect.left - parent.left + (rect.width - 720 * scale) / 2
     const offsetY = rect.top - parent.top + (rect.height - 500 * scale) / 2
-    projectedAnchors.value = fallbackPoints.map(({ id, side, point }) => ({
+    projectedAnchors.value = fallbackPoints.map(({ id, side, inset, point }) => ({
       id,
       side,
+      inset,
+      offset: boothMapCalloutOffsets[id],
       x: offsetX + (360 + (point.x * 382) / 12 - (point.z * 202) / 7.5) * scale,
       y:
         offsetY +
@@ -296,20 +303,22 @@ onMounted(async () => {
         object = room.getObjectByName(location.objectId)!
         if (location.objectId.includes('desk')) point.y = 0.88
       }
-      return { id: location.deskId, side: location.side, object, point }
+      return { id: location.deskId, side: location.side, inset: location.inset, object, point }
     })
     // 代替SVGでも、同じ物体の同じ点から線を伸ばす。
     room.updateMatrixWorld(true)
-    calloutAnchors.forEach(({ id, side, object, point }) => {
-      fallbackPoints.push({ id, side, point: object.localToWorld(point.clone()) })
+    calloutAnchors.forEach(({ id, side, inset, object, point }) => {
+      fallbackPoints.push({ id, side, inset, point: object.localToWorld(point.clone()) })
     })
     function projectCallouts() {
       room.updateMatrixWorld(true)
-      projectedAnchors.value = calloutAnchors.map(({ id, side, object, point }) => {
+      projectedAnchors.value = calloutAnchors.map(({ id, side, inset, object, point }) => {
         const projected = object.localToWorld(point.clone()).project(camera)
         return {
           id,
           side,
+          inset,
+          offset: boothMapCalloutOffsets[id],
           x: ((projected.x + 1) / 2) * mapSize.value.width,
           y: ((1 - projected.y) / 2) * mapSize.value.height,
         }
@@ -463,7 +472,12 @@ onMounted(async () => {
             1.1,
             visitorPlacement.z + Math.cos(-Math.PI / 7) * 0.445,
           )
-        fallbackPoints.push({ id: location.deskId, side: location.side, point })
+        fallbackPoints.push({
+          id: location.deskId,
+          side: location.side,
+          inset: location.inset,
+          point,
+        })
       })
     }
     reducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches

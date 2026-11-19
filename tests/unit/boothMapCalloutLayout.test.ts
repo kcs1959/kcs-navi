@@ -13,6 +13,52 @@ function anchors(): BoothMapCalloutAnchor[] {
   }))
 }
 
+function objectAnchors(width: number): BoothMapCalloutAnchor[] {
+  const locations =
+    width === 1040
+      ? [
+          ['board-wall', 269, 251],
+          ['desk-a', 409, 280],
+          ['desk-b', 516, 320],
+          ['desk-c', 622, 359],
+          ['desk-d', 729, 398],
+          ['desk-e', 836, 437],
+          ['desk-f', 201, 380],
+          ['board-stand', 502, 435],
+          ['smartphone', 652, 494],
+        ]
+      : width === 310
+        ? [
+            ['board-wall', 78, 241],
+            ['desk-a', 121, 250],
+            ['desk-b', 154, 262],
+            ['desk-c', 186, 274],
+            ['desk-d', 219, 286],
+            ['desk-e', 252, 298],
+            ['desk-f', 58, 280],
+            ['board-stand', 149, 297],
+            ['smartphone', 195, 315],
+          ]
+        : [
+            ['board-wall', 66, 248],
+            ['desk-a', 100, 255],
+            ['desk-b', 127, 265],
+            ['desk-c', 153, 274],
+            ['desk-d', 180, 284],
+            ['desk-e', 206, 294],
+            ['desk-f', 49, 280],
+            ['board-stand', 124, 293],
+            ['smartphone', 161, 308],
+          ]
+  return locations.map(([id, x, y]) => ({
+    id: String(id),
+    x: Number(x),
+    y: Number(y),
+    side: ['desk-f', 'board-stand', 'smartphone'].includes(String(id)) ? 'bottom' : 'top',
+    inset: !['desk-a', 'desk-b', 'desk-c'].includes(String(id)),
+  }))
+}
+
 describe('booth map callout layout', () => {
   it.each([
     { width: 240, height: 380 },
@@ -96,5 +142,51 @@ describe('booth map callout layout', () => {
     expect(layoutBoothMapCallouts([], { width: 320, height: 380 })).toEqual([])
     expect(layoutBoothMapCallouts(anchors(), { width: 0, height: 380 })).toEqual([])
     expect(layoutBoothMapCallouts(anchors(), { width: 320, height: 0 })).toEqual([])
+  })
+
+  it.each([
+    { width: 256, height: 500, previous: [184, 118, 111, 97, 84, 128] },
+    { width: 310, height: 500, previous: [175, 160, 171, 154, 137, 120] },
+    { width: 1040, height: 760, previous: [209, 332, 372, 314, 259, 239] },
+  ])('brings all six requested cards closer at $width px while enlarging them', (viewport) => {
+    const input = objectAnchors(viewport.width)
+    const cards = layoutBoothMapCallouts(input, viewport)
+    const ids = ['board-wall', 'desk-d', 'desk-e', 'desk-f', 'board-stand', 'smartphone']
+    for (const [index, id] of ids.entries()) {
+      const card = cards.find((item) => item.id === id)!
+      expect(Math.hypot(card.edgeX - card.anchorX, card.edgeY - card.anchorY)).toBeLessThan(
+        viewport.previous[index]!,
+      )
+      const coversOwnAnchor =
+        card.anchorX >= card.x &&
+        card.anchorX <= card.x + card.width &&
+        card.anchorY >= card.y &&
+        card.anchorY <= card.y + card.height
+      expect(coversOwnAnchor).toBe(false)
+    }
+    for (const card of cards) {
+      expect(card.width).toBeGreaterThan(100)
+      expect(card.height).toBe(66)
+      expect(card.x).toBeGreaterThanOrEqual(0)
+      expect(card.y).toBeGreaterThanOrEqual(0)
+      expect(card.x + card.width).toBeLessThanOrEqual(viewport.width)
+      expect(card.y + card.height).toBeLessThanOrEqual(viewport.height)
+      for (const other of cards.filter((item) => item.id !== card.id)) {
+        expect(
+          card.x < other.x + other.width &&
+            card.x + card.width > other.x &&
+            card.y < other.y + other.height &&
+            card.y + card.height > other.y,
+        ).toBe(false)
+      }
+    }
+    expect(layoutBoothMapCallouts([...input].reverse(), viewport)).toEqual(cards)
+  })
+
+  it('lays out only the outer top cards for independent camera padding measurement', () => {
+    const input = objectAnchors(310).filter((anchor) => !anchor.inset)
+    const cards = layoutBoothMapCallouts(input, { width: 310, height: 500 })
+    expect(cards).toHaveLength(3)
+    expect(cards.every((card) => card.side === 'top' && card.y + card.height < 180)).toBe(true)
   })
 })

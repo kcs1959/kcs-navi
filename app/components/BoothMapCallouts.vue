@@ -125,9 +125,9 @@ const callouts = computed(() => {
   justify-content: center;
   gap: 3px;
   min-height: 44px;
-  padding: 7px 9px;
+  padding: 10px 12px;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 13px;
   background: var(--glass);
   box-shadow: 0 2px 5px var(--navigation-shadow);
   color: var(--ink);
@@ -164,13 +164,13 @@ const callouts = computed(() => {
 .callout-title {
   flex: 1;
   min-width: 0;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.35;
 }
 .callout-count {
   flex: none;
   color: var(--muted);
-  font-size: 8px;
+  font-size: 9px;
   line-height: 1.4;
   white-space: nowrap;
 }
@@ -182,7 +182,7 @@ const callouts = computed(() => {
 }
 .callout-description {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.5;
 }
 .reduced-motion .callout-stem,
