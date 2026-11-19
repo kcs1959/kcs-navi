@@ -232,8 +232,12 @@ onMounted(async () => {
     const boardFrameMaterial = material('--muted')
     const boardTexture = new THREE.TextureLoader().load(kcsLogo)
     boardTexture.colorSpace = THREE.SRGBColorSpace
-    const boardMaterial = new THREE.MeshStandardMaterial({
+    const wallBoardMaterial = new THREE.MeshStandardMaterial({
       map: boardTexture,
+      color: '#ffffff',
+      roughness: 0.8,
+    })
+    const standBoardMaterial = new THREE.MeshStandardMaterial({
       color: '#ffffff',
       roughness: 0.8,
     })
@@ -243,7 +247,7 @@ onMounted(async () => {
       tabletop: material('--peach'),
       outline: deskOutlineMaterial,
       frame: material('--muted'),
-      board: boardMaterial,
+      board: standBoardMaterial,
       skin: new THREE.MeshStandardMaterial({ color: '#f2c4a0', roughness: 0.9 }),
       hair: new THREE.MeshStandardMaterial({ color: '#49372e', roughness: 0.9 }),
       shirt: material('--orange'),
@@ -279,7 +283,7 @@ onMounted(async () => {
     // 左壁の白いパネルをホワイトボードとして残す。
     const panelX = -width / 2 + thickness / 2
     box(0.09, 1.95, 3.3, panelX + 0.05, 1.9, -0.55, boardFrameMaterial)
-    box(0.035, 1.77, 3.12, panelX + 0.11, 1.9, -0.55, boardMaterial).name = 'wall-whiteboard'
+    box(0.035, 1.77, 3.12, panelX + 0.11, 1.9, -0.55, wallBoardMaterial).name = 'wall-whiteboard'
 
     // 配置はDBの3机とは独立。回転中は隠し、完成姿勢のまま真下に降ろす。
     const furnishings: THREE.Group[] = deskPlacements.map(({ id, x, z, rotation }) => {
