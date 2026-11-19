@@ -60,7 +60,6 @@ function selectDesk(key: string) {
   <div class="page-content map-page">
     <PageHeading
       title="KCS ブースマップ"
-      description="吹き出しをタップすると作品の詳細が表示されます。"
     />
     <CrowdCard
       :stats="stats"
