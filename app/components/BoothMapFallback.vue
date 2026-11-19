@@ -1,12 +1,13 @@
 <script setup lang="ts">
 type Position = { x: number; z: number }
 type DeskPlacement = Position & { id: string; rotation: number }
+type BoardPlacement = Position & { rotation?: number }
 type Point = readonly [number, number, number]
 
 const props = defineProps<{
   desks: DeskPlacement[]
   visitor: Position
-  board: Position
+  board: BoardPlacement
 }>()
 
 function project(x: number, y: number, z: number) {
@@ -33,8 +34,8 @@ function localPoint(position: Position, x: number, y: number, z: number, rotatio
 function deskPolygon(desk: DeskPlacement, points: readonly Point[]) {
   return points.map(([x, y, z]) => localPoint(desk, x, y, z, desk.rotation)).join(' ')
 }
-function boardPolygon(board: Position, points: readonly Point[]) {
-  return points.map(([x, y, z]) => localPoint(board, x, y, z)).join(' ')
+function boardPolygon(board: BoardPlacement, points: readonly Point[]) {
+  return points.map(([x, y, z]) => localPoint(board, x, y, z, board.rotation ?? 0)).join(' ')
 }
 
 const corners = [
@@ -116,24 +117,26 @@ const items = computed(() =>
           <polygon class="table-top" :points="deskPolygon(item, tabletop)" />
         </g>
         <g v-else-if="item.kind === 'board'">
-          <g v-for="x in [-0.72, 0.72]" :key="x" class="board-leg">
-            <polyline
-              :points="
-                boardPolygon(item, [
-                  [x, 0.065, -0.325],
-                  [x, 0.065, 0.325],
-                ])
-              "
-            />
-            <polyline
-              :points="
-                boardPolygon(item, [
-                  [x, 0.065, 0],
-                  [x, 1.98, 0],
-                ])
-              "
-            />
-          </g>
+          <polygon
+            class="frame"
+            :points="
+              boardPolygon(item, [
+                [-0.4, 0.065, -0.325],
+                [0.4, 0.065, -0.325],
+                [0.4, 0.065, 0.325],
+                [-0.4, 0.065, 0.325],
+              ])
+            "
+          />
+          <polyline
+            class="board-post"
+            :points="
+              boardPolygon(item, [
+                [0, 0.065, 0],
+                [0, 0.965, 0],
+              ])
+            "
+          />
           <polygon class="frame" :points="boardPolygon(item, boardFrame)" />
           <polygon class="board-surface" :points="boardPolygon(item, boardSurface)" />
           <polyline
@@ -164,15 +167,6 @@ const items = computed(() =>
             width="11"
             height="19"
             rx="2"
-            transform="rotate(-12 -19 -45)"
-          />
-          <rect
-            class="phone-screen"
-            x="-22"
-            y="-52"
-            width="7"
-            height="12"
-            rx="0.5"
             transform="rotate(-12 -19 -45)"
           />
           <circle class="skin" cx="-14" cy="-44" r="3" />
@@ -228,14 +222,24 @@ p {
   fill: var(--glass);
 }
 .desk-leg,
-.board-leg {
+.board-leg,
+.board-post {
   fill: none;
   stroke: var(--muted);
   stroke-width: 3;
   stroke-linecap: round;
 }
+.board-post {
+  stroke-width: 3.5;
+}
 .table-top {
   fill: var(--lemon);
+}
+.table-top,
+.table-side {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-linejoin: round;
 }
 .board-surface {
   fill: var(--white);

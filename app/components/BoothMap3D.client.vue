@@ -29,7 +29,7 @@ const { theme } = useTheme()
 // 写真の、横長の床と奥・左の2面の壁。寸法・カメラはここで調整する。
 const roomSize = { width: 12, depth: 7.5, height: 3.2, thickness: 0.16 }
 const intro = { duration: 1000, rotation: -Math.PI * 0.7, scale: 0.68 }
-const drop = { delay: 100, duration: 720, height: 3.6 }
+const drop = { duration: 720, height: 3.6 }
 const deskPlacements = [
   ...[-4.6, -2.3, 0, 2.3, 4.6].map((x, index) => ({
     id: `wall-desk-${index + 1}`,
@@ -41,7 +41,7 @@ const deskPlacements = [
   { id: 'panel-side-desk', x: -4.95, z: 2.3, rotation: Math.PI / 2 },
 ]
 const visitorPlacement = { x: roomSize.width / 2 - 2, z: roomSize.depth / 2 - 3 }
-const boardPlacement = { x: -0.9, z: 1.35 }
+const boardPlacement = { x: -0.9, z: 1.35, rotation: Math.PI / 2 }
 
 let renderer: THREE.WebGLRenderer | undefined
 let scene: THREE.Scene | undefined
@@ -61,7 +61,7 @@ function disposeScene() {
   const materials = new Set<THREE.Material>()
   const textures = new Set<THREE.Texture>()
   scene?.traverse((object) => {
-    if (!(object instanceof THREE.Mesh)) return
+    if (!(object instanceof THREE.Mesh || object instanceof THREE.LineSegments)) return
     geometries.add(object.geometry)
     const objectMaterials = Array.isArray(object.material) ? object.material : [object.material]
     objectMaterials.forEach((material) => {
@@ -118,7 +118,10 @@ onMounted(async () => {
     sunlight.position.set(4, 10, 7)
     world.add(sunlight)
 
-    const themedMaterials: { material: THREE.MeshStandardMaterial; token: string }[] = []
+    const themedMaterials: {
+      material: THREE.MeshStandardMaterial | THREE.LineBasicMaterial
+      token: string
+    }[] = []
     function material(token: string) {
       const surface = new THREE.MeshStandardMaterial({ roughness: 0.9 })
       themedMaterials.push({ material: surface, token })
@@ -129,8 +132,11 @@ onMounted(async () => {
     const trimMaterial = material('--strong')
     const boardFrameMaterial = material('--muted')
     const boardMaterial = material('--glass')
+    const deskOutlineMaterial = new THREE.LineBasicMaterial({ linewidth: 1 })
+    themedMaterials.push({ material: deskOutlineMaterial, token: '--muted' })
     const furnitureMaterials: BoothModelMaterials = {
       tabletop: material('--peach'),
+      outline: deskOutlineMaterial,
       frame: material('--muted'),
       board: boardMaterial,
       skin: new THREE.MeshStandardMaterial({ color: '#f2c4a0', roughness: 0.9 }),
@@ -180,8 +186,8 @@ onMounted(async () => {
     })
     const board = createBoothWhiteboard(furnitureMaterials)
     board.position.set(boardPlacement.x, 0, boardPlacement.z)
-    board.rotation.y = (Math.PI / 2) 
-    furnishings.push(board) 
+    board.rotation.y = boardPlacement.rotation
+    furnishings.push(board)
     const visitor = createBoothVisitor(furnitureMaterials)
     visitor.position.set(visitorPlacement.x, 0, visitorPlacement.z)
     visitor.rotation.y = -Math.PI / 7
@@ -278,7 +284,7 @@ onMounted(async () => {
         const eased = 1 - (1 - progress) ** 3
         room.rotation.y = intro.rotation * (1 - eased)
         room.scale.setScalar(intro.scale + (1 - intro.scale) * eased)
-        const dropElapsed = elapsed - intro.duration - drop.delay
+        const dropElapsed = elapsed - intro.duration
         if (dropElapsed >= 0) {
           const falling = Math.min(dropElapsed / drop.duration, 1)
           // 前半は加速して落下、着地後は小さく一度だけ跳ねて止まる。

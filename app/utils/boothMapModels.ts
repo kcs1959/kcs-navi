@@ -2,6 +2,7 @@ import * as THREE from 'three'
 
 export type BoothModelMaterials = {
   tabletop: THREE.Material
+  outline: THREE.LineBasicMaterial
   frame: THREE.Material
   board: THREE.Material
   skin: THREE.Material
@@ -79,6 +80,16 @@ export function createBoothDesk(materials: BoothModelMaterials): THREE.Group {
     addBox(desk, `${side}-apron`, materials.frame, [0.075, 0.1, 0.64], [x, 0.73, 0])
   }
   addBox(desk, 'back-apron', materials.frame, [1.38, 0.1, 0.075], [0, 0.73, -0.31])
+  // 天板と脚の輪郭に、画面上で細さを保つ線を重ねる。
+  for (const part of desk.children) {
+    if (!(part instanceof THREE.Mesh)) continue
+    const outline = new THREE.LineSegments(
+      new THREE.EdgesGeometry(part.geometry),
+      materials.outline,
+    )
+    outline.name = `${part.name}-outline`
+    part.add(outline)
+  }
   return desk
 }
 
@@ -172,13 +183,8 @@ export function createBoothVisitor(materials: BoothModelMaterials): THREE.Group 
 export function createBoothWhiteboard(materials: BoothModelMaterials): THREE.Group {
   const whiteboard = new THREE.Group()
   whiteboard.name = 'whiteboard'
-  for (const [side, x] of [
-    ['left', -0.72],
-    ['right', 0.72],
-  ] as const) {
-    addBox(whiteboard, `${side}-foot`, materials.frame, [0.12, 0.065, 0.65], [x, 0.0325, 0])
-    addBox(whiteboard, `${side}-post`, materials.frame, [0.055, 1.92, 0.055], [x, 1.025, 0])
-  }
+  addBox(whiteboard, 'base', materials.frame, [0.8, 0.065, 0.65], [0, 0.0325, 0])
+  addBox(whiteboard, 'central-post', materials.frame, [0.085, 0.9, 0.085], [0, 0.515, 0])
   addBox(whiteboard, 'board-frame', materials.frame, [1.85, 1.22, 0.095], [0, 1.39, 0])
   addBox(whiteboard, 'board-surface', materials.board, [1.74, 1.11, 0.025], [0, 1.39, 0.059])
   addBox(whiteboard, 'pen-tray', materials.frame, [1.72, 0.04, 0.16], [0, 0.785, 0.1])
