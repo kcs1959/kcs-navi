@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { clearNuxtState, useNuxtApp } from '#app'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import ThemeToggle from '~/components/ThemeToggle.vue'
+import ThemeToggle from '~/components/common/ThemeToggle.vue'
 
 function resetTheme() {
   useNuxtApp().runWithContext(() => clearNuxtState(['theme', 'theme-ready']))

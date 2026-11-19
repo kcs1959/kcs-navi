@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CheckinStatsResponse, CongestionLevel } from '../../shared/types'
+import type { CheckinStatsResponse, CongestionLevel } from '../../../shared/types'
 
 // 混雑度を一目で伝えるための絵文字。3段階の分岐はサーバー側の congestionFor と揃えている。
 const levelEmoji: Record<CongestionLevel, string> = {

@@ -16,7 +16,12 @@ beforeAll(async () => {
     envFiles: [],
   })
   db = platform.env.DB
-  const migrationFiles = ['0001_create_exhibitions.sql', '0002_add_creator_to_exhibitions.sql', '0003_make_exhibitions_desk_key_nullable.sql']
+  const migrationFiles = [
+    '0001_create_exhibitions.sql',
+    '0002_add_creator_to_exhibitions.sql',
+    '0003_make_exhibitions_desk_key_nullable.sql',
+    '0004_expand_exhibition_desk_keys.sql',
+  ]
   for (const file of migrationFiles) {
     const sql = await readFile(new URL(`../../migrations/${file}`, import.meta.url), 'utf8')
     await db.batch(
@@ -130,5 +135,78 @@ describe('D1 likes repository', () => {
     await repository.addLike(1)
     await executeSqlFile('../../seeds/test.sql')
     expect((await repository.listExhibitions())[0]?.likes).toBe(1)
+  })
+  it('preserves works and likes while expanding to all nine map locations', async () => {
+    // persist:false のテストDBを、いいねが空のうちに移行前の3キー制約へ戻す。
+    await executeSqlFile('../../migrations/0003_make_exhibitions_desk_key_nullable.sql')
+    await expect(
+      db.prepare("UPDATE exhibitions SET desk_key = 'desk-d' WHERE id = 1").run(),
+    ).rejects.toThrow()
+    await db
+      .prepare("UPDATE exhibitions SET creator = 'Original creator', desk_key = NULL WHERE id = 2")
+      .run()
+    await db.batch([
+      db
+        .prepare('INSERT INTO likes (id, exhibition_id, created_at) VALUES (?, ?, ?)')
+        .bind(41, 1, '2026-11-19T12:34:56.789Z'),
+      db
+        .prepare('INSERT INTO likes (id, exhibition_id, created_at) VALUES (?, ?, ?)')
+        .bind(42, 2, '2026-11-19T12:35:00.000Z'),
+    ])
+    const originalWorks = await repository.listExhibitions()
+    const originalLikes = await db.prepare('SELECT * FROM likes ORDER BY id').all()
+
+    // このテスト直前の作品は従来のa〜c/NULLのみ。既存行のあるDBを移行する。
+    await executeSqlFile('../../migrations/0004_expand_exhibition_desk_keys.sql')
+    expect(await repository.listExhibitions()).toEqual(originalWorks)
+    expect((await db.prepare('SELECT * FROM likes ORDER BY id').all()).results).toEqual(
+      originalLikes.results,
+    )
+
+    for (const [index, key] of [
+      'desk-d',
+      'desk-e',
+      'desk-f',
+      'board-wall',
+      'board-stand',
+      'smartphone',
+    ].entries()) {
+      await db
+        .prepare(
+          'INSERT INTO exhibitions (id, team_id, desk_key, title, description, creator_comment) VALUES (?, 1, ?, ?, ?, ?)',
+        )
+        .bind(100 + index, key, `Work ${key}`, 'Description', '')
+        .run()
+    }
+    expect((await repository.listExhibitions()).slice(4).map((work) => work.deskKey)).toEqual([
+      'desk-d',
+      'desk-e',
+      'desk-f',
+      'board-wall',
+      'board-stand',
+      'smartphone',
+    ])
+    expect(await repository.addLike(1)).toBe(2)
+    const newWork = await repository.listExhibitions()
+    expect(newWork.find((work) => work.id === 2)?.creator).toBe('Original creator')
+    expect(newWork.find((work) => work.id === 2)?.deskKey).toBeNull()
+    expect((await db.prepare('PRAGMA foreign_key_check').all()).results).toEqual([])
+
+    // 改名後も外部キーは新しいexhibitionsを参照し、作品削除時のCASCADEを維持する。
+    await db.prepare('DELETE FROM exhibitions WHERE id = 1').run()
+    expect((await db.prepare('SELECT * FROM likes WHERE exhibition_id = 1').all()).results).toEqual(
+      [],
+    )
+    expect(
+      await db.prepare('SELECT COUNT(*) AS count FROM likes WHERE exhibition_id = 2').first(),
+    ).toEqual({ count: 1 })
+    await expect(
+      db
+        .prepare(
+          'INSERT INTO exhibitions (id, team_id, desk_key, title, description, creator_comment) VALUES (999, 1, ?, ?, ?, ?)',
+        )
+        .bind('desk-j', 'Invalid location', 'Description', '')
+        .run(),
+    ).rejects.toThrow()
   })
 })

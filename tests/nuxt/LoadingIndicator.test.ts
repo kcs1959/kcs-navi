@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import LoadingIndicator from '~/components/LoadingIndicator.vue'
+import LoadingIndicator from '~/components/common/LoadingIndicator.vue'
 
 describe('LoadingIndicator', () => {
   it('announces the label as a status and hides the animation from assistive tech', async () => {

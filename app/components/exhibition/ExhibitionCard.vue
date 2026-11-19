@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Exhibition, Team } from '../../shared/types'
+import type { Exhibition, Team } from '../../../shared/types'
 const props = withDefaults(
   defineProps<{
     exhibition: Exhibition
@@ -24,8 +24,7 @@ defineEmits<{ select: [] }>()
   >
     <span class="work-meta"
       ><span class="chip">{{ team?.name ?? '展示作品' }}</span
-      ><span v-if="exhibition.deskKey">展示 {{ exhibition.deskKey.replace('desk-', '').toUpperCase() }}</span></span
-    >
+    ></span>
     <strong class="work-title">{{ exhibition.title }}</strong>
     <span v-if="exhibition.creator" class="work-creator">By: {{ exhibition.creator }}</span>
     <span v-if="showDescription" class="work-description">{{ exhibition.description }}</span>

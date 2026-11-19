@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { deskKeys, type ExhibitionsResponse, type TeamsResponse } from '~~/shared/types'
+import { boothMapLocations } from '~~/shared/boothMap'
 
 useHead({ title: '会場マップ' })
 const { data, error, status, refresh } = await useFetch<ExhibitionsResponse>('/api/exhibitions', {
@@ -14,12 +15,8 @@ const {
   refresh: refreshStats,
 } = useCrowdStats()
 
-// 初回のクライアント描画が完了するまでローディングを維持する。
-// マウント前はSSR側と同じ状態にし、ハイドレーションの不一致を防ぐ。
+// 3D描画（WebGL利用不可時は全体図）の準備完了までローディングを維持する。
 const mapRendered = ref(false)
-onMounted(() => {
-  mapRendered.value = true
-})
 const mapLoading = computed(() => status.value === 'pending' || !mapRendered.value)
 const worksAvailable = computed(
   () => Boolean(data.value) && !error.value && status.value !== 'pending',
@@ -48,6 +45,9 @@ const desks = computed(() =>
       countLabel:
         count === null ? (status.value === 'pending' ? '読み込み中' : '未取得') : `${count}作品`,
       titles: works.map((work) => work.title).join('、'),
+      title:
+        works[0]?.title ?? boothMapLocations.find((location) => location.deskId === key)?.label,
+      description: works[0]?.description ?? '',
     }
   }),
 )
@@ -61,7 +61,7 @@ function selectDesk(key: string) {
     <PageHeading
       eyebrow="EXPLORE KCS"
       title="KCS ブースマップ"
-      description="机をタップすると作品の詳細が表示されます。"
+      description="吹き出しをタップすると作品の詳細が表示されます。"
     />
     <CrowdCard
       :stats="stats"
@@ -69,16 +69,18 @@ function selectDesk(key: string) {
       :loading="statsStatus === 'pending'"
       @retry="refreshStats()"
     />
-    <section class="card booth-map" aria-labelledby="map-title" :aria-busy="mapLoading">
+    <section class="card booth-map" aria-label="展示マップ" :aria-busy="mapLoading">
       <div class="map-heading">
-        <h2 id="map-title">展示マップ</h2>
-        <span class="chip lemon">机をタップ</span>
+        <span class="chip lemon">三田キャンパス 院校舎 345A教室</span>
       </div>
       <div class="map-surface">
-        <BoothMap :desks="desks" @select="selectDesk" />
+        <BoothMap3D :desks="desks" @select="selectDesk" @ready="mapRendered = true" />
         <Transition name="loading-fade">
           <LoadingIndicator v-if="mapLoading" overlay label="マップを準備しています" />
         </Transition>
+      </div>
+      <div class="map-footer">
+        <NuxtLink to="/exhibitions">展示作品を見る <span aria-hidden="true">→</span></NuxtLink>
       </div>
     </section>
     <div v-if="error" class="error-card" role="alert">
@@ -115,6 +117,25 @@ function selectDesk(key: string) {
 .map-surface {
   position: relative;
   border-radius: 20px;
+  height: clamp(500px, 65vw, 760px);
+}
+.map-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+.map-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding-inline: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+.map-footer a:hover {
+  color: var(--ink);
 }
 .loading-fade-leave-active {
   transition: opacity 0.3s;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { LIKE_LIMIT, type Exhibition, type Team } from '../../shared/types'
-import { likeStorageKey } from '../composables/useLocalLikes'
+import { LIKE_LIMIT, type Exhibition, type Team } from '../../../shared/types'
+import { likeStorageKey } from '../../composables/useLocalLikes'
 const props = defineProps<{
   exhibition: Exhibition
   team?: Team
@@ -82,9 +82,6 @@ function dismissBackdrop(event: MouseEvent) {
     <div class="detail-body">
       <div class="detail-heading">
         <div>
-          <p class="eyebrow">
-            EXHIBITION {{ exhibition.deskKey ? exhibition.deskKey.replace('desk-', '').toUpperCase() : '未割当' }}
-          </p>
           <h2 id="exhibition-title">{{ exhibition.title }}</h2>
         </div>
         <button

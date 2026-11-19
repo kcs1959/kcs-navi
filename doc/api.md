@@ -26,7 +26,7 @@
 }
 ```
 
-机は固定設定の `desk-a`、`desk-b`、`desk-c`。同じ `deskKey` を持つ作品を複数返せる。制作者を表示する場合は登録者がコメント本文に含める。
+地図上の固定ID（desk_id）は `desk-a`〜`desk-i` の9枠で、APIでは `deskKey`、DBでは `exhibitions.desk_key` として同じ値を扱う。机6台・ボード2枚・スマホの対応は [database.md](database.md) と [shared/boothMap.ts](../shared/boothMap.ts) に記載。同じ `deskKey` を持つ作品を複数返せる。未割当の作品は `deskKey: null` となり、地図の吹き出しには表示しない。
 
 ## GET /api/teams
 
