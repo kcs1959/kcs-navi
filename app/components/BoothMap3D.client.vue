@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import * as THREE from 'three'
 import type { DeskKey } from '~~/shared/types'
+import {
+  createBoothDesk,
+  createBoothVisitor,
+  createBoothWhiteboard,
+  type BoothModelMaterials,
+} from '~/utils/boothMapModels'
 
-// 展示物は次の段階で追加する。既存マップと同じデータ・選択イベントを受け継ぐ。
+// 展示説明は次の段階で接続する。既存マップと同じデータ・選択イベントを受け継ぐ。
 defineProps<{
   desks: {
     key: DeskKey
@@ -23,6 +29,19 @@ const { theme } = useTheme()
 // 写真の、横長の床と奥・左の2面の壁。寸法・カメラはここで調整する。
 const roomSize = { width: 12, depth: 7.5, height: 3.2, thickness: 0.16 }
 const intro = { duration: 1000, rotation: -Math.PI * 0.7, scale: 0.68 }
+const drop = { delay: 100, duration: 720, height: 3.6 }
+const deskPlacements = [
+  ...[-4.6, -2.3, 0, 2.3, 4.6].map((x, index) => ({
+    id: `wall-desk-${index + 1}`,
+    x,
+    z: -2.75,
+    rotation: 0,
+  })),
+  // 左壁パネルの左隣（壁に沿って手前側）。長辺を左壁と平行にする。
+  { id: 'panel-side-desk', x: -4.95, z: 2.3, rotation: Math.PI / 2 },
+]
+const visitorPlacement = { x: roomSize.width / 2 - 2, z: roomSize.depth / 2 - 3 }
+const boardPlacement = { x: -0.9, z: 1.35 }
 
 let renderer: THREE.WebGLRenderer | undefined
 let scene: THREE.Scene | undefined
@@ -86,6 +105,7 @@ onMounted(async () => {
     scene = new THREE.Scene()
     const world = scene
     const room = new THREE.Group()
+    room.name = 'booth-room'
     world.add(room)
 
     const camera = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 100)
@@ -107,8 +127,18 @@ onMounted(async () => {
     const floorMaterial = material('--paper')
     const wallMaterial = material('--peach')
     const trimMaterial = material('--strong')
-    const screenFrameMaterial = material('--muted')
-    const screenMaterial = material('--glass')
+    const boardFrameMaterial = material('--muted')
+    const boardMaterial = material('--glass')
+    const furnitureMaterials: BoothModelMaterials = {
+      tabletop: material('--peach'),
+      frame: material('--muted'),
+      board: boardMaterial,
+      skin: new THREE.MeshStandardMaterial({ color: '#f2c4a0', roughness: 0.9 }),
+      hair: new THREE.MeshStandardMaterial({ color: '#49372e', roughness: 0.9 }),
+      shirt: material('--orange'),
+      trousers: new THREE.MeshStandardMaterial({ color: '#536575', roughness: 0.9 }),
+      phone: new THREE.MeshStandardMaterial({ color: '#353a41', roughness: 0.8 }),
+    }
 
     function box(
       width: number,
@@ -135,35 +165,48 @@ onMounted(async () => {
     box(width, 0.12, 0.04, 0, 0.06, -depth / 2 + thickness / 2 + 0.02, trimMaterial)
     box(0.04, 0.12, depth, -width / 2 + thickness / 2 + 0.02, 0.06, 0, trimMaterial)
 
-    // 左壁のPVスクリーン。動画や作品データにはまだ接続しない。
-    const screenX = -width / 2 + thickness / 2
-    box(0.09, 1.95, 3.3, screenX + 0.05, 1.9, -0.55, screenFrameMaterial)
-    box(0.035, 1.77, 3.12, screenX + 0.11, 1.9, -0.55, screenMaterial)
+    // 左壁の白いパネルをホワイトボードとして残す。
+    const panelX = -width / 2 + thickness / 2
+    box(0.09, 1.95, 3.3, panelX + 0.05, 1.9, -0.55, boardFrameMaterial)
+    box(0.035, 1.77, 3.12, panelX + 0.11, 1.9, -0.55, boardMaterial).name = 'wall-whiteboard'
 
-    const labelCanvas = document.createElement('canvas')
-    labelCanvas.width = 640
-    labelCanvas.height = 360
-    const labelContext = labelCanvas.getContext('2d')
-    if (!labelContext) throw new Error('PV screen canvas is unavailable')
-    const labelTexture = new THREE.CanvasTexture(labelCanvas)
-    labelTexture.colorSpace = THREE.SRGBColorSpace
-    const labelMaterial = new THREE.MeshBasicMaterial({ map: labelTexture, transparent: true })
-    const label = new THREE.Mesh(new THREE.PlaneGeometry(2.95, 1.66), labelMaterial)
-    label.rotation.y = Math.PI / 2
-    label.position.set(screenX + 0.132, 1.9, -0.55)
-    room.add(label)
+    // 配置はDBの3机とは独立。回転中は隠し、完成姿勢のまま真下に降ろす。
+    const furnishings: THREE.Group[] = deskPlacements.map(({ id, x, z, rotation }) => {
+      const desk = createBoothDesk(furnitureMaterials)
+      desk.name = id
+      desk.position.set(x, 0, z)
+      desk.rotation.y = rotation
+      return desk
+    })
+    const board = createBoothWhiteboard(furnitureMaterials)
+    board.position.set(boardPlacement.x, 0, boardPlacement.z)
+    board.rotation.y = (Math.PI / 2) 
+    furnishings.push(board) 
+    const visitor = createBoothVisitor(furnitureMaterials)
+    visitor.position.set(visitorPlacement.x, 0, visitorPlacement.z)
+    visitor.rotation.y = -Math.PI / 7
+    furnishings.push(visitor)
+    room.add(...furnishings)
+
+    const shadowMaterial = material('--ink')
+    shadowMaterial.transparent = true
+    shadowMaterial.opacity = 0.08
+    shadowMaterial.depthWrite = false
+    const shadows = furnishings.map((furnishing) => {
+      const shadow = new THREE.Mesh(new THREE.CircleGeometry(1, 32), shadowMaterial)
+      shadow.rotation.x = -Math.PI / 2
+      shadow.position.set(furnishing.position.x, 0.01, furnishing.position.z)
+      const isVisitor = furnishing === visitor
+      shadow.scale.set(isVisitor ? 0.42 : 0.95, isVisitor ? 0.3 : 0.47, 1)
+      room.add(shadow)
+      return shadow
+    })
 
     function applyPalette() {
       const styles = getComputedStyle(host!)
       themedMaterials.forEach(({ material: surface, token }) => {
         surface.color.set(styles.getPropertyValue(token).trim())
       })
-      labelContext!.clearRect(0, 0, labelCanvas.width, labelCanvas.height)
-      labelContext!.fillStyle = styles.getPropertyValue('--muted').trim()
-      labelContext!.textAlign = 'center'
-      labelContext!.textBaseline = 'middle'
-      labelContext!.font = '500 72px sans-serif'
-      labelTexture.needsUpdate = true
       view.render(world, camera)
     }
 
@@ -199,6 +242,12 @@ onMounted(async () => {
     finishIntro = () => {
       room.rotation.y = 0
       room.scale.setScalar(1)
+      furnishings.forEach((furnishing) => {
+        furnishing.visible = true
+        furnishing.position.y = 0
+      })
+      shadows.forEach((shadow) => (shadow.visible = true))
+      shadowMaterial.opacity = 0.08
       view.setAnimationLoop(null)
       view.render(world, camera)
     }
@@ -213,19 +262,42 @@ onMounted(async () => {
     if (motionPreference.matches) {
       finishIntro()
     } else {
+      furnishings.forEach((furnishing) => {
+        furnishing.visible = false
+        furnishing.position.y = drop.height
+      })
+      shadows.forEach((shadow) => (shadow.visible = false))
       room.rotation.y = intro.rotation
       room.scale.setScalar(intro.scale)
       view.render(world, camera)
       let start: number | undefined
       view.setAnimationLoop((time) => {
         start ??= time
-        const progress = Math.min((time - start) / intro.duration, 1)
+        const elapsed = time - start
+        const progress = Math.min(elapsed / intro.duration, 1)
         const eased = 1 - (1 - progress) ** 3
         room.rotation.y = intro.rotation * (1 - eased)
         room.scale.setScalar(intro.scale + (1 - intro.scale) * eased)
+        const dropElapsed = elapsed - intro.duration - drop.delay
+        if (dropElapsed >= 0) {
+          const falling = Math.min(dropElapsed / drop.duration, 1)
+          // 前半は加速して落下、着地後は小さく一度だけ跳ねて止まる。
+          const lift =
+            falling < 0.8
+              ? drop.height * (1 - (falling / 0.8) ** 2)
+              : Math.sin(((falling - 0.8) / 0.2) * Math.PI) * 0.12
+          furnishings.forEach((furnishing) => {
+            furnishing.visible = true
+            furnishing.position.y = lift
+          })
+          shadows.forEach((shadow) => (shadow.visible = true))
+          shadowMaterial.opacity = 0.08 * (0.25 + 0.75 * (1 - lift / drop.height))
+          if (falling === 1) {
+            finishIntro?.()
+            return
+          }
+        }
         view.render(world, camera)
-        // 導入後は描画ループを停止し、リサイズ・テーマ変更時のみ再描画する。
-        if (progress === 1) finishIntro?.()
       })
     }
     emit('ready')
@@ -246,23 +318,14 @@ onBeforeUnmount(disposeScene)
       ref="viewport"
       class="room-viewport"
       role="img"
-      aria-label="横長の教室の3D全体図。奥と左に壁があり、左壁にPVスクリーンがあります。"
+      aria-label="教室の3D全体図。長い壁沿いに机5台、左壁のホワイトボードの左隣に机1台、手前に自立式ボードがあり、入口にはスマホを持つ人が立っています。"
     />
-    <div v-if="webglFailed" class="room-fallback">
-      <svg
-        viewBox="0 0 720 500"
-        role="img"
-        aria-label="教室の全体図。奥と左に壁があり、左壁にPVスクリーンがあります。"
-      >
-        <path class="fallback-floor-edge" d="m68 282 382 164 202-126v14L450 460 68 296Z" />
-        <path class="fallback-floor" d="m68 282 202-126 382 164-202 126Z" />
-        <path class="fallback-wall" d="M68 282V146L270 20v136Zm202-126V20l382 164v136Z" />
-        <path class="fallback-trim" d="M68 146 270 20l382 164M68 282l202-126 382 164" />
-        <path class="fallback-frame" d="m123 150 99-61v74l-99 61Z" />
-        <path class="fallback-screen" d="m130 153 85-52v58l-85 52Z" />
-      </svg>
-      <p role="status">3D表示を利用できないため、全体図を表示しています。</p>
-    </div>
+    <BoothMapFallback
+      v-if="webglFailed"
+      :desks="deskPlacements"
+      :visitor="visitorPlacement"
+      :board="boardPlacement"
+    />
   </div>
 </template>
 
@@ -277,8 +340,7 @@ onBeforeUnmount(disposeScene)
   border-radius: 20px;
   background: var(--glass);
 }
-.room-viewport,
-.room-fallback {
+.room-viewport {
   width: 100%;
   height: 100%;
 }
@@ -286,48 +348,5 @@ onBeforeUnmount(disposeScene)
   display: block;
   width: 100%;
   height: 100%;
-}
-.room-fallback {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 16px;
-}
-.room-fallback svg {
-  display: block;
-  width: 100%;
-  min-height: 0;
-}
-.room-fallback p {
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.7;
-  text-align: center;
-}
-.fallback-floor {
-  fill: var(--paper);
-}
-.fallback-wall {
-  fill: var(--peach);
-}
-.fallback-floor-edge {
-  fill: var(--strong);
-}
-.fallback-trim {
-  fill: none;
-  stroke: var(--strong);
-  stroke-width: 5;
-  stroke-linejoin: round;
-}
-.fallback-frame {
-  fill: var(--muted);
-}
-.fallback-screen {
-  fill: var(--glass);
-}
-.fallback-label {
-  fill: var(--muted);
-  font-size: 24px;
-  font-weight: 500;
 }
 </style>
