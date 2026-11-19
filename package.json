@@ -28,25 +28,25 @@
   },
   "dependencies": {
     "@fontsource/noto-sans-jp": "5.3.1",
-    "nuxt": "4.6.3",
+    "nuxt": "4.6.4",
     "three": "0.187.0",
-    "vue": "3.5.44"
+    "vue": "3.5.45"
   },
   "devDependencies": {
     "@nuxt/eslint": "1.17.0",
-    "@nuxt/test-utils": "4.3.4",
-    "@serwist/nuxt": "^9.5.13",
-    "@serwist/vite": "9.5.13",
+    "@nuxt/test-utils": "4.4.0",
+    "@serwist/nuxt": "^9.5.14",
+    "@serwist/vite": "9.5.14",
     "@types/node": "26.6.6",
     "@types/three": "0.187.0",
-    "@vue/test-utils": "2.5.1",
-    "eslint": "10.14.0",
+    "@vue/test-utils": "2.6.0",
+    "eslint": "10.15.0",
     "happy-dom": "21.0.4",
-    "prettier": "3.9.10",
-    "serwist": "9.5.13",
+    "prettier": "3.10.1",
+    "serwist": "9.5.14",
     "typescript": "5.9.3",
     "vitest": "5.1.0",
     "vue-tsc": "3.3.14",
-    "wrangler": "4.156.0"
+    "wrangler": "4.163.0"
   }
 }
