@@ -46,7 +46,7 @@ const filteredExhibitions = computed(() =>
     <PageHeading
       eyebrow="EXHIBITIONS"
       title="展示作品"
-      description="KCSのメンバーが制作しました！"
+      description="KCSのメンバーが制作しました！タップして詳細を確認"
     />
 
     <div v-if="worksError" class="error-card" role="alert">
