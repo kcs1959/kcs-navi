@@ -66,7 +66,7 @@ const todayLabel = computed(() => {
 
 <template>
   <div class="page-content stack crowd-page">
-    <PageHeading title="KCS ブースの混雑状況" />
+    <PageHeading title="来場者数・混雑状況" />
     <CrowdCard
       :stats="data"
       :linked="false"

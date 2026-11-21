@@ -14,7 +14,7 @@ const countWorks = (teamId: number) =>
 
 <template>
   <div class="page-content stack teams-page">
-    <PageHeading eyebrow="KCS TEAMS" title="班紹介" description="KCSの班活動について" />
+    <PageHeading title="班紹介" />
     <div v-if="error" class="error-card" role="alert">
       <p>班の情報を読み込めませんでした。</p>
       <button type="button" class="secondary-button" @click="refresh()">再読み込み</button>
