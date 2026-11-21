@@ -7,25 +7,21 @@ const links = [
   {
     to: '/',
     title: 'ブースマップ',
-    description: '展示作品の配置を確認！',
     icon: '/figma/menu-icon-map.svg',
   },
   {
     to: '/crowd',
-    title: 'ブースの混雑状況',
-    description: '来場者数・混雑度合いをチェックできます',
+    title: '混雑状況・来場者数',
     icon: '/figma/menu-icon-chart-no-axes-column.svg',
   },
   {
     to: '/exhibitions',
-    title: '展示紹介',
-    description: '三田祭に展示されている作品をまとめました',
+    title: '展示作品',
     icon: '/figma/menu-icon-layout-grid.svg',
   },
   {
     to: '/teams',
     title: '班紹介',
-    description: 'KCSの班活動について',
     icon: '/figma/menu-icon-layout-grid.svg',
   },
 ]
@@ -35,7 +31,6 @@ const links = [
   <div class="page-content stack menu-page">
     <header class="menu-heading">
       <div class="page-heading">
-        <p class="eyebrow">MENU</p>
         <h1 id="menu-title">メニュー</h1>
       </div>
       <button
@@ -59,8 +54,7 @@ const links = [
       >
         <img :src="link.icon" alt="" width="24" height="24" />
         <span class="menu-link-text"
-          ><strong>{{ link.title }}</strong
-          ><span>{{ link.description }}</span></span
+          ><strong>{{ link.title }}</strong></span
         >
         <img src="/figma/menu-icon-chevron-right.svg" alt="" width="16" height="16" />
       </NuxtLink>
@@ -165,7 +159,7 @@ const links = [
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 65px;
+  min-height: 52px;
   padding: 14px 0;
   text-decoration: none;
 }
