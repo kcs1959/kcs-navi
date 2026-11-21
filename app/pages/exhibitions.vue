@@ -43,7 +43,10 @@ const filteredExhibitions = computed(() =>
 
 <template>
   <div class="page-content works-page stack">
-    <PageHeading title="展示作品" />
+    <PageHeading
+      title="展示作品"
+      description="KCSのメンバーが制作しました！タップして詳細を確認"
+    />
 
     <div v-if="worksError" class="error-card" role="alert">
       <p>展示情報を読み込めませんでした。</p>

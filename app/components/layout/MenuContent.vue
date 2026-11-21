@@ -11,7 +11,7 @@ const links = [
   },
   {
     to: '/crowd',
-    title: '来場者数・混雑状況',
+    title: '混雑状況・来場者数',
     icon: '/figma/menu-icon-chart-no-axes-column.svg',
   },
   {

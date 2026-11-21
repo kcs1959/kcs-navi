@@ -6,7 +6,7 @@ import { crowdChartBuckets } from '../utils/crowdChart'
 // 画面上の説明表示は絵文字と色による直感的な表示へ置き換えたため削除し、
 // 算出根拠はこのコメントと server/services/checkins.ts の congestionFor に残す。
 
-useHead({ title: '来場者数・混雑状況' })
+useHead({ title: 'ブースの混雑状況' })
 const { data, error, status, refresh } = useCrowdStats()
 const selectedTab = ref<'hourly' | 'daily'>('hourly')
 const chartTitle = computed(() =>
@@ -66,7 +66,7 @@ const todayLabel = computed(() => {
 
 <template>
   <div class="page-content stack crowd-page">
-    <PageHeading title="来場者数・混雑状況" />
+    <PageHeading title="KCS ブースの混雑状況" />
     <CrowdCard
       :stats="data"
       :linked="false"
